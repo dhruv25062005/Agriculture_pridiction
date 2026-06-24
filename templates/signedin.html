@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Smart Agriculture</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================= */
+/* GOOGLE FONT */
+/* ============================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ============================= */
+/* GOOGLE FONT */
+/* ============================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ============================= */
+/* GLOBAL RESET */
+/* ============================= */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  color:#e6edf3;
+  background:#0f172a;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ============================= */
+/* ANIMATED BACKGROUND */
+/* ============================= */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:url("/static/image.jpeg") center/cover no-repeat;
+  z-index:-3;
+  transform:scale(1.1);
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:linear-gradient(120deg,#0f172a 20%,#052e16 60%,#022c22 100%);
+  opacity:.85;
+  z-index:-2;
+}
+
+/* ============================= */
+/* APP WRAPPER */
+/* ============================= */
+.app{
+  min-height:100vh;
+  overflow-y:auto;
+  padding:40px 20px;
+  animation:fadeIn 1.2s ease;
+}
+
+/* ============================= */
+/* HERO SECTION */
+/* ============================= */
+.hero{
+  text-align:center;
+  margin-bottom:50px;
+}
+
+.hero h1{
+  font-size:3.5rem;
+  font-weight:800;
+  background:linear-gradient(90deg,#00ffcc,#00e676,#76ff03,#00ffcc);
+  background-size:300% 300%;
+  -webkit-background-clip:text;
+  color:transparent;
+  animation:gradientMove 6s ease infinite;
+}
+
+.hero p{
+  margin-top:12px;
+  font-size:1.1rem;
+  opacity:.85;
+}
+
+/* ============================= */
+/* STATS SECTION */
+/* ============================= */
+.stats{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-top:35px;
+}
+
+.stat{
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(18px);
+  padding:20px 25px;
+  border-radius:18px;
+  min-width:170px;
+  text-align:center;
+  transition:all .3s ease;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+.stat:hover{
+  transform:translateY(-8px);
+  box-shadow:0 15px 40px rgba(0,255,140,.25);
+}
+
+/* ============================= */
+/* CARD */
+/* ============================= */
+.card{
+  max-width:950px;
+  margin:35px auto;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(20px);
+  border-radius:25px;
+  padding:35px;
+  border:1px solid rgba(255,255,255,.15);
+  transition:all .4s ease;
+}
+
+.card:hover{
+  box-shadow:0 25px 60px rgba(0,255,150,.2);
+  transform:translateY(-6px);
+}
+
+.card h2{
+  margin-bottom:20px;
+  font-weight:600;
+}
+
+/* ============================= */
+/* INPUTS */
+/* ============================= */
+input,select{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.1);
+  color:#fff;
+  margin-bottom:15px;
+  transition:.3s ease;
+}
+
+input:focus,select:focus{
+  outline:none;
+  border-color:#00ffcc;
+  box-shadow:0 0 0 3px rgba(0,255,200,.2);
+  background:rgba(255,255,255,.15);
+}
+
+/* ============================= */
+/* BUTTON */
+/* ============================= */
+button{
+  width:100%;
+  padding:16px;
+  border-radius:50px;
+  border:none;
+  background:linear-gradient(135deg,#00c853,#64dd17);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:12px;
+  transition:all .3s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 35px rgba(0,255,100,.4);
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:20px;
+}
+
+/* ============================= */
+/* DROP ZONE */
+/* ============================= */
+.drop-zone{
+  border:2px dashed rgba(255,255,255,.5);
+  padding:40px;
+  border-radius:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:.3s ease;
+  background:rgba(255,255,255,.05);
+}
+
+.drop-zone:hover{
+  border-color:#00ffcc;
+  background:rgba(0,255,200,.08);
+}
+
+.drop-zone.dragover{
+  border-color:#2ecc71;
+  background:rgba(0,255,120,.1);
+}
+
+#previewImg{
+  display:none;
+  max-width:100%;
+  border-radius:16px;
+  margin-top:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.4);
+}
+
+/* ============================= */
+/* CAMERA */
+/* ============================= */
+video{
+  width:100%;
+  border-radius:20px;
+  margin-top:20px;
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* ============================= */
+/* RESULT BOX */
+/* ============================= */
+.result{
+  margin-top:20px;
+  padding:20px;
+  border-radius:16px;
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(0,255,120,.2);
+}
+
+/* ============================= */
+/* WEATHER WIDGET */
+/* ============================= */
+.weather-widget{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:370px;
+  padding:28px;
+  border-radius:28px;
+  background:rgba(15,23,42,.9);
+  backdrop-filter:blur(25px);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:0 25px 60px rgba(0,0,0,.5);
+  z-index:1000;
+}
+#logout-btn{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: auto; /* VERY IMPORTANT (overrides full width) */
+  padding: 10px 20px;
+  border-radius: 30px;
+  background: linear-gradient(135deg,#ff5252,#ff1744);
+  color: #fff;
+  font-weight: 600;
+  z-index: 2000;
+  box-shadow: 0 10px 25px rgba(255,0,0,0.4);
+  transition: 0.3s ease;
+}
+
+#logout-btn:hover{
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(255,0,0,0.6);
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+
+  <!-- ✅ LOGOUT BUTTON -->
+<a href="http://127.0.0.1:8080/template">
+  <button id="logout-btn">🚪 Logout</button>
+</a>
+<div class="hero">
+  <h1>🌱 AI Smart Agriculture</h1>
+  <p>Smart Farming • Disease Detection • AI Powered</p>
+
+  <div class="stats">
+    <div class="stat">🧠 Deep Learning</div>
+    <div class="stat">🌦️ Weather Aware</div>
+    <div class="stat">🚜 Smart Farming</div>
+  </div>
+</div>
+
+<!-- DISEASE -->
+<div class="card">
+<h2>🦠 Plant Disease Detection</h2>
+
+<form id="predictForm" enctype="multipart/form-data">
+
+<div id="dropZone" class="drop-zone">
+  Click or Drop Leaf Image
+  <input type="file" id="imageInput" name="image" hidden required>
+  <img id="previewImg">
+</div>
+
+<button type="button" onclick="openCamera()">📷 Open Camera</button>
+<video id="camera" hidden autoplay></video>
+<button type="button" id="captureBtn" hidden onclick="captureImage()">📸 Capture</button>
+
+<select name="method">
+  <option>Chemical</option>
+  <option>Organic</option>
+</select>
+
+<button type="submit">Analyze</button>
+</form>
+
+<div id="diseaseResult"></div>
+</div>
+
+<!-- CROP -->
+<div class="card">
+<h2>🌾 Crop Recommendation</h2>
+<div class="grid">
+<input id="temp" placeholder="Temperature (°C)">
+<input id="rainfall" placeholder="Rainfall (mm)">
+</div>
+<button onclick="recommendCrop()">Recommend</button>
+<div id="cropResult"></div>
+</div>
+
+<!-- FERTILIZER -->
+<div class="card">
+<h2>🧪 Fertilizer Advice</h2>
+<div class="grid">
+<input id="N" placeholder="Nitrogen">
+<input id="P" placeholder="Phosphorus">
+<input id="K" placeholder="Potassium">
+</div>
+<button onclick="fertilizerAdvice()">Get Advice</button>
+<div id="fertilizerResult"></div>
+</div>
+
+<!-- YIELD -->
+<div class="card">
+<h2>📈 Yield Prediction</h2>
+<input id="humidity" placeholder="Humidity (%)">
+<button onclick="predictYield()">Predict</button>
+<div id="yieldResult"></div>
+</div>
+
+</div>
+
+<!-- WEATHER -->
+<div class="weather-widget">
+
+  <div class="weather-header">
+    <div class="weather-icon" id="weatherIcon">🌤</div>
+    <div>
+      <h2 id="temperature">--°C</h2>
+      <p id="cityName">Enter City</p>
+    </div>
+  </div>
+
+  <div class="weather-search">
+    <input type="text" id="cityInput" placeholder="Enter city name (e.g. Delhi)">
+    <button onclick="getWeather()">Check</button>
+  </div>
+
+  <div class="weather-info">
+    <div class="info-box">
+      🌬 <span id="wind">-- km/h</span>
+    </div>
+    <div class="info-box">
+      🌥 <span id="condition">--</span>
+    </div>
+  </div>
+
+</div>
+
+
+
+<script>
+async function getWeather(){
+  const city = document.getElementById("cityInput").value.trim();
+
+  if(city === ""){
+    alert("Enter city name");
+    return;
+  }
+
+  try{
+    document.getElementById("temperature").innerText = "Loading...";
+    document.getElementById("cityName").innerText = city;
+
+    // STEP 1: Get Coordinates
+    const geoRes = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
+    );
+    const geoData = await geoRes.json();
+
+    if(!geoData.results || geoData.results.length === 0){
+      alert("City not found!");
+      return;
+    }
+
+    const { latitude, longitude, country } = geoData.results[0];
+
+    // STEP 2: Get Weather (FIXED URL - single line)
+    const weatherRes = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,pressure_msl,visibility,apparent_temperature`
+    );
+
+    const weatherData = await weatherRes.json();
+
+    const current = weatherData.current_weather;
+    const hourly = weatherData.hourly;
+
+    const temp = current.temperature;
+    const wind = current.windspeed;
+    const code = current.weathercode;
+
+    const humidity = hourly.relativehumidity_2m[0];
+    const pressure = hourly.pressure_msl[0];
+    const visibility = hourly.visibility[0] / 1000;
+    const feelsLike = hourly.apparent_temperature[0];
+
+    document.getElementById("temperature").innerText = temp + "°C";
+    document.getElementById("wind").innerText = wind + " km/h";
+    document.getElementById("cityName").innerText = city + ", " + country;
+
+    document.getElementById("condition").innerText =
+      `Feels: ${feelsLike}°C | 💧 ${humidity}% | 📊 ${pressure} hPa | 👁 ${visibility} km`;
+
+function setWeatherIcon(code){
+  const icon = document.getElementById("weatherIcon");
+
+  if(code === 0) icon.innerHTML="☀️";
+  else if(code <= 3) icon.innerHTML="🌤️";
+  else if(code <= 48) icon.innerHTML="☁️";
+  else if(code <= 67) icon.innerHTML="🌧️";
+  else if(code <= 77) icon.innerHTML="❄️";
+  else icon.innerHTML="⛈️";
+}
+
+  }catch(error){
+    console.error(error);
+    alert("Weather service failed");
+  }
+}
+
+
+</script>
+
+
+<script>
+/* ---------- IMAGE UPLOAD ---------- */
+const dropZone=document.getElementById("dropZone");
+const imageInput=document.getElementById("imageInput");
+const previewImg=document.getElementById("previewImg");
+
+dropZone.onclick=()=>imageInput.click();
+dropZone.ondragover=e=>{e.preventDefault();dropZone.classList.add("dragover")};
+dropZone.ondragleave=()=>dropZone.classList.remove("dragover");
+dropZone.ondrop=e=>{
+  e.preventDefault();
+  imageInput.files=e.dataTransfer.files;
+  preview();
+};
+
+imageInput.onchange=preview;
+function preview(){
+  const file=imageInput.files[0];
+  if(!file) return;
+  previewImg.src=URL.createObjectURL(file);
+  previewImg.style.display="block";
+}
+
+/* ---------- CAMERA ---------- */
+let stream=null;
+async function openCamera(){
+  stream=await navigator.mediaDevices.getUserMedia({video:true});
+  camera.srcObject=stream;
+  camera.hidden=false;
+  captureBtn.hidden=false;
+}
+function captureImage(){
+  const c=document.createElement("canvas");
+  c.width=camera.videoWidth;
+  c.height=camera.videoHeight;
+  c.getContext("2d").drawImage(camera,0,0);
+  c.toBlob(b=>{
+    const f=new File([b],"leaf.png",{type:"image/png"});
+    const dt=new DataTransfer();
+    dt.items.add(f);
+    imageInput.files=dt.files;
+    preview();
+  });
+  stream.getTracks().forEach(t=>t.stop());
+  camera.hidden=true;
+  captureBtn.hidden=true;
+}
+
+/* ---------- BACKEND CALLS ---------- */
+predictForm.onsubmit=async e=>{
+  e.preventDefault();
+  diseaseResult.innerHTML="⏳ Analyzing...";
+  const res=await fetch("/predict",{method:"POST",body:new FormData(predictForm)});
+  const d=await res.json();
+  diseaseResult.innerHTML=`<div class="result">Disease: ${d.disease}<br>Treatment: ${d.treatment}</div>`;
+};
+
+async function recommendCrop(){
+  const r=await fetch("/recommend_crop",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({temp:temp.value,rainfall:rainfall.value})});
+  cropResult.innerHTML=`<div class="result">${(await r.json()).crop}</div>`;
+}
+
+async function fertilizerAdvice(){
+  const r=await fetch("/fertilizer_advice",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({N:N.value,P:P.value,K:K.value})});
+  fertilizerResult.innerHTML=`<div class="result">${(await r.json()).advice}</div>`;
+}
+
+async function predictYield(){
+  const r=await fetch("/predict_yield",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({humidity:humidity.value})});
+  yieldResult.innerHTML=`<div class="result">Yield Index: ${(await r.json()).yield_index}</div>`;
+}
+
+/* ---------- WEATHER ---------- */
+const WEATHER_API_KEY="PUT_YOUR_API_KEY_HERE";
+
+function loadWeather(){
+  weatherText.innerText="⏳ Loading...";
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const {latitude,longitude}=pos.coords;
+    const res=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`);
+    const d=await res.json();
+    weatherText.innerText=`🌦️ ${d.main.temp}°C | ${d.weather[0].main}`;
+  },()=>weatherText.innerText="Location blocked");
+}
+</script>
+<script src="/static/signout.js"></script>
+</body>
+</html>
