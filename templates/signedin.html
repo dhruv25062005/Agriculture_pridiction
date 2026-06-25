@@ -543,26 +543,94 @@ function captureImage(){
 }
 
 /* ---------- BACKEND CALLS ---------- */
-predictForm.onsubmit=async e=>{
-  e.preventDefault();
-  diseaseResult.innerHTML="⏳ Analyzing...";
-  const res=await fetch("/predict",{method:"POST",body:new FormData(predictForm)});
-  const d=await res.json();
-  diseaseResult.innerHTML=`<div class="result">Disease: ${d.disease}<br>Treatment: ${d.treatment}</div>`;
+predictForm.onsubmit = async (e) => {
+    e.preventDefault();
+
+    if (imageInput.files.length === 0) {
+        alert("Please upload or capture a leaf image first.");
+        return;
+    }
+
+    diseaseResult.innerHTML = "⏳ Analyzing...";
+
+    try {
+        const res = await fetch("/predict", {
+            method: "POST",
+            credentials: "include",
+            body: new FormData(predictForm)
+        });
+
+        const d = await res.json();
+
+        if (!res.ok) {
+            diseaseResult.innerHTML = `
+                <div class="result">
+                    ❌ ${d.error || "Prediction failed"}
+                </div>`;
+            return;
+        }
+
+        diseaseResult.innerHTML = `
+            <div class="result">
+                <b>Disease:</b> ${d.disease}<br>
+                <b>Confidence:</b> ${d.confidence}%<br>
+                <b>Treatment:</b> ${d.treatment}
+            </div>`;
+
+    } catch (err) {
+        console.error(err);
+
+        diseaseResult.innerHTML = `
+            <div class="result">
+                ❌ Server connection failed
+            </div>`;
+    }
 };
 
 async function recommendCrop(){
-  const r=await fetch("/recommend_crop",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({temp:temp.value,rainfall:rainfall.value})});
+const r = await fetch("/recommend_crop",{
+    method:"POST",
+    credentials:"include",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+        temp:temp.value,
+        rainfall:rainfall.value
+    })
+});
   cropResult.innerHTML=`<div class="result">${(await r.json()).crop}</div>`;
 }
 
 async function fertilizerAdvice(){
-  const r=await fetch("/fertilizer_advice",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({N:N.value,P:P.value,K:K.value})});
+const r = await fetch("/fertilizer_advice",{
+    method:"POST",
+    credentials:"include",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+        N:N.value,
+        P:P.value,
+        K:K.value
+    })
+});
   fertilizerResult.innerHTML=`<div class="result">${(await r.json()).advice}</div>`;
 }
 
 async function predictYield(){
-  const r=await fetch("/predict_yield",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({humidity:humidity.value})});
+const r = await fetch("/predict_yield",{
+    method:"POST",
+    credentials:"include",
+    headers:{
+        "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+    temp: temp.value,
+    rainfall: rainfall.value,
+    humidity: humidity.value
+     })
+     });
   yieldResult.innerHTML=`<div class="result">Yield Index: ${(await r.json()).yield_index}</div>`;
 }
 
