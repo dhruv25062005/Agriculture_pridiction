@@ -13,11 +13,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
 /* ============================= */
-/* GOOGLE FONT */
-/* ============================= */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
-/* ============================= */
 /* GLOBAL RESET */
 /* ============================= */
 *{
@@ -295,6 +290,17 @@ video{
   transform: scale(1.05);
   box-shadow: 0 15px 35px rgba(255,0,0,0.6);
 }
+
+.weather-header{display:flex;align-items:center;gap:15px;margin-bottom:15px}
+.weather-search{display:flex;gap:10px;margin:15px 0}
+.weather-search input{margin:0}
+.weather-search button{width:auto;padding:12px 18px;margin:0}
+.weather-info{display:grid;gap:10px}
+.info-box{background:rgba(255,255,255,.08);padding:10px;border-radius:12px}
+.weather-icon{font-size:48px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
 </style>
 
 </head>
@@ -305,7 +311,7 @@ video{
 
 
   <!-- ✅ LOGOUT BUTTON -->
-<a href="http://127.0.0.1:8080/template">
+<a href="/template">
   <button id="logout-btn">🚪 Logout</button>
 </a>
 <div class="hero">
@@ -460,6 +466,8 @@ async function getWeather(){
     document.getElementById("condition").innerText =
       `Feels: ${feelsLike}°C | 💧 ${humidity}% | 📊 ${pressure} hPa | 👁 ${visibility} km`;
 
+    setWeatherIcon(code);
+
 function setWeatherIcon(code){
   const icon = document.getElementById("weatherIcon");
 
@@ -507,10 +515,14 @@ function preview(){
 /* ---------- CAMERA ---------- */
 let stream=null;
 async function openCamera(){
-  stream=await navigator.mediaDevices.getUserMedia({video:true});
-  camera.srcObject=stream;
-  camera.hidden=false;
-  captureBtn.hidden=false;
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:true});
+    camera.srcObject=stream;
+    camera.hidden=false;
+    captureBtn.hidden=false;
+  }catch(e){
+    alert("Camera permission denied.");
+  }
 }
 function captureImage(){
   const c=document.createElement("canvas");
@@ -527,6 +539,7 @@ function captureImage(){
   stream.getTracks().forEach(t=>t.stop());
   camera.hidden=true;
   captureBtn.hidden=true;
+  camera.srcObject=null;
 }
 
 /* ---------- BACKEND CALLS ---------- */
@@ -553,18 +566,6 @@ async function predictYield(){
   yieldResult.innerHTML=`<div class="result">Yield Index: ${(await r.json()).yield_index}</div>`;
 }
 
-/* ---------- WEATHER ---------- */
-const WEATHER_API_KEY="PUT_YOUR_API_KEY_HERE";
-
-function loadWeather(){
-  weatherText.innerText="⏳ Loading...";
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const {latitude,longitude}=pos.coords;
-    const res=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`);
-    const d=await res.json();
-    weatherText.innerText=`🌦️ ${d.main.temp}°C | ${d.weather[0].main}`;
-  },()=>weatherText.innerText="Location blocked");
-}
 </script>
 <script src="/static/signout.js"></script>
 </body>
