@@ -17,18 +17,23 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
 # SESSION COOKIE CONFIG (IMPORTANT)
 # ===============================
 app.config.update(
-    SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=False  # set True only when using HTTPS
+    SESSION_COOKIE_SAMESITE="None",
+    SESSION_COOKIE_SECURE=True
 )
 
 # ===============================
 # CORS (Firebase + fetch + cookies)
 # ===============================
 from flask_cors import CORS
+
 CORS(
     app,
     supports_credentials=True,
-    resources={r"/*": {"origins": ["http://127.0.0.1:8080", "http://localhost:8080"]}}
+    origins=[
+        "https://agriculture-pridiction-laeb.onrender.com",
+        "http://127.0.0.1:8080",
+        "http://localhost:8080"
+    ]
 )
 
 # ===============================
@@ -48,8 +53,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 MODEL_PATH = os.path.join(BASE_DIR, "model", "disease_model.pkl")
 LABEL_PATH = os.path.join(BASE_DIR, "model", "class_names.json")
-model = load(MODEL_PATH)
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError(f"Model not found: {MODEL_PATH}")
 
+model = load(MODEL_PATH)
 with open(LABEL_PATH, "r") as f:
     class_names = json.load(f)
 
@@ -143,42 +150,71 @@ def template():
 # ===============================
 @app.route("/predict", methods=["POST"])
 def predict():
+
+    # Check if user is logged in
     if "user" not in session:
         return jsonify({"error": "Unauthorized"}), 401
 
-    if "image" not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
+    # Get uploaded image
+    file = request.files.get("image")
 
-    file = request.files["image"]
+    if file is None:
+        return jsonify({
+            "error": "Image missing"
+        }), 400
+
+    if file.filename == "":
+        return jsonify({
+            "error": "No image selected"
+        }), 400
+
+    # Get treatment method
     method = request.form.get("method", "Chemical")
 
     try:
+        # Read image
         image = Image.open(io.BytesIO(file.read())).convert("RGB")
-    except Exception:
-        return jsonify({"error": "Invalid image"}), 400
 
-    features = extract_features(image)
-    idx = int(model.predict(features)[0])
-    disease = class_names[idx]
+        # Extract features
+        features = extract_features(image)
 
-    if hasattr(model, "decision_function"):
-        score = np.max(model.decision_function(features))
-        confidence = round(min(95, 60 + abs(score) * 10), 2)
-    else:
-        confidence = 90.0
+        # Predict disease
+        idx = int(model.predict(features)[0])
+        disease = class_names[idx]
 
-    treatment = (
-        ORGANIC_DB.get(disease, "Neem oil recommended")
-        if method == "Organic"
-        else CHEMICAL_DB.get(disease, "Consult agriculture expert")
-    )
+        # Calculate confidence
+        if hasattr(model, "decision_function"):
+            score = np.max(model.decision_function(features))
+            confidence = round(min(95, 60 + abs(score) * 10), 2)
+        else:
+            confidence = 90.0
 
-    return jsonify({
-        "disease": disease,
-        "confidence": confidence,
-        "treatment": treatment
-    })
+        # Select treatment
+        if method == "Organic":
+            treatment = ORGANIC_DB.get(
+                disease,
+                "Neem oil recommended"
+            )
+        else:
+            treatment = CHEMICAL_DB.get(
+                disease,
+                "Consult agriculture expert"
+            )
 
+        return jsonify({
+            "success": True,
+            "disease": disease,
+            "confidence": confidence,
+            "treatment": treatment
+        })
+
+    except Exception as e:
+        print("Prediction Error:", e)
+
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 # ===============================
 # 🌾 CROP RECOMMENDATION
 # ===============================
@@ -255,8 +291,12 @@ def weather():
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
     r = requests.get(url, timeout=5)
-    data = r.json()
+    if r.status_code != 200:
+           return jsonify({
+        "error":"Weather API failed"
+    }),500
 
+    data = r.json()
     return jsonify({
         "city": city,
         "temperature": data["main"]["temp"],
