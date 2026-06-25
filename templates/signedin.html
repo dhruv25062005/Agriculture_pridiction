@@ -333,7 +333,7 @@ video{
 
 <div id="dropZone" class="drop-zone">
   Click or Drop Leaf Image
-  <input type="file" id="imageInput" name="image" hidden>
+  <input type="file" id="imageInput" name="image" hidden >
   <img id="previewImg">
 </div>
 
@@ -546,10 +546,16 @@ function captureImage(){
 predictForm.onsubmit = async (e) => {
     e.preventDefault();
 
-    if (imageInput.files.length === 0) {
+    console.log("Files:", imageInput.files);
+    console.log("Length:", imageInput.files.length);
+    console.log("First file:", imageInput.files[0]);
+
+    if (!imageInput.files || imageInput.files.length === 0) {
         alert("Please upload or capture a leaf image first.");
         return;
     }
+
+    // rest of your code...
 
     diseaseResult.innerHTML = "⏳ Analyzing...";
 
