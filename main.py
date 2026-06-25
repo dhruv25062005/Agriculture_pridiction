@@ -44,9 +44,10 @@ from PIL import Image
 # ML CONFIG
 # ===============================
 IMG_SIZE = 96
-MODEL_PATH = "model/disease_model.pkl"
-LABEL_PATH = "model/class_names.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+MODEL_PATH = os.path.join(BASE_DIR, "model", "disease_model.pkl")
+LABEL_PATH = os.path.join(BASE_DIR, "model", "class_names.json")
 model = load(MODEL_PATH)
 
 with open(LABEL_PATH, "r") as f:
@@ -303,4 +304,5 @@ def server_error(e):
 # RUN SERVER
 # ===============================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=False)
