@@ -2,645 +2,2284 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Smart Agriculture</title>
+<title>AI Smart Agriculture • Farm Intelligence Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-/* ============================= */
-/* GOOGLE FONT */
-/* ============================= */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-
-/* ============================= */
-/* GLOBAL RESET */
-/* ============================= */
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Poppins',sans-serif;
+/* ======================================================== */
+/* DESIGN SYSTEM & 3D ENVIRONMENT                           */
+/* ======================================================== */
+:root {
+  --bg-base: #071510;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #064e3b 0%, #03271d 45%, #02140f 100%);
+  --card-bg: rgba(255, 255, 255, 0.055);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --card-hover-border: rgba(0, 255, 170, 0.38);
+  --accent-green: #00e676;
+  --accent-cyan: #00ffcc;
+  --accent-gold: #fbbf24;
+  --accent-red: #f87171;
+  --text-main: #f0fdf4;
+  --text-muted: #94a3b8;
+  --glass-blur: blur(20px);
 }
 
-html{
-  scroll-behavior:smooth;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
-body{
-  min-height:100vh;
-  color:#e6edf3;
-  background:#0f172a;
-  overflow-x:hidden;
-  position:relative;
+html {
+  scroll-behavior: smooth;
 }
 
-/* ============================= */
-/* ANIMATED BACKGROUND */
-/* ============================= */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:url("/static/image.jpeg") center/cover no-repeat;
-  z-index:-3;
-  transform:scale(1.1);
+body {
+  min-height: 100vh;
+  color: var(--text-main);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  position: relative;
 }
 
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:linear-gradient(120deg,#0f172a 20%,#052e16 60%,#022c22 100%);
-  opacity:.85;
-  z-index:-2;
-}
-
-/* ============================= */
-/* APP WRAPPER */
-/* ============================= */
-.app{
-  min-height:100vh;
-  overflow-y:auto;
-  padding:40px 20px;
-  animation:fadeIn 1.2s ease;
-}
-
-/* ============================= */
-/* HERO SECTION */
-/* ============================= */
-.hero{
-  text-align:center;
-  margin-bottom:50px;
-}
-
-.hero h1{
-  font-size:3.5rem;
-  font-weight:800;
-  background:linear-gradient(90deg,#00ffcc,#00e676,#76ff03,#00ffcc);
-  background-size:300% 300%;
-  -webkit-background-clip:text;
-  color:transparent;
-  animation:gradientMove 6s ease infinite;
-}
-
-.hero p{
-  margin-top:12px;
-  font-size:1.1rem;
-  opacity:.85;
-}
-
-/* ============================= */
-/* STATS SECTION */
-/* ============================= */
-.stats{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  flex-wrap:wrap;
-  margin-top:35px;
-}
-
-.stat{
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(18px);
-  padding:20px 25px;
-  border-radius:18px;
-  min-width:170px;
-  text-align:center;
-  transition:all .3s ease;
-  border:1px solid rgba(255,255,255,.15);
-}
-
-.stat:hover{
-  transform:translateY(-8px);
-  box-shadow:0 15px 40px rgba(0,255,140,.25);
-}
-
-/* ============================= */
-/* CARD */
-/* ============================= */
-.card{
-  max-width:950px;
-  margin:35px auto;
-  background:rgba(255,255,255,.07);
-  backdrop-filter:blur(20px);
-  border-radius:25px;
-  padding:35px;
-  border:1px solid rgba(255,255,255,.15);
-  transition:all .4s ease;
-}
-
-.card:hover{
-  box-shadow:0 25px 60px rgba(0,255,150,.2);
-  transform:translateY(-6px);
-}
-
-.card h2{
-  margin-bottom:20px;
-  font-weight:600;
-}
-
-/* ============================= */
-/* INPUTS */
-/* ============================= */
-input,select{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.2);
-  background:rgba(255,255,255,.1);
-  color:#fff;
-  margin-bottom:15px;
-  transition:.3s ease;
-}
-
-input:focus,select:focus{
-  outline:none;
-  border-color:#00ffcc;
-  box-shadow:0 0 0 3px rgba(0,255,200,.2);
-  background:rgba(255,255,255,.15);
-}
-
-/* ============================= */
-/* BUTTON */
-/* ============================= */
-button{
-  width:100%;
-  padding:16px;
-  border-radius:50px;
-  border:none;
-  background:linear-gradient(135deg,#00c853,#64dd17);
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-  margin-top:12px;
-  transition:all .3s ease;
-  position:relative;
-  overflow:hidden;
-}
-
-button:hover{
-  transform:translateY(-3px);
-  box-shadow:0 15px 35px rgba(0,255,100,.4);
-}
-
-button:active{
-  transform:scale(.97);
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:20px;
-}
-
-/* ============================= */
-/* DROP ZONE */
-/* ============================= */
-.drop-zone{
-  border:2px dashed rgba(255,255,255,.5);
-  padding:40px;
-  border-radius:20px;
-  text-align:center;
-  cursor:pointer;
-  transition:.3s ease;
-  background:rgba(255,255,255,.05);
-}
-
-.drop-zone:hover{
-  border-color:#00ffcc;
-  background:rgba(0,255,200,.08);
-}
-
-.drop-zone.dragover{
-  border-color:#2ecc71;
-  background:rgba(0,255,120,.1);
-}
-
-#previewImg{
-  display:none;
-  max-width:100%;
-  border-radius:16px;
-  margin-top:20px;
-  box-shadow:0 20px 40px rgba(0,0,0,.4);
-}
-
-/* ============================= */
-/* CAMERA */
-/* ============================= */
-video{
-  width:100%;
-  border-radius:20px;
-  margin-top:20px;
-  box-shadow:0 20px 50px rgba(0,0,0,.4);
-}
-
-.hidden{
-  display:none !important;
-}
-
-/* ============================= */
-/* RESULT BOX */
-/* ============================= */
-.result{
-  margin-top:20px;
-  padding:20px;
-  border-radius:16px;
-  background:rgba(0,0,0,.4);
-  border:1px solid rgba(0,255,120,.2);
-}
-
-/* ============================= */
-/* WEATHER WIDGET */
-/* ============================= */
-.weather-widget{
-  position:fixed;
-  bottom:30px;
-  right:30px;
-  width:370px;
-  padding:28px;
-  border-radius:28px;
-  background:rgba(15,23,42,.9);
-  backdrop-filter:blur(25px);
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 25px 60px rgba(0,0,0,.5);
-  z-index:1000;
-}
-#logout-btn{
+/* Background subtle ambient orbs */
+.bg-ambient-orb {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: auto; /* VERY IMPORTANT (overrides full width) */
-  padding: 10px 20px;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.16;
+}
+.orb-left {
+  width: 450px;
+  height: 450px;
+  background: #00e676;
+  top: 5%;
+  left: -150px;
+}
+.orb-right {
+  width: 500px;
+  height: 500px;
+  background: #00ffcc;
+  top: 40%;
+  right: -180px;
+}
+
+/* ======================================================== */
+/* TOP NAVIGATION BAR                                       */
+/* ======================================================== */
+.top-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 30px;
+  background: rgba(4, 20, 15, 0.78);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  font-size: 28px;
+  animation: pulseLeaf 3s ease-in-out infinite;
+}
+
+@keyframes pulseLeaf {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+}
+
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #ffffff, #a7f3d0, #00e676);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Language selector */
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 30px;
-  background: linear-gradient(135deg,#ff5252,#ff1744);
+  padding: 6px 14px;
+}
+
+.lang-selector select {
+  background: transparent;
+  border: none;
+  color: #00ffcc;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.lang-selector select option {
+  background: #062b21;
+  color: #fff;
+}
+
+/* 3D Logout Button */
+.logout-btn-nav {
+  padding: 8px 22px;
+  border-radius: 30px;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   color: #fff;
   font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logout-btn-nav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+}
+
+/* Firebase Cloud Badge & Pulse */
+.firebase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.15);
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #34d399;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+  70% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+  100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+.plot-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* ======================================================== */
+/* QUICK SECTION NAV PILLS                                  */
+/* ======================================================== */
+.nav-pills-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-pill {
+  padding: 8px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-pill:hover, .nav-pill.active {
+  background: rgba(0, 230, 118, 0.18);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 255, 170, 0.2);
+}
+
+/* ======================================================== */
+/* HERO SECTION                                             */
+/* ======================================================== */
+.hero-section {
+  text-align: center;
+  padding: 35px 20px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 30px;
+  background: rgba(0, 255, 204, 0.12);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  color: var(--accent-cyan);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 15px rgba(0, 255, 204, 0.15);
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #ffffff 10%, #a7f3d0 45%, #00e676 80%, #00ffcc 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 12px;
+}
+
+.hero-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 780px;
+  margin: 0 auto 30px;
+  line-height: 1.6;
+}
+
+/* STATS BANNER */
+.stats-banner {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.stat-3d {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  padding: 16px 24px;
+  min-width: 190px;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-3d:hover {
+  transform: translateY(-2px);
+  border-color: var(--card-hover-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.stat-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #00ffcc;
+  display: block;
+}
+
+.stat-lbl {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ======================================================== */
+/* CARDS & MODULES CONTAINER                                */
+/* ======================================================== */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+}
+
+.card-3d {
+  background: var(--card-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 24px;
+  padding: 36px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-3d:hover {
+  border-color: var(--card-hover-border);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.shine-layer {
+  display: none;
+}
+
+.card-header-3d {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+}
+
+.card-title-group h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-title-group p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.card-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(0, 230, 118, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+/* ======================================================== */
+/* INPUT ELEMENTS & GRIDS                                   */
+/* ======================================================== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media(max-width: 860px) {
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(15, 23, 42, 0.6);
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.22);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+/* Primary Action Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 50px;
+  border: none;
+  background: linear-gradient(135deg, #00c853, #00e676, #00ffcc);
+  color: #022c22;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.35);
+  margin-top: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 15px 45px rgba(0, 255, 170, 0.55);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* ======================================================== */
+/* MODULE 1: AI PLANT DOCTOR & SCANNER                      */
+/* ======================================================== */
+.drop-zone {
+  border: 2px dashed rgba(0, 255, 204, 0.4);
+  padding: 35px 20px;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(0, 255, 204, 0.03);
+  margin-bottom: 16px;
+}
+
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--accent-green);
+  background: rgba(0, 230, 118, 0.1);
+  transform: translateY(-2px);
+}
+
+.drop-icon {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+#previewImg {
+  display: none;
+  max-width: 280px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin: 15px auto 0;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--accent-cyan);
+}
+
+video#camera {
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin: 15px 0;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 204, 0.5);
+}
+
+/* 3D DIAGNOSIS RESULT BOX */
+.diagnosis-result-card {
+  margin-top: 25px;
+  padding: 28px;
+  border-radius: 22px;
+  background: rgba(6, 32, 24, 0.85);
+  border: 1px solid rgba(0, 255, 170, 0.3);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+  animation: slideUpFade 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.diagnosis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 14px;
+}
+
+.disease-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.disease-plant {
+  font-size: 0.95rem;
+  color: var(--accent-cyan);
+}
+
+.severity-pill {
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sev-healthy { background: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676; }
+.sev-mild { background: rgba(250, 204, 21, 0.2); color: #facc15; border: 1px solid #facc15; }
+.sev-moderate { background: rgba(251, 146, 60, 0.2); color: #fb923c; border: 1px solid #fb923c; }
+.sev-critical { background: rgba(248, 113, 113, 0.25); color: #f87171; border: 1px solid #f87171; }
+
+.treatment-box {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin: 15px 0;
+  border-left: 4px solid var(--accent-green);
+}
+
+.treatment-box h4 {
+  font-size: 0.95rem;
+  color: var(--accent-cyan);
+  margin-bottom: 6px;
+}
+
+.protocol-list {
+  list-style: none;
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.protocol-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+}
+
+.btn-tts {
+  background: rgba(0, 255, 204, 0.15);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-tts:hover {
+  background: var(--accent-cyan);
+  color: #022c22;
+}
+
+/* ======================================================== */
+/* MODULE 2: PLOT FERTILIZER & SOIL HEALTH                  */
+/* ======================================================== */
+.fert-output-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+@media(max-width: 768px) {
+  .fert-output-grid { grid-template-columns: 1fr; }
+}
+
+.fert-bag-card {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.fert-bag-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.bag-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent-green);
+}
+
+.bag-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.soil-ph-gauge {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ======================================================== */
+/* MODULE 3: WEATHER & SPRAY ADVISORY                       */
+/* ======================================================== */
+.weather-hero-card {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 25px;
+  align-items: center;
+}
+
+@media(max-width: 860px) {
+  .weather-hero-card { grid-template-columns: 1fr; }
+}
+
+.weather-orb-container {
+  text-align: center;
+  padding: 25px;
+  background: radial-gradient(circle, rgba(0, 230, 118, 0.15) 0%, rgba(255, 255, 255, 0.02) 70%);
+  border-radius: 24px;
+  border: 1px solid rgba(0, 255, 170, 0.2);
+}
+
+.weather-orb-icon {
+  font-size: 64px;
+  filter: drop-shadow(0 10px 20px rgba(0, 255, 170, 0.3));
+}
+
+.weather-temp-big {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.spray-alert-box {
+  padding: 20px 24px;
+  border-radius: 18px;
+  margin-top: 15px;
+  border-left: 5px solid;
+}
+
+.spray-safe {
+  background: rgba(0, 230, 118, 0.15);
+  border-color: #00e676;
+}
+.spray-caution {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: #fbbf24;
+}
+.spray-unsafe {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+}
+
+/* ======================================================== */
+/* MODULE 4: COMMODITY MANDI & PROFIT                       */
+/* ======================================================== */
+.mandi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 15px;
+}
+
+.commodity-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.commodity-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+}
+
+.commodity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.commodity-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-green);
+}
+
+.trend-up { color: #34d399; }
+.trend-down { color: #f87171; }
+.trend-stable { color: #38bdf8; }
+
+.profit-summary-card {
+  background: rgba(6, 40, 30, 0.8);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(0, 255, 170, 0.3);
+  margin-top: 20px;
+}
+
+/* ======================================================== */
+/* MODULE 6: SCAN JOURNAL                                   */
+/* ======================================================== */
+.journal-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  transition: all 0.25s ease;
+}
+
+.journal-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 255, 204, 0.3);
+  transform: translateX(4px);
+}
+
+/* Voice Toast Floating Status */
+.voice-toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(6, 32, 24, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--accent-cyan);
+  padding: 12px 24px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
   z-index: 2000;
-  box-shadow: 0 10px 25px rgba(255,0,0,0.4);
-  transition: 0.3s ease;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-#logout-btn:hover{
-  transform: scale(1.05);
-  box-shadow: 0 15px 35px rgba(255,0,0,0.6);
+.voice-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
-.weather-header{display:flex;align-items:center;gap:15px;margin-bottom:15px}
-.weather-search{display:flex;gap:10px;margin:15px 0}
-.weather-search input{margin:0}
-.weather-search button{width:auto;padding:12px 18px;margin:0}
-.weather-info{display:grid;gap:10px}
-.info-box{background:rgba(255,255,255,.08);padding:10px;border-radius:12px}
-.weather-icon{font-size:48px}
-@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.voice-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
 
+.voice-wave .bar {
+  width: 3px;
+  height: 100%;
+  background: var(--accent-cyan);
+  border-radius: 3px;
+  animation: wavePulse 1s ease-in-out infinite;
+}
+
+.voice-wave .bar:nth-child(2) { animation-delay: 0.2s; height: 70%; }
+.voice-wave .bar:nth-child(3) { animation-delay: 0.4s; height: 90%; }
+.voice-wave .bar:nth-child(4) { animation-delay: 0.1s; height: 50%; }
+
+@keyframes wavePulse {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.hidden { display: none !important; }
 </style>
-
 </head>
 
 <body>
 
-<div class="app">
+<!-- Ambient background orbs -->
+<div class="bg-ambient-orb orb-left"></div>
+<div class="bg-ambient-orb orb-right"></div>
 
-
-  <!-- ✅ LOGOUT BUTTON -->
-<a href="/template">
-  <button id="logout-btn">🚪 Logout</button>
-</a>
-<div class="hero">
-  <h1>🌱 AI Smart Agriculture</h1>
-  <p>Smart Farming • Disease Detection • AI Powered</p>
-
-  <div class="stats">
-    <div class="stat">🧠 Deep Learning</div>
-    <div class="stat">🌦️ Weather Aware</div>
-    <div class="stat">🚜 Smart Farming</div>
-  </div>
-</div>
-
-<!-- DISEASE -->
-<div class="card">
-<h2>🦠 Plant Disease Detection</h2>
-
-<form id="predictForm" enctype="multipart/form-data">
-
-<div id="dropZone" class="drop-zone">
-  Click or Drop Leaf Image
-  <input type="file" id="imageInput" name="image" hidden >
-  <img id="previewImg">
-</div>
-
-<button type="button" onclick="openCamera()">📷 Open Camera</button>
-<video id="camera" hidden autoplay></video>
-<button type="button" id="captureBtn" hidden onclick="captureImage()">📸 Capture</button>
-
-<select name="method">
-  <option>Chemical</option>
-  <option>Organic</option>
-</select>
-
-<button type="submit">Analyze</button>
-</form>
-
-<div id="diseaseResult"></div>
-</div>
-
-<!-- CROP -->
-<div class="card">
-<h2>🌾 Crop Recommendation</h2>
-<div class="grid">
-<input id="temp" placeholder="Temperature (°C)">
-<input id="rainfall" placeholder="Rainfall (mm)">
-</div>
-<button onclick="recommendCrop()">Recommend</button>
-<div id="cropResult"></div>
-</div>
-
-<!-- FERTILIZER -->
-<div class="card">
-<h2>🧪 Fertilizer Advice</h2>
-<div class="grid">
-<input id="N" placeholder="Nitrogen">
-<input id="P" placeholder="Phosphorus">
-<input id="K" placeholder="Potassium">
-</div>
-<button onclick="fertilizerAdvice()">Get Advice</button>
-<div id="fertilizerResult"></div>
-</div>
-
-<!-- YIELD -->
-<div class="card">
-<h2>📈 Yield Prediction</h2>
-<input id="humidity" placeholder="Humidity (%)">
-<button onclick="predictYield()">Predict</button>
-<div id="yieldResult"></div>
-</div>
-
-</div>
-
-<!-- WEATHER -->
-<div class="weather-widget">
-
-  <div class="weather-header">
-    <div class="weather-icon" id="weatherIcon">🌤</div>
+<!-- ======================================================== -->
+<!-- TOP NAVIGATION BAR                                       -->
+<!-- ======================================================== -->
+<header class="top-navbar">
+  <div class="brand-wrapper">
+    <span class="brand-icon">🌱</span>
     <div>
-      <h2 id="temperature">--°C</h2>
-      <p id="cityName">Enter City</p>
+      <h1 class="brand-title" id="t-appTitle">AI Smart Agriculture</h1>
     </div>
   </div>
 
-  <div class="weather-search">
-    <input type="text" id="cityInput" placeholder="Enter city name (e.g. Delhi)">
-    <button onclick="getWeather()">Check</button>
-  </div>
-
-  <div class="weather-info">
-    <div class="info-box">
-      🌬 <span id="wind">-- km/h</span>
+  <div class="nav-actions">
+    <!-- Firebase Status Badge -->
+    <div id="firebaseStatusBadge" class="firebase-badge">
+      <span class="pulse-dot"></span>
+      <span id="firebaseStatusText">☁️ Firestore Connecting...</span>
     </div>
-    <div class="info-box">
-      🌥 <span id="condition">--</span>
-    </div>
-  </div>
 
+    <div id="userProfileTag" style="font-size:0.85rem; color:#a7f3d0; font-weight:600; display:none;"></div>
+
+    <!-- Language Selector -->
+    <div class="lang-selector">
+      <span>🌐</span>
+      <select id="langSelect" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="es">Español (Spanish)</option>
+        <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+        <option value="bn">বাংলা (Bengali)</option>
+      </select>
+    </div>
+
+    <!-- Logout / Exit -->
+    <a href="/signout" class="logout-btn-nav" id="t-logout">
+      🚪 Logout
+    </a>
+  </div>
+</header>
+
+<!-- QUICK SECTION NAV PILLS -->
+<nav class="nav-pills-bar">
+  <a href="#section-scanner" class="nav-pill active" id="t-navScanner">🔬 Plant Doctor</a>
+  <a href="#section-fertilizer" class="nav-pill" id="t-navFertilizer">🧪 Fertilizer Calculator</a>
+  <a href="#section-weather" class="nav-pill" id="t-navWeather">🌦️ Spray & Weather</a>
+  <a href="#section-mandi" class="nav-pill" id="t-navMarket">💰 Mandi & Profit</a>
+  <a href="#section-crop-yield" class="nav-pill" id="t-navYield">🌾 Crop & Yield</a>
+  <a href="#section-journal" class="nav-pill" id="t-navJournal">📖 Scan Journal</a>
+</nav>
+
+<!-- ======================================================== -->
+<!-- HERO SECTION                                             -->
+<!-- ======================================================== -->
+<div class="hero-section" style="padding: 24px 20px 10px; margin-bottom: 24px;">
+  <div class="hero-badge" id="t-poweredBy">
+    🌱 AI Smart Agriculture Dashboard
+  </div>
+  <h1 class="hero-title" style="font-size: 2.1rem; margin-bottom: 8px;">Precision Agricultural Intelligence</h1>
+  <p class="hero-subtitle" id="t-appSubtitle" style="max-width: 680px; margin: 0 auto; font-size: 0.92rem;">
+    Multimodal leaf diagnostics, precision plot fertilization, live commodity price intelligence, and weather spray advisories.
+  </p>
 </div>
 
+<!-- ======================================================== -->
+<!-- MAIN CONTENT MODULES                                     -->
+<!-- ======================================================== -->
+<main class="main-container">
 
+  <!-- ====================================================== -->
+  <!-- MODULE 1: AI PLANT DOCTOR & SCANNER                    -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-scanner">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-scannerTitle">🦠 Vision-Powered AI Plant Doctor</h2>
+        <p id="t-scannerDesc">Inspect any leaf or crop. Gemini AI diagnoses disease, severity, cause, recovery plan, and treatment.</p>
+      </div>
+      <span class="card-chip">Vision AI</span>
+    </div>
+
+    <form id="predictForm" enctype="multipart/form-data">
+      <div id="dropZone" class="drop-zone">
+        <div class="drop-icon">🍃</div>
+        <p id="t-dropText" style="font-weight:600; font-size:1.05rem;">Click or Drop Plant Leaf Image Here</p>
+        <span style="font-size:0.8rem; color:var(--text-muted);">Supports JPG, PNG, WEBP from phone camera or gallery</span>
+        <input type="file" id="imageInput" name="image" accept="image/*" hidden>
+        <img id="previewImg" alt="Leaf Preview">
+      </div>
+
+      <div class="grid-2" style="margin-bottom:15px;">
+        <button type="button" class="btn-secondary" onclick="openCamera()" id="t-openCamera">📷 Open Camera</button>
+        <button type="button" id="captureBtn" class="btn-primary hidden" onclick="captureImage()" id="t-capturePhoto">📸 Capture Leaf Snapshot</button>
+      </div>
+
+      <video id="camera" class="hidden" autoplay playsinline></video>
+
+      <div class="form-group" style="margin-top:10px;">
+        <label id="t-methodLabel">Preferred Treatment Protocol:</label>
+        <select name="method" id="treatmentMethodSelect">
+          <option value="Organic" id="t-optOrganic">🌱 Eco-Friendly Organic / Bio-Fungicide (Neem, Trichoderma, Compost Tea)</option>
+          <option value="Chemical" id="t-optChemical">🧪 Targeted Chemical Active (Fast Action - Mancozeb, Chlorothalonil)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-primary" id="analyzeBtn">
+        <span id="t-analyzeBtn">🔍 Run Multimodal Diagnosis</span>
+      </button>
+    </form>
+
+    <div id="diseaseResult"></div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE 2: PLOT-SIZED FERTILIZER & SOIL HEALTH          -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-fertilizer">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-fertTitle">🧪 Plot-Sized Fertilizer & Soil Health Calculator</h2>
+        <p id="t-fertDesc">Calculate exact 50kg bags needed, total fertilizer expense, and soil pH corrections for your field.</p>
+      </div>
+      <span class="card-chip">Soil Intelligence</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="form-group">
+        <label id="t-plotSizeLabel">Plot Size Area</label>
+        <input type="number" id="plotSizeInput" value="2" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label>Measurement Unit</label>
+        <select id="plotUnitSelect">
+          <option value="acres">Acres</option>
+          <option value="hectares">Hectares</option>
+          <option value="bigha">Bigha</option>
+          <option value="sqm">Square Meters</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="t-cropLabel">Target Crop</label>
+        <select id="fertCropSelect">
+          <option value="Tomato">Tomato (Hybrid)</option>
+          <option value="Potato">Potato</option>
+          <option value="Rice (Paddy)">Rice (Paddy / Basmati)</option>
+          <option value="Wheat">Wheat</option>
+          <option value="Maize">Maize (Corn)</option>
+          <option value="Cotton">Cotton</option>
+          <option value="Pepper">Bell Pepper</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-top:15px;">
+      <div class="form-group">
+        <label id="t-phLabel">Soil pH (4.0 - 9.0)</label>
+        <input type="number" id="fertPhInput" value="6.5" min="4" max="9" step="0.1">
+      </div>
+      <div class="form-group">
+        <label id="t-nitrogenLabel">Nitrogen (N) kg/ha</label>
+        <input type="number" id="fertNInput" value="40" min="0">
+      </div>
+      <div class="form-group">
+        <label id="t-phosphorusLabel">Phosphorus (P) kg/ha</label>
+        <input type="number" id="fertPInput" value="28" min="0">
+      </div>
+      <div class="form-group">
+        <label id="t-potassiumLabel">Potassium (K) kg/ha</label>
+        <input type="number" id="fertKInput" value="32" min="0">
+      </div>
+    </div>
+
+    <button type="button" class="btn-primary" onclick="calculatePlotFertilizer()" id="t-calcFertBtn">
+      📊 Calculate Plot Requirements
+    </button>
+
+    <div id="fertCalculationResult"></div>
+
+    <!-- SAVED PLOTS CLOUD FIRESTORE LOG -->
+    <div id="savedPlotsContainer" style="margin-top:24px;"></div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE 3: SMART WEATHER & SPRAY ADVISORY               -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-weather">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-weatherTitle">🌦️ Smart Weather & Spray Safety Advisory</h2>
+        <p id="t-weatherDesc">Prevents pesticide wash-off and spray drift. Recommends ideal foliar spraying and irrigation windows.</p>
+      </div>
+      <span class="card-chip">Weather Aware</span>
+    </div>
+
+    <div class="grid-2" style="align-items:flex-end;">
+      <div class="form-group">
+        <label>Your Farming Location (City/District)</label>
+        <input type="text" id="weatherCityInput" value="Delhi" placeholder="Enter city or district (e.g. Delhi, Punjab, California)">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-primary" style="margin:0;" onclick="loadWeather()" id="t-checkWeather">
+          🔍 Check Conditions
+        </button>
+        <button type="button" class="btn-secondary" style="width:auto; margin:0;" onclick="useMyLocation()" title="Locate my farm">
+          📍 GPS
+        </button>
+      </div>
+    </div>
+
+    <div id="weatherDisplayBox" style="margin-top:20px;"></div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE 4: COMMODITY MANDI PRICES & PROFIT ESTIMATOR    -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-mandi">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-marketTitle">💰 Crop Market Mandi Prices & Profit Estimator</h2>
+        <p id="t-marketDesc">Live commodity price benchmarks per quintal (100kg) and farm net profit projections.</p>
+      </div>
+      <span class="card-chip">Commodity Exchange</span>
+    </div>
+
+    <!-- Live Commodity Ticker Grid -->
+    <div class="mandi-grid" id="mandiGridContainer">
+      <!-- Injected dynamically -->
+    </div>
+
+    <!-- Profit Simulator -->
+    <div style="margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px;">
+      <h3 style="margin-bottom:15px; font-size:1.2rem; color:#fff;" id="t-estProfitBtn">📈 Farm Profitability Forecaster</h3>
+      <div class="grid-3">
+        <div class="form-group">
+          <label id="t-selectCropProfit">Select Crop</label>
+          <select id="profitCropSelect">
+            <option value="Rice (Basmati)">Rice (Basmati)</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Maize (Corn)">Maize (Corn)</option>
+            <option value="Tomato (Hybrid)">Tomato (Hybrid)</option>
+            <option value="Potato">Potato</option>
+            <option value="Cotton (Medium Staple)">Cotton</option>
+            <option value="Soybean">Soybean</option>
+            <option value="Onion (Red)">Onion</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label id="t-plotAreaAcres">Cultivated Area (Acres)</label>
+          <input type="number" id="profitAcresInput" value="3" min="0.5" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Custom Yield (Quintals/Acre - Optional)</label>
+          <input type="number" id="profitCustomYield" placeholder="Auto-calculated if blank">
+        </div>
+      </div>
+      <button type="button" class="btn-primary" onclick="calculateFarmProfit()">
+        💵 Estimate Net Profit & ROI
+      </button>
+      <div id="profitResultContainer"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE 5: CLIMATE CROP RECOMMENDATION & YIELD          -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-crop-yield">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-cropRecTitle">🌾 Climate-Based Crop Recommendation & Yield</h2>
+        <p>Predict optimal matching crops and productivity index based on agro-climatic conditions.</p>
+      </div>
+      <span class="card-chip">Yield Modeling</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Crop Recommendation Box -->
+      <div style="background:rgba(255,255,255,0.04); padding:22px; border-radius:18px; border:1px solid rgba(255,255,255,0.1);">
+        <h3 style="margin-bottom:12px; font-size:1.1rem; color:var(--accent-cyan);">🌾 Crop Recommendation</h3>
+        <div class="form-group">
+          <label id="t-tempInput">Temperature (°C)</label>
+          <input type="number" id="cropTempInput" value="26">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label id="t-rainInput">Rainfall (mm)</label>
+          <input type="number" id="cropRainInput" value="160">
+        </div>
+        <button type="button" class="btn-primary" onclick="recommendCrop()" id="t-recBtn">
+          Recommend Crop
+        </button>
+        <div id="cropResult" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- Yield Prediction Box -->
+      <div style="background:rgba(255,255,255,0.04); padding:22px; border-radius:18px; border:1px solid rgba(255,255,255,0.1);">
+        <h3 style="margin-bottom:12px; font-size:1.1rem; color:var(--accent-green);" id="t-yieldTitle">📈 Agricultural Yield Index</h3>
+        <div class="form-group">
+          <label id="t-humidityInput">Relative Humidity (%)</label>
+          <input type="number" id="yieldHumidityInput" value="65">
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label>Seasonal Rain Index (mm)</label>
+          <input type="number" id="yieldRainInput" value="120">
+        </div>
+        <button type="button" class="btn-primary" onclick="predictYield()" id="t-predictYieldBtn">
+          Calculate Yield Index
+        </button>
+        <div id="yieldResult" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE 6: SCAN HISTORY & FIELD PROGRESS JOURNAL        -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-journal">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-journalTitle">📖 Scan History & Field Progress Journal</h2>
+        <p id="t-journalDesc">Track disease spread and treatment recovery logs over time.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-secondary" style="width:auto; padding:8px 16px; font-size:0.82rem;" onclick="window.print()" id="t-printReport">
+          🖨️ Print Report
+        </button>
+        <button type="button" class="btn-secondary" style="width:auto; padding:8px 16px; font-size:0.82rem;" onclick="loadScanJournal()">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <div id="scanJournalList">
+      <!-- Injected dynamically -->
+    </div>
+  </section>
+
+</main>
+
+<!-- FLOATING VOICE READOUT TOAST -->
+<div id="voiceAudioToast" class="voice-toast">
+  <div class="voice-wave">
+    <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+  </div>
+  <span id="voiceToastMsg">🔊 Speaking field advisory...</span>
+  <button id="voiceStopBtn" onclick="window.stopAudioReadout()" style="padding:6px 12px; border-radius:20px; border:none; background:#ef4444; color:#fff; cursor:pointer; font-weight:600; font-size:0.8rem;">⏹ Stop</button>
+</div>
+
+<!-- ======================================================== -->
+<!-- SCRIPTS & CLIENT LOGIC                                   -->
+<!-- ======================================================== -->
+<script type="module">
+import { init3DEffects, speechEngine } from "/static/js/3d-engine.js";
+import { TRANSLATIONS } from "/static/js/translations.js";
+import {
+  auth,
+  db,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  deleteDoc,
+  handleFirestoreError,
+  OperationType,
+  firebaseReady
+} from "/static/js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// Make globally accessible
+window.speechEngine = speechEngine;
+window.TRANSLATIONS = TRANSLATIONS;
+window.firebaseAuth = auth;
+window.firebaseDB = db;
+window.doc = doc;
+window.setDoc = setDoc;
+window.getDoc = getDoc;
+window.getDocs = getDocs;
+window.collection = collection;
+window.query = query;
+window.orderBy = orderBy;
+window.onSnapshot = onSnapshot;
+window.deleteDoc = deleteDoc;
+window.handleFirestoreError = handleFirestoreError;
+window.OperationType = OperationType;
+
+// Initialize 3D subtle micro-tilt on cards
+init3DEffects();
+
+firebaseReady.then((instances) => {
+  const currentAuth = instances?.auth || window.firebaseAuth;
+  const currentDB = instances?.db || window.firebaseDB;
+
+  if (currentAuth) {
+    window.firebaseAuth = currentAuth;
+    window.firebaseDB = currentDB;
+
+    onAuthStateChanged(currentAuth, async (user) => {
+      const statusText = document.getElementById("firebaseStatusText");
+      const userTag = document.getElementById("userProfileTag");
+
+      if (user) {
+        console.log("👤 Firebase Auth User:", user.uid, user.email);
+        if (statusText) {
+          statusText.textContent = "☁️ Firestore Live (" + (user.email ? user.email.split("@")[0] : "Farmer") + ")";
+        }
+        if (userTag) {
+          userTag.textContent = user.displayName || user.email || "Smart Farmer";
+          userTag.style.display = "inline-block";
+        }
+
+        // Sync farmer profile
+        if (currentDB) {
+          try {
+            await setDoc(doc(currentDB, "users", user.uid), {
+              userId: user.uid,
+              email: user.email || "farmer@agriculture.local",
+              displayName: user.displayName || "Smart Farmer",
+              preferredLanguage: window.currentLanguage || "en",
+              updatedAt: new Date().toISOString()
+            }, { merge: true });
+          } catch (e) {
+            console.warn("User profile sync notice:", e);
+          }
+
+          if (typeof window.initFirestoreScansListener === "function") {
+            window.initFirestoreScansListener(user.uid);
+          }
+          if (typeof window.initFirestorePlotsListener === "function") {
+            window.initFirestorePlotsListener(user.uid);
+          }
+        }
+      } else {
+        if (statusText) statusText.textContent = "☁️ Firestore Ready";
+      }
+    });
+  } else {
+    const statusText = document.getElementById("firebaseStatusText");
+    if (statusText) statusText.textContent = "☁️ Local Demo Mode";
+  }
+});
+</script>
 
 <script>
-async function getWeather(){
-  const city = document.getElementById("cityInput").value.trim();
+let currentLanguage = "en";
+let latestDiagnosisData = null;
+let latestFertilizerData = null;
 
-  if(city === ""){
-    alert("Enter city name");
+// ==========================================
+// 🌐 MULTILINGUAL SYSTEM
+// ==========================================
+function changeLanguage(lang) {
+  currentLanguage = lang;
+  const dict = window.TRANSLATIONS[lang] || window.TRANSLATIONS["en"];
+
+  // Update text elements with matching ID
+  for (const [key, value] of Object.entries(dict)) {
+    const el = document.getElementById("t-" + key);
+    if (el) {
+      if (el.tagName === "INPUT" && el.hasAttribute("placeholder")) {
+        el.placeholder = value;
+      } else {
+        el.innerText = value;
+      }
+    }
+  }
+}
+
+// ==========================================
+// 📷 CAMERA & IMAGE UPLOAD
+// ==========================================
+const dropZone = document.getElementById("dropZone");
+const imageInput = document.getElementById("imageInput");
+const previewImg = document.getElementById("previewImg");
+const camera = document.getElementById("camera");
+const captureBtn = document.getElementById("captureBtn");
+let cameraStream = null;
+
+dropZone.onclick = () => imageInput.click();
+dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add("dragover"); };
+dropZone.ondragleave = () => dropZone.classList.remove("dragover");
+dropZone.ondrop = e => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    imageInput.files = e.dataTransfer.files;
+    showPreview();
+  }
+};
+
+imageInput.onchange = showPreview;
+
+function showPreview() {
+  const file = imageInput.files[0];
+  if (!file) return;
+  previewImg.src = URL.createObjectURL(file);
+  previewImg.style.display = "block";
+}
+
+async function openCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" }
+    });
+    camera.srcObject = cameraStream;
+    camera.classList.remove("hidden");
+    captureBtn.classList.remove("hidden");
+  } catch (err) {
+    console.warn("Camera access note:", err.message);
+    const box = document.getElementById("diseaseResult");
+    if (box) {
+      box.innerHTML = `
+        <div class="diagnosis-result-card" style="border-color:#fbbf24;">
+          <h4 style="color:#fbbf24;">📷 Camera Access Required</h4>
+          <p style="margin-top:6px; font-size:0.88rem;">Camera permission was denied or device is busy. You can use the "Browse file / Drag leaf photo" button directly.</p>
+        </div>
+      `;
+    }
+  }
+}
+
+function captureImage() {
+  if (!camera || !camera.videoWidth) return;
+  const canvas = document.createElement("canvas");
+  canvas.width = camera.videoWidth;
+  canvas.height = camera.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(camera, 0, 0);
+
+  canvas.toBlob(blob => {
+    const file = new File([blob], "leaf-snapshot.jpg", { type: "image/jpeg" });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    imageInput.files = dataTransfer.files;
+    showPreview();
+  }, "image/jpeg", 0.92);
+
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+  }
+  camera.classList.add("hidden");
+  captureBtn.classList.add("hidden");
+  camera.srcObject = null;
+}
+
+// Client-side image optimization (prevents fetch payload timeout on mobile / slow networks)
+async function compressImageIfNeeded(file) {
+  if (!file || !file.type.startsWith("image/")) return file;
+  if (file.size < 1.2 * 1024 * 1024) return file;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 1400;
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        if (blob) {
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+        } else {
+          resolve(file);
+        }
+      }, "image/jpeg", 0.85);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+}
+
+// ==========================================
+// 🔬 MODULE 1: PLANT DISEASE DIAGNOSIS
+// ==========================================
+const predictForm = document.getElementById("predictForm");
+const diseaseResult = document.getElementById("diseaseResult");
+
+predictForm.onsubmit = async (e) => {
+  e.preventDefault();
+
+  if (!imageInput.files || imageInput.files.length === 0) {
+    diseaseResult.innerHTML = `
+      <div class="diagnosis-result-card" style="border-color:#fbbf24;">
+        <h4 style="color:#fbbf24;">⚠️ Photo Required</h4>
+        <p style="margin-top:6px; font-size:0.88rem;">Please select or capture a crop leaf photo before clicking inspect.</p>
+      </div>
+    `;
     return;
   }
 
-  try{
-    document.getElementById("temperature").innerText = "Loading...";
-    document.getElementById("cityName").innerText = city;
+  const dict = window.TRANSLATIONS[currentLanguage] || window.TRANSLATIONS["en"];
+  diseaseResult.innerHTML = `
+    <div style="padding:24px; text-align:center; background:rgba(0,255,200,0.08); border-radius:18px; margin-top:20px; border:1px solid rgba(0,255,200,0.2);">
+      <div style="font-size:32px; animation:pulseLeaf 1.5s infinite;">🧬</div>
+      <p style="margin-top:10px; font-weight:600; color:var(--accent-cyan);">${dict.analyzingText || "Inspecting leaf cell morphology with AI..."}</p>
+    </div>
+  `;
 
-    // STEP 1: Get Coordinates
-    const geoRes = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`
-    );
-    const geoData = await geoRes.json();
+  try {
+    const rawFile = imageInput.files[0];
+    const optimizedFile = await compressImageIfNeeded(rawFile);
+    const methodChoice = document.querySelector('input[name="method"]:checked')?.value || "Chemical";
 
-    if(!geoData.results || geoData.results.length === 0){
-      alert("City not found!");
+    const formData = new FormData();
+    formData.append("image", optimizedFile);
+    formData.append("method", methodChoice);
+    formData.append("lang", currentLanguage);
+
+    const res = await fetch("/predict", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) {
+      let errText = "Could not analyze the leaf image.";
+      try {
+        const errJson = await res.json();
+        errText = errJson.error || errText;
+      } catch (parseErr) {}
+      diseaseResult.innerHTML = `
+        <div class="diagnosis-result-card" style="border-color:#ef4444;">
+          <h3 style="color:#ef4444;">❌ Analysis Error</h3>
+          <p style="margin-top:8px;">${errText}</p>
+        </div>
+      `;
       return;
     }
 
-    const { latitude, longitude, country } = geoData.results[0];
-
-    // STEP 2: Get Weather (FIXED URL - single line)
-    const weatherRes = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,pressure_msl,visibility,apparent_temperature`
-    );
-
-    const weatherData = await weatherRes.json();
-
-    const current = weatherData.current_weather;
-    const hourly = weatherData.hourly;
-
-    const temp = current.temperature;
-    const wind = current.windspeed;
-    const code = current.weathercode;
-
-    const humidity = hourly.relativehumidity_2m[0];
-    const pressure = hourly.pressure_msl[0];
-    const visibility = hourly.visibility[0] / 1000;
-    const feelsLike = hourly.apparent_temperature[0];
-
-    document.getElementById("temperature").innerText = temp + "°C";
-    document.getElementById("wind").innerText = wind + " km/h";
-    document.getElementById("cityName").innerText = city + ", " + country;
-
-    document.getElementById("condition").innerText =
-      `Feels: ${feelsLike}°C | 💧 ${humidity}% | 📊 ${pressure} hPa | 👁 ${visibility} km`;
-
-    setWeatherIcon(code);
-
-function setWeatherIcon(code){
-  const icon = document.getElementById("weatherIcon");
-
-  if(code === 0) icon.innerHTML="☀️";
-  else if(code <= 3) icon.innerHTML="🌤️";
-  else if(code <= 48) icon.innerHTML="☁️";
-  else if(code <= 67) icon.innerHTML="🌧️";
-  else if(code <= 77) icon.innerHTML="❄️";
-  else icon.innerHTML="⛈️";
-}
-
-  }catch(error){
-    console.error(error);
-    alert("Weather service failed");
-  }
-}
-
-
-</script>
-
-
-<script>
-/* ---------- IMAGE UPLOAD ---------- */
-const dropZone=document.getElementById("dropZone");
-const imageInput=document.getElementById("imageInput");
-const previewImg=document.getElementById("previewImg");
-
-dropZone.onclick=()=>imageInput.click();
-dropZone.ondragover=e=>{e.preventDefault();dropZone.classList.add("dragover")};
-dropZone.ondragleave=()=>dropZone.classList.remove("dragover");
-dropZone.ondrop=e=>{
-  e.preventDefault();
-  imageInput.files=e.dataTransfer.files;
-  preview();
-};
-
-imageInput.onchange=preview;
-function preview(){
-  const file=imageInput.files[0];
-  if(!file) return;
-  previewImg.src=URL.createObjectURL(file);
-  previewImg.style.display="block";
-}
-
-/* ---------- CAMERA ---------- */
-let stream=null;
-async function openCamera(){
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:true});
-    camera.srcObject=stream;
-    camera.hidden=false;
-    captureBtn.hidden=false;
-  }catch(e){
-    alert("Camera permission denied.");
-  }
-}
-function captureImage(){
-  const c=document.createElement("canvas");
-  c.width=camera.videoWidth;
-  c.height=camera.videoHeight;
-  c.getContext("2d").drawImage(camera,0,0);
-  c.toBlob(b=>{
-    const f=new File([b],"leaf.png",{type:"image/png"});
-    const dt=new DataTransfer();
-    dt.items.add(f);
-    imageInput.files=dt.files;
-    preview();
-  });
-  stream.getTracks().forEach(t=>t.stop());
-  camera.hidden=true;
-  captureBtn.hidden=true;
-  camera.srcObject=null;
-}
-
-/* ---------- BACKEND CALLS ---------- */
-predictForm.onsubmit = async (e) => {
-    e.preventDefault();
-
-    console.log("Files:", imageInput.files);
-    console.log("Length:", imageInput.files.length);
-    console.log("First file:", imageInput.files[0]);
-
-    if (!imageInput.files || imageInput.files.length === 0) {
-        alert("Please upload or capture a leaf image first.");
-        return;
+    const d = await res.json();
+    if (!d || !d.success) {
+      diseaseResult.innerHTML = `
+        <div class="diagnosis-result-card" style="border-color:#ef4444;">
+          <h3 style="color:#ef4444;">❌ Analysis Error</h3>
+          <p style="margin-top:8px;">${d?.error || "Could not analyze the leaf image."}</p>
+        </div>
+      `;
+      return;
     }
 
-    // rest of your code...
+    latestDiagnosisData = d;
 
-    diseaseResult.innerHTML = "⏳ Analyzing...";
+    // Severity styling class
+    const sevClass = (d.severity || "").toLowerCase().includes("healthy") ? "sev-healthy"
+      : (d.severity || "").toLowerCase().includes("mild") ? "sev-mild"
+      : (d.severity || "").toLowerCase().includes("moderate") ? "sev-moderate"
+      : "sev-critical";
 
+    let protocolHtml = "";
+    if (d.recovery_protocol && d.recovery_protocol.length > 0) {
+      protocolHtml = `
+        <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">📅 Day-by-Day Recovery Protocol:</h4>
+        <ul class="protocol-list">
+          ${d.recovery_protocol.map(step => `<li><span>✅</span> <span>${step}</span></li>`).join("")}
+        </ul>
+      `;
+    }
+
+    let preventionHtml = "";
+    if (d.prevention_tips && d.prevention_tips.length > 0) {
+      preventionHtml = `
+        <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">🛡️ Prevention & Protection:</h4>
+        <ul class="protocol-list">
+          ${d.prevention_tips.map(tip => `<li><span>🌿</span> <span>${tip}</span></li>`).join("")}
+        </ul>
+      `;
+    }
+
+    diseaseResult.innerHTML = `
+      <div class="diagnosis-result-card">
+        <div class="diagnosis-header">
+          <div>
+            <div class="disease-plant">${d.plant || "Plant Specimen"}</div>
+            <div class="disease-name">${d.disease}</div>
+            <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">
+              Cause: <b>${d.cause || "Pathological"}</b> • Confidence: <b>${d.confidence}%</b> • Source: <b>${d.source}</b>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+            <span class="severity-pill ${sevClass}">${d.severity}</span>
+            <button type="button" class="btn-tts" onclick="readDiagnosisAloud()">
+              🔊 Listen / आवाज
+            </button>
+          </div>
+        </div>
+
+        <p style="font-size:0.92rem; line-height:1.6; color:#e2e8f0; margin-bottom:12px;">
+          ${d.summary || ""}
+        </p>
+
+        <div class="treatment-box">
+          <h4>💊 Recommended Treatment (${d.method} Protocol):</h4>
+          <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">
+            ${d.treatment}
+          </p>
+        </div>
+
+        <div style="display:flex; gap:10px; margin:10px 0;">
+          <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Organic')">
+            🌱 View Organic Remedy
+          </button>
+          <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
+            🧪 View Chemical Remedy
+          </button>
+        </div>
+
+        ${protocolHtml}
+        ${preventionHtml}
+      </div>
+    `;
+
+    // Save scan directly to Cloud Firestore in background without blocking UI
+    if (typeof window.saveDiagnosisToFirestore === "function") {
+      try {
+        await window.saveDiagnosisToFirestore(d);
+      } catch (saveErr) {
+        console.warn("Background scan save note:", saveErr.message);
+      }
+    } else {
+      loadScanJournal();
+    }
+
+  } catch (err) {
+    console.warn("Diagnosis fetch notice:", err.message);
+    diseaseResult.innerHTML = `
+      <div class="diagnosis-result-card" style="border-color:#ef4444;">
+        <h3 style="color:#ef4444;">❌ Server Connection Notice</h3>
+        <p style="margin-top:8px;">Could not connect to diagnosis service. Please check your network and retry.</p>
+      </div>
+    `;
+  }
+};
+
+function switchTreatmentView(method) {
+  if (!latestDiagnosisData) return;
+  const box = document.querySelector(".treatment-box");
+  if (!box) return;
+
+  const content = method === "Organic" ? latestDiagnosisData.organic_treatment : latestDiagnosisData.chemical_treatment;
+  box.innerHTML = `
+    <h4>💊 Recommended Treatment (${method} Protocol):</h4>
+    <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">${content}</p>
+  `;
+}
+
+function readDiagnosisAloud() {
+  if (!latestDiagnosisData || !window.speechEngine) return;
+  const speechLang = currentLanguage === "hi" ? "hi-IN" 
+    : currentLanguage === "es" ? "es-ES" 
+    : currentLanguage === "pa" ? "pa-IN" 
+    : currentLanguage === "te" ? "te-IN" 
+    : currentLanguage === "bn" ? "bn-IN" 
+    : "en-US";
+
+  const readoutText = `${latestDiagnosisData.plant}. Disease detected: ${latestDiagnosisData.disease}. Severity is ${latestDiagnosisData.severity}. ${latestDiagnosisData.summary}. Treatment recommendation: ${latestDiagnosisData.treatment}`;
+  window.speechEngine.speak(readoutText, speechLang);
+}
+
+// ==========================================
+// 🧪 MODULE 2: PLOT FERTILIZER CALCULATOR
+// ==========================================
+async function calculatePlotFertilizer() {
+  const plotSize = parseFloat(document.getElementById("plotSizeInput").value) || 1;
+  const unit = document.getElementById("plotUnitSelect").value;
+  const crop = document.getElementById("fertCropSelect").value;
+  const pH = parseFloat(document.getElementById("fertPhInput").value) || 6.5;
+  const N = parseFloat(document.getElementById("fertNInput").value) || 40;
+  const P = parseFloat(document.getElementById("fertPInput").value) || 30;
+  const K = parseFloat(document.getElementById("fertKInput").value) || 35;
+
+  const resultContainer = document.getElementById("fertCalculationResult");
+  resultContainer.innerHTML = `<div style="padding:15px; text-align:center; color:var(--accent-cyan);">⏳ Calculating plot requirements...</div>`;
+
+  try {
+    const res = await fetch("/plot_fertilizer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plot_size: plotSize, unit, crop, pH, N, P, K })
+    });
+
+    const data = await res.json();
+    latestFertilizerData = { ...data, plotSize, unit, crop, pH, N, P, K };
+
+    resultContainer.innerHTML = `
+      <div style="margin-top:20px; animation:slideUpFade 0.5s ease;">
+        <div class="fert-output-grid">
+          <div class="fert-bag-card">
+            <div class="bag-number">${data.urea_bags}</div>
+            <div class="bag-label">🌾 Urea Bags (50kg)</div>
+            <span style="font-size:0.75rem; color:#a7f3d0;">Supplies active Nitrogen (46% N)</span>
+          </div>
+
+          <div class="fert-bag-card">
+            <div class="bag-number">${data.dap_bags}</div>
+            <div class="bag-label">🧪 DAP Bags (50kg)</div>
+            <span style="font-size:0.75rem; color:#a7f3d0;">Phosphorus & Starter N (18:46:0)</span>
+          </div>
+
+          <div class="fert-bag-card">
+            <div class="bag-number">${data.mop_bags}</div>
+            <div class="bag-label">🧂 MOP / Potash (50kg)</div>
+            <span style="font-size:0.75rem; color:#a7f3d0;">Potassium for immunity (60% K2O)</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,255,200,0.08); border-radius:16px; padding:18px 24px; margin-top:16px; border:1px solid rgba(0,255,200,0.25);">
+          <div>
+            <span style="font-size:0.85rem; color:var(--text-muted);">Estimated Fertilizer Investment:</span>
+            <div style="font-size:1.6rem; font-weight:800; color:var(--accent-green);">
+              ₹${data.estimated_cost_inr.toLocaleString()} <span style="font-size:1rem; color:var(--text-muted);">($${data.estimated_cost_usd})</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Normalized Area:</span>
+            <div style="font-weight:700; color:#fff;">${data.acres} Acres</div>
+          </div>
+        </div>
+
+        <div class="soil-ph-gauge">
+          <span style="font-size:28px;">🔬</span>
+          <div>
+            <b style="color:#fff;">Soil pH Status: <span style="color:var(--accent-cyan);">${data.ph_status}</span></b>
+            <p style="font-size:0.85rem; color:#cbd5e1; margin-top:2px;">${data.ph_advice}</p>
+          </div>
+        </div>
+
+        <div style="margin-top:15px; background:rgba(255,255,255,0.04); border-radius:16px; padding:18px; border:1px solid rgba(255,255,255,0.1);">
+          <b style="color:#a7f3d0;">🌿 Prescribed Micronutrients:</b>
+          <ul style="margin:8px 0 0 20px; font-size:0.86rem; color:#e2e8f0; line-height:1.6;">
+            ${data.micronutrients.map(m => `<li>${m}</li>`).join("")}
+          </ul>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button type="button" class="btn-secondary" style="width:100%; border-color:rgba(52, 211, 153, 0.5); color:#a7f3d0;" onclick="savePlotToFirestore()">
+            💾 Save Plot Plan to Cloud Firestore
+          </button>
+          <div id="savePlotStatus" style="font-size:0.85rem; margin-top:8px; text-align:center;"></div>
+        </div>
+      </div>
+    `;
+
+    // Re-trigger 3D tilt on newly created cards
+    window.init3DEffects && window.init3DEffects();
+
+  } catch (err) {
+    console.warn("Plot fertilizer calculation notice:", err.message);
+    resultContainer.innerHTML = `<div style="color:#ef4444; padding:10px;">Calculation failed. Please verify inputs.</div>`;
+  }
+}
+
+// ==========================================
+// 🌦️ MODULE 3: WEATHER & SMART SPRAY ADVISORY
+// ==========================================
+async function loadWeather(cityParam) {
+  const city = cityParam || document.getElementById("weatherCityInput").value.trim() || "Delhi";
+  const box = document.getElementById("weatherDisplayBox");
+  box.innerHTML = `<div style="padding:20px; text-align:center; color:var(--accent-cyan);">⏳ Retrieving atmospheric telemetry...</div>`;
+
+  try {
+    const res = await fetch(`/weather?city=${encodeURIComponent(city)}`);
+    if (!res.ok) {
+      throw new Error(`Weather service responded with status ${res.status}`);
+    }
+    const d = await res.json();
+
+    const sprayClass = d.spray_safety === "SAFE" ? "spray-safe" 
+      : d.spray_safety === "CAUTION" ? "spray-caution" : "spray-unsafe";
+
+    box.innerHTML = `
+      <div class="weather-hero-card">
+        <div class="weather-orb-container">
+          <div class="weather-orb-icon">🌤️</div>
+          <div class="weather-temp-big">${d.temperature}°C</div>
+          <div style="font-size:1.1rem; font-weight:600; color:#fff;">${d.city}</div>
+          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${d.condition}</div>
+        </div>
+
+        <div>
+          <div class="grid-2">
+            <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+              <span style="font-size:0.8rem; color:var(--text-muted);">Wind Speed</span>
+              <div style="font-size:1.2rem; font-weight:700; color:#fff;">🌬️ ${d.windSpeed} km/h</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+              <span style="font-size:0.8rem; color:var(--text-muted);">Humidity</span>
+              <div style="font-size:1.2rem; font-weight:700; color:#fff;">💧 ${d.humidity}%</div>
+            </div>
+          </div>
+
+          <div class="spray-alert-box ${sprayClass}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <b style="font-size:1rem;">${d.spray_badge}</b>
+              <button type="button" class="btn-tts" style="padding:6px 14px; font-size:0.78rem;" onclick="readWeatherAloud('${d.city}', '${d.temperature}', '${d.spray_badge}', '${d.spray_reason}', '${d.spray_window}')">
+                🔊 Listen / सुनें
+              </button>
+            </div>
+            <p style="font-size:0.88rem; margin-top:8px; line-height:1.5;">${d.spray_reason}</p>
+            <div style="font-size:0.82rem; margin-top:6px; color:#cbd5e1;">
+              🕒 <b>Best Spray Window:</b> ${d.spray_window}
+            </div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.05); padding:14px 18px; border-radius:14px; margin-top:12px; border:1px solid rgba(255,255,255,0.08);">
+            <b style="font-size:0.88rem; color:var(--accent-cyan);">💧 Irrigation Directive:</b>
+            <p style="font-size:0.85rem; color:#e2e8f0; margin-top:4px;">${d.irrigation_advice}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.warn("Weather telemetry notice:", err.message);
+    box.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.04); border-radius:14px; color:#cbd5e1;">Atmospheric telemetry updating for ${city}... <button type="button" class="btn-secondary" style="margin-left:10px; padding:4px 10px; font-size:0.8rem;" onclick="loadWeather('Delhi')">Retry</button></div>`;
+  }
+}
+
+function readWeatherAloud(city, temp, badge, reason, windowHours) {
+  if (!window.speechEngine) return;
+  const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+  const readout = `Weather report for ${city}. Current temperature is ${temp} degrees celsius. Spray advisory is: ${badge}. ${reason}. Ideal spray hours are ${windowHours}.`;
+  window.speechEngine.speak(readout, speechLang);
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) {
+    loadWeather("Delhi");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async pos => {
     try {
-        const res = await fetch("/predict", {
-            method: "POST",
-            credentials: "include",
-            body: new FormData(predictForm)
-        });
-
-        const d = await res.json();
-
-        if (!res.ok) {
-            diseaseResult.innerHTML = `
-                <div class="result">
-                    ❌ ${d.error || "Prediction failed"}
-                </div>`;
-            return;
-        }
-
-        diseaseResult.innerHTML = `
-            <div class="result">
-                <b>Disease:</b> ${d.disease}<br>
-                <b>Confidence:</b> ${d.confidence}%<br>
-                <b>Treatment:</b> ${d.treatment}
-            </div>`;
-
-    } catch (err) {
-        console.error(err);
-
-        diseaseResult.innerHTML = `
-            <div class="result">
-                ❌ Server connection failed
-            </div>`;
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const res = await fetch(`/weather?lat=${lat}&lon=${lon}`);
+      if (res.ok) {
+        const data = await res.json();
+        renderWeatherUI(data);
+      } else {
+        loadWeather("Delhi");
+      }
+    } catch(e) {
+      loadWeather("Delhi");
     }
+  }, () => {
+    loadWeather("Delhi");
+  });
+}
+
+// ==========================================
+// 💰 MODULE 4: COMMODITY MANDI & PROFIT
+// ==========================================
+async function loadMandiPrices() {
+  const container = document.getElementById("mandiGridContainer");
+  try {
+    const res = await fetch("/market_prices");
+    if (!res.ok) throw new Error("Mandi response not ok");
+    const data = await res.json();
+
+    container.innerHTML = data.commodities.map(c => {
+      const trendIcon = c.trend === "up" ? "📈" : c.trend === "down" ? "📉" : "➖";
+      const trendClass = c.trend === "up" ? "trend-up" : c.trend === "down" ? "trend-down" : "trend-stable";
+      return `
+        <div class="commodity-card">
+          <div class="commodity-header">
+            <b style="color:#fff; font-size:0.95rem;">${c.crop}</b>
+            <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:12px;">${c.season}</span>
+          </div>
+          <div class="commodity-price">${c.price_per_quintal.toLocaleString()} <span style="font-size:0.8rem; color:var(--text-muted);">${c.unit}</span></div>
+          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.78rem;">
+            <span class="${trendClass}">${trendIcon} ${c.trend.toUpperCase()}</span>
+            <span style="color:var(--text-muted);">Avg Yield: ${c.avg_yield} Q/ac</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    window.init3DEffects && window.init3DEffects();
+
+  } catch (err) {
+    console.warn("Mandi price fetch notice:", err.message);
+  }
+}
+
+async function calculateFarmProfit() {
+  const crop = document.getElementById("profitCropSelect").value;
+  const acres = parseFloat(document.getElementById("profitAcresInput").value) || 1;
+  const customYield = parseFloat(document.getElementById("profitCustomYield").value) || 0;
+
+  const container = document.getElementById("profitResultContainer");
+  container.innerHTML = `<div style="padding:15px; color:var(--accent-cyan); text-align:center;">⏳ Running profitability algorithm...</div>`;
+
+  try {
+    const res = await fetch("/calculate_profit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ crop, acres, yield_per_acre: customYield })
+    });
+
+    if (!res.ok) throw new Error("Profit calculation failed");
+    const d = await res.json();
+
+    container.innerHTML = `
+      <div class="profit-summary-card" style="animation:slideUpFade 0.5s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px; margin-bottom:16px;">
+          <div>
+            <h4 style="font-size:1.2rem; color:#fff;">${d.crop} • ${d.acres} Acres</h4>
+            <span style="font-size:0.85rem; color:var(--accent-cyan);">Expected Production: <b>${d.total_production_quintals} Quintals</b></span>
+          </div>
+          <span style="font-size:0.85rem; background:rgba(0,255,200,0.15); color:var(--accent-cyan); border:1px solid rgba(0,255,200,0.3); padding:6px 14px; border-radius:20px;">
+            ROI: <b>${d.roi_percentage}%</b>
+          </span>
+        </div>
+
+        <div class="grid-3">
+          <div style="background:rgba(255,255,255,0.06); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Gross Revenue:</span>
+            <div style="font-size:1.4rem; font-weight:800; color:#fff;">₹${d.gross_revenue.toLocaleString()}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Total Input Costs:</span>
+            <div style="font-size:1.4rem; font-weight:800; color:#f87171;">₹${d.estimated_input_cost.toLocaleString()}</div>
+          </div>
+          <div style="background:rgba(0,230,118,0.15); padding:16px; border-radius:14px; border:1px solid rgba(0,230,118,0.4);">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Projected Net Profit:</span>
+            <div style="font-size:1.6rem; font-weight:900; color:var(--accent-green);">₹${d.net_profit.toLocaleString()}</div>
+            <span style="font-size:0.75rem; color:#a7f3d0;">(~$${d.net_profit_usd.toLocaleString()} USD)</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+  } catch (err) {
+    console.warn("Profit calculation notice:", err.message);
+    container.innerHTML = `<div style="color:#ef4444; padding:10px;">Could not compute profit. Please verify parameters.</div>`;
+  }
+}
+
+// ==========================================
+// 🌾 MODULE 5: CROP & YIELD RECOMMENDATION
+// ==========================================
+async function recommendCrop() {
+  const temp = document.getElementById("cropTempInput").value;
+  const rainfall = document.getElementById("cropRainInput").value;
+  const resultBox = document.getElementById("cropResult");
+
+  try {
+    const r = await fetch("/recommend_crop", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ temp, rainfall })
+    });
+    if (!r.ok) throw new Error("Crop recommendation request failed");
+    const d = await r.json();
+    resultBox.innerHTML = `
+      <div style="background:rgba(0,230,118,0.15); border:1px solid var(--accent-green); padding:14px; border-radius:14px; color:#fff;">
+        🌾 Optimal Crop: <b style="color:var(--accent-green); font-size:1.1rem;">${d.crop}</b><br>
+        <span style="font-size:0.82rem; color:#cbd5e1;">Season: ${d.season} • Expected: ${d.expected_yield}</span>
+      </div>
+    `;
+  } catch (err) {
+    console.warn("Crop recommendation notice:", err.message);
+    resultBox.innerHTML = `<div style="color:#ef4444; padding:8px;">Recommendation service unavailable.</div>`;
+  }
+}
+
+async function predictYield() {
+  const humidity = document.getElementById("yieldHumidityInput").value;
+  const rainfall = document.getElementById("yieldRainInput").value;
+  const resultBox = document.getElementById("yieldResult");
+
+  try {
+    const r = await fetch("/predict_yield", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ humidity, rainfall, temp: 25 })
+    });
+    if (!r.ok) throw new Error("Yield prediction request failed");
+    const d = await r.json();
+    resultBox.innerHTML = `
+      <div style="background:rgba(0,255,204,0.15); border:1px solid var(--accent-cyan); padding:14px; border-radius:14px; color:#fff;">
+        📈 Productivity Index: <b style="color:var(--accent-cyan); font-size:1.2rem;">${d.yield_index}</b><br>
+        <span style="font-size:0.82rem; color:#cbd5e1;">Relative field productivity factor (Optimal range: 60 - 95)</span>
+      </div>
+    `;
+  } catch (err) {
+    console.warn("Yield prediction notice:", err.message);
+    resultBox.innerHTML = `<div style="color:#ef4444; padding:8px;">Yield calculation unavailable.</div>`;
+  }
+}
+
+// ==========================================
+// 📖 MODULE 6: SCAN JOURNAL & HISTORY (FIRESTORE REAL-TIME + FALLBACK)
+// ==========================================
+let unsubscribeScans = null;
+let unsubscribePlots = null;
+
+// Real-time Firestore Scans Listener
+window.initFirestoreScansListener = function(userId) {
+  if (!window.firebaseDB || !window.collection || !window.onSnapshot) return;
+  if (unsubscribeScans) unsubscribeScans();
+
+  try {
+    const scansCol = window.collection(window.firebaseDB, "users", userId, "scans");
+    unsubscribeScans = window.onSnapshot(scansCol, (snapshot) => {
+      const scans = [];
+      snapshot.forEach(docSnap => {
+        scans.push(docSnap.data());
+      });
+      scans.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+      window.renderJournalList(scans);
+    }, (error) => {
+      console.warn("Firestore scans snapshot notice:", error);
+      loadScanJournalFallback();
+    });
+  } catch (e) {
+    console.warn("Could not attach scans listener:", e);
+    loadScanJournalFallback();
+  }
 };
 
-async function recommendCrop(){
-const r = await fetch("/recommend_crop",{
-    method:"POST",
-    credentials:"include",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-        temp:temp.value,
-        rainfall:rainfall.value
-    })
+// Render scans
+window.renderJournalList = function(scans) {
+  const container = document.getElementById("scanJournalList");
+  if (!container) return;
+
+  if (!scans || scans.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding:35px; color:var(--text-muted); background:rgba(255,255,255,0.03); border-radius:18px;">
+        🌱 No diagnostic scans logged yet in Cloud Firestore. Upload a leaf photo above to begin your live field log.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = scans.map(s => {
+    const sevClass = (s.severity || "").toLowerCase().includes("healthy") ? "sev-healthy"
+      : (s.severity || "").toLowerCase().includes("mild") ? "sev-mild"
+      : (s.severity || "").toLowerCase().includes("moderate") ? "sev-moderate"
+      : "sev-critical";
+
+    const timeFormatted = new Date(s.timestamp || Date.now()).toLocaleString([], {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+
+    const safeTreatment = (s.treatment || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+    return `
+      <div class="journal-item">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <b style="font-size:1.05rem; color:#fff;">${s.disease}</b>
+            <span class="severity-pill ${sevClass}" style="font-size:0.7rem; padding:3px 10px;">${s.severity}</span>
+            <span style="font-size:0.72rem; color:#34d399; background:rgba(52,211,153,0.1); padding:2px 8px; border-radius:10px;">☁️ Firestore</span>
+          </div>
+          <div style="font-size:0.82rem; color:var(--text-muted); margin-top:3px;">
+            Crop: <b style="color:#a7f3d0;">${s.plant}</b> • ${timeFormatted} • Protocol: <b>${s.method}</b>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.78rem; width:auto;" onclick="window.speechEngine && window.speechEngine.speak('${s.disease} on ${s.plant}. Treatment: ${safeTreatment}', '${currentLanguage === 'hi' ? 'hi-IN' : 'en-US'}')">
+            🔊 Speak
+          </button>
+          <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.78rem; width:auto; border-color:rgba(239,68,68,0.4); color:#f87171;" onclick="deleteScan('${s.id}')">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  window.init3DEffects && window.init3DEffects();
+};
+
+// Save leaf diagnosis to Firestore
+window.saveDiagnosisToFirestore = async function(d) {
+  const user = window.firebaseAuth?.currentUser;
+  if (user && window.firebaseDB && window.setDoc && window.doc) {
+    const scanId = d.id || ("scan-" + Date.now());
+    const scanDoc = {
+      id: scanId,
+      userId: user.uid,
+      plant: d.plant || "Field Specimen",
+      disease: d.disease || "Healthy Specimen",
+      severity: d.severity || "Healthy",
+      cause: d.cause || "Pathological",
+      confidence: Number(d.confidence) || 95,
+      summary: d.summary || "",
+      method: d.method || "Chemical",
+      treatment: d.treatment || "",
+      timestamp: new Date().toISOString()
+    };
+    try {
+      await window.setDoc(window.doc(window.firebaseDB, "users", user.uid, "scans", scanId), scanDoc);
+      console.log("☁️ Successfully saved scan to Firestore:", scanId);
+    } catch (err) {
+      console.warn("Firestore scan sync note:", err.message);
+    }
+  } else {
+    loadScanJournalFallback();
+  }
+};
+
+// Delete scan
+window.deleteScan = async function(id) {
+  const user = window.firebaseAuth?.currentUser;
+  if (user && window.firebaseDB && window.deleteDoc && window.doc) {
+    try {
+      await window.deleteDoc(window.doc(window.firebaseDB, "users", user.uid, "scans", id));
+      console.log("🗑️ Deleted scan from Firestore:", id);
+    } catch (err) {
+      console.warn("Firestore scan delete note:", err.message);
+    }
+  }
+
+  // Also notify server memory endpoint
+  try {
+    await fetch("/scan_history/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    });
+  } catch (e) {}
+
+  if (!user) {
+    loadScanJournal();
+  }
+};
+
+// Fallback loader if not using Firestore auth
+async function loadScanJournal() {
+  if (window.firebaseAuth?.currentUser && window.firebaseDB) {
+    return;
+  }
+  loadScanJournalFallback();
+}
+
+async function loadScanJournalFallback() {
+  const container = document.getElementById("scanJournalList");
+  if (!container) return;
+  try {
+    const res = await fetch("/scan_history");
+    if (!res.ok) return;
+    const data = await res.json();
+    window.renderJournalList(data.scans || []);
+  } catch (err) {
+    console.warn("Scan journal fallback notice:", err.message);
+  }
+}
+
+// ==========================================
+// 🌾 MODULE 2-EXT: SAVED FARM PLOTS (FIRESTORE)
+// ==========================================
+window.savePlotToFirestore = async function() {
+  const statusEl = document.getElementById("savePlotStatus");
+  if (!latestFertilizerData) {
+    if (statusEl) statusEl.innerHTML = `<span style="color:#f87171;">⚠️ Please calculate plot requirements first.</span>`;
+    return;
+  }
+
+  const user = window.firebaseAuth?.currentUser;
+  if (!user || !window.firebaseDB || !window.setDoc || !window.doc) {
+    if (statusEl) statusEl.innerHTML = `<span style="color:#fbbf24;">ℹ️ Please sign in to sync plot plans to Cloud Firestore.</span>`;
+    return;
+  }
+
+  if (statusEl) statusEl.innerHTML = `<span style="color:#34d399;">⏳ Saving plot to Cloud Firestore...</span>`;
+
+  const plotId = "plot-" + Date.now();
+  const plotDoc = {
+    id: plotId,
+    userId: user.uid,
+    crop: latestFertilizerData.crop || "Crop",
+    plotSize: Number(latestFertilizerData.plotSize) || 1,
+    unit: latestFertilizerData.unit || "acres",
+    pH: Number(latestFertilizerData.pH) || 6.5,
+    n: Number(latestFertilizerData.N) || 40,
+    p: Number(latestFertilizerData.P) || 30,
+    k: Number(latestFertilizerData.K) || 35,
+    estimatedCost: Number(latestFertilizerData.estimated_cost_inr) || 0,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await window.setDoc(window.doc(window.firebaseDB, "users", user.uid, "plots", plotId), plotDoc);
+    if (statusEl) statusEl.innerHTML = `<span style="color:#34d399;">✅ Plot plan "${plotDoc.crop}" saved securely to Firestore!</span>`;
+    setTimeout(() => { if (statusEl) statusEl.innerHTML = ""; }, 4000);
+  } catch (err) {
+    console.warn("Firestore plot save notice:", err.message);
+    if (statusEl) statusEl.innerHTML = `<span style="color:#f87171;">❌ Could not save plot: ${err.message}</span>`;
+  }
+};
+
+window.initFirestorePlotsListener = function(userId) {
+  if (!window.firebaseDB || !window.collection || !window.onSnapshot) return;
+  if (unsubscribePlots) unsubscribePlots();
+
+  try {
+    const plotsCol = window.collection(window.firebaseDB, "users", userId, "plots");
+    unsubscribePlots = window.onSnapshot(plotsCol, (snapshot) => {
+      const plots = [];
+      snapshot.forEach(docSnap => {
+        plots.push(docSnap.data());
+      });
+      plots.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      window.renderPlotsList(plots);
+    }, (err) => {
+      console.warn("Plots listener notice:", err);
+    });
+  } catch (e) {
+    console.warn("Could not attach plots listener:", e);
+  }
+};
+
+window.renderPlotsList = function(plots) {
+  const container = document.getElementById("savedPlotsContainer");
+  if (!container) return;
+
+  if (!plots || plots.length === 0) {
+    container.innerHTML = `
+      <div style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); border-radius:14px; padding:20px; text-align:center;">
+        <span style="font-size:0.85rem; color:var(--text-muted);">📋 No saved plots in Cloud Firestore yet. Calculate above and click "Save Plot Plan" to store your field data.</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <b style="color:#a7f3d0; font-size:0.95rem;">📋 Saved Farm Plots (Cloud Firestore)</b>
+        <span style="font-size:0.75rem; color:var(--text-muted);">${plots.length} plot${plots.length > 1 ? 's' : ''} stored</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+        ${plots.map(p => `
+          <div class="plot-item">
+            <div>
+              <b style="color:#fff; font-size:0.98rem;">🌾 ${p.crop}</b>
+              <div style="font-size:0.82rem; color:var(--text-muted); margin-top:2px;">
+                ${p.plotSize} ${p.unit} • Soil pH: ${p.pH}
+              </div>
+              <div style="font-size:0.78rem; color:#34d399; margin-top:4px;">
+                N:${p.n} P:${p.p} K:${p.k} • ₹${(p.estimatedCost || 0).toLocaleString()}
+              </div>
+            </div>
+            <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.75rem; border-color:rgba(239,68,68,0.4); color:#f87171; width:auto;" onclick="deletePlot('${p.id}')">
+              🗑️
+            </button>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+};
+
+window.deletePlot = async function(plotId) {
+  const user = window.firebaseAuth?.currentUser;
+  if (user && window.firebaseDB && window.deleteDoc && window.doc) {
+    try {
+      await window.deleteDoc(window.doc(window.firebaseDB, "users", user.uid, "plots", plotId));
+      console.log("🗑️ Deleted plot:", plotId);
+    } catch (err) {
+      console.warn("Notice deleting plot:", err.message);
+    }
+  }
+};
+
+// Initial boot sequence
+window.addEventListener("DOMContentLoaded", () => {
+  loadWeather("Delhi");
+  loadMandiPrices();
+  loadScanJournal();
 });
-  cropResult.innerHTML=`<div class="result">${(await r.json()).crop}</div>`;
-}
-
-async function fertilizerAdvice(){
-const r = await fetch("/fertilizer_advice",{
-    method:"POST",
-    credentials:"include",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-        N:N.value,
-        P:P.value,
-        K:K.value
-    })
-});
-  fertilizerResult.innerHTML=`<div class="result">${(await r.json()).advice}</div>`;
-}
-
-async function predictYield(){
-const r = await fetch("/predict_yield",{
-    method:"POST",
-    credentials:"include",
-    headers:{
-        "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-    temp: temp.value,
-    rainfall: rainfall.value,
-    humidity: humidity.value
-     })
-     });
-  yieldResult.innerHTML=`<div class="result">Yield Index: ${(await r.json()).yield_index}</div>`;
-}
-
 </script>
-<script src="/static/signout.js"></script>
+
+<script type="module" src="/static/js/signout.js"></script>
+
 </body>
 </html>

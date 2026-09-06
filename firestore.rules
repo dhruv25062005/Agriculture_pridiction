@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Health probe / test connection path
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // User Profile Entity Validation Helper
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.email is string && data.email.size() <= 128 &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128)) &&
+             (!('preferredLanguage' in data) || (data.preferredLanguage is string && data.preferredLanguage.size() <= 10)) &&
+             (!('farmLocation' in data) || (data.farmLocation is string && data.farmLocation.size() <= 128)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    // User Root Collection
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow create: if isValidId(userId) && isOwner(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == userId;
+      allow update: if isValidId(userId) && isOwner(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       (!('createdAt' in incoming()) || incoming().createdAt == existing().createdAt);
+      allow delete: if isValidId(userId) && isOwner(userId);
+
+      // Subcollection: Crop Scans
+      match /scans/{scanId} {
+        function isValidCropScan(data) {
+          return data.id is string && isValidId(data.id) &&
+                 data.userId is string && data.userId == request.auth.uid &&
+                 data.plant is string && data.plant.size() > 0 && data.plant.size() <= 100 &&
+                 data.disease is string && data.disease.size() > 0 && data.disease.size() <= 150 &&
+                 data.severity in ['Healthy', 'Mild', 'Moderate', 'Critical'] &&
+                 data.method in ['Organic', 'Chemical'] &&
+                 data.timestamp is string && data.timestamp.size() <= 50 &&
+                 (!('cause' in data) || (data.cause is string && data.cause.size() <= 100)) &&
+                 (!('confidence' in data) || data.confidence is number) &&
+                 (!('summary' in data) || (data.summary is string && data.summary.size() <= 1000)) &&
+                 (!('treatment' in data) || (data.treatment is string && data.treatment.size() <= 2000));
+        }
+
+        allow get: if isValidId(userId) && isOwner(userId) && isValidId(scanId);
+        allow list: if isValidId(userId) && isOwner(userId);
+        allow create: if isValidId(userId) && isOwner(userId) && isValidId(scanId) &&
+                         isValidCropScan(incoming()) &&
+                         incoming().id == scanId &&
+                         incoming().userId == userId;
+        allow update: if isValidId(userId) && isOwner(userId) && isValidId(scanId) &&
+                         isValidCropScan(incoming()) &&
+                         incoming().id == existing().id &&
+                         incoming().userId == existing().userId;
+        allow delete: if isValidId(userId) && isOwner(userId) && isValidId(scanId);
+      }
+
+      // Subcollection: Farm Plots
+      match /plots/{plotId} {
+        function isValidFarmPlot(data) {
+          return data.id is string && isValidId(data.id) &&
+                 data.userId is string && data.userId == request.auth.uid &&
+                 data.crop is string && data.crop.size() > 0 && data.crop.size() <= 80 &&
+                 data.plotSize is number && data.plotSize > 0 &&
+                 data.unit in ['acres', 'hectares', 'bigha', 'sqm'] &&
+                 (!('pH' in data) || data.pH is number) &&
+                 (!('n' in data) || data.n is number) &&
+                 (!('p' in data) || data.p is number) &&
+                 (!('k' in data) || data.k is number) &&
+                 (!('estimatedCost' in data) || data.estimatedCost is number) &&
+                 (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50));
+        }
+
+        allow get: if isValidId(userId) && isOwner(userId) && isValidId(plotId);
+        allow list: if isValidId(userId) && isOwner(userId);
+        allow create: if isValidId(userId) && isOwner(userId) && isValidId(plotId) &&
+                         isValidFarmPlot(incoming()) &&
+                         incoming().id == plotId &&
+                         incoming().userId == userId;
+        allow update: if isValidId(userId) && isOwner(userId) && isValidId(plotId) &&
+                         isValidFarmPlot(incoming()) &&
+                         incoming().id == existing().id &&
+                         incoming().userId == existing().userId;
+        allow delete: if isValidId(userId) && isOwner(userId) && isValidId(plotId);
+      }
+    }
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Farmer profile information and settings",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique identifier of user matching auth UID"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Farmer full display name"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "maxLength": 10,
+          "description": "Language code preference"
+        },
+        "farmLocation": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "Farm geographical location or district"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Account registration timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Profile modification timestamp"
+        }
+      },
+      "required": ["userId", "email"]
+    },
+    "CropScan": {
+      "title": "CropScan",
+      "description": "Diagnostic pathology record of crop leaf and treatment protocols",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique scan record identifier"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Farmer owner auth UID"
+        },
+        "plant": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Crop or plant name"
+        },
+        "disease": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Identified disease or condition"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["Healthy", "Mild", "Moderate", "Critical"],
+          "description": "Pathology severity level"
+        },
+        "cause": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Pathogen or root cause"
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Diagnostic confidence percentage"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Summary of diagnosis"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["Organic", "Chemical"],
+          "description": "Selected treatment remedy methodology"
+        },
+        "treatment": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Remediation and application dosage details"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO timestamp of scan"
+        }
+      },
+      "required": ["id", "userId", "plant", "disease", "severity", "method", "timestamp"]
+    },
+    "FarmPlot": {
+      "title": "FarmPlot",
+      "description": "Farm plot parcel details and fertilizer calculation logs",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique plot identifier"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Farmer owner auth UID"
+        },
+        "crop": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Target crop grown"
+        },
+        "plotSize": {
+          "type": "number",
+          "description": "Parcel area size"
+        },
+        "unit": {
+          "type": "string",
+          "enum": ["acres", "hectares", "bigha", "sqm"],
+          "description": "Area dimension unit"
+        },
+        "pH": {
+          "type": "number",
+          "description": "Soil pH level"
+        },
+        "n": {
+          "type": "number",
+          "description": "Soil Nitrogen level"
+        },
+        "p": {
+          "type": "number",
+          "description": "Soil Phosphorus level"
+        },
+        "k": {
+          "type": "number",
+          "description": "Soil Potassium level"
+        },
+        "estimatedCost": {
+          "type": "number",
+          "description": "Estimated fertilizer cost"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "userId", "crop", "plotSize", "unit"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores user profile and preferences"
+    },
+    "/users/{userId}/scans/{scanId}": {
+      "schema": "CropScan",
+      "description": "Stores individual pathology crop scans for the farmer"
+    },
+    "/users/{userId}/plots/{plotId}": {
+      "schema": "FarmPlot",
+      "description": "Stores calculated fertilizer plot plans for the farmer"
+    }
+  }
+}

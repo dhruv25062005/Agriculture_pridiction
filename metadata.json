@@ -1,0 +1,6 @@
+{
+  "name": "AI Smart Agriculture",
+  "description": "Smart farming application featuring AI plant disease detection, crop recommendation, fertilizer advisory, yield prediction, and live weather insights.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
