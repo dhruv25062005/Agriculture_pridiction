@@ -1,10 +1,12 @@
 // KisanAI Progressive Web App Service Worker
-const CACHE_NAME = "kisan-ai-cache-v1";
+const CACHE_NAME = "kisan-ai-cache-v2";
 
 const PRECACHE_URLS = [
   "/signedin",
   "/template",
   "/static/manifest.json",
+  "/static/smart_agri_hero.webp",
+  "/static/smart_agri_hero.jpg",
   "/static/js/3d-engine.js",
   "/static/js/translations.js",
   "/static/js/firebase-config.js",

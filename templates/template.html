@@ -9,7 +9,9 @@
 <link rel="manifest" href="/static/manifest.json">
 <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 :root{
@@ -102,7 +104,8 @@ body{
   position:relative;
   background:
     linear-gradient(180deg, rgba(4,32,24,0.65), rgba(3,20,15,0.88)),
-    url("/static/smart_agri_hero.jpg") center/cover no-repeat;
+    -webkit-image-set(url("/static/smart_agri_hero.webp") 1x, url("/static/smart_agri_hero.jpg") 1x) center/cover no-repeat,
+    url("/static/smart_agri_hero.webp") center/cover no-repeat;
   border-right:1px solid rgba(255,255,255,0.1);
 }
 

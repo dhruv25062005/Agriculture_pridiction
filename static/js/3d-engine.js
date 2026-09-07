@@ -14,34 +14,53 @@ export function init3DEffects() {
     if (card.dataset.tiltInit === "true") return;
     card.dataset.tiltInit = "true";
 
+    let bounds = null;
+    let rafId = null;
+
     function handleMouseEnter() {
+      bounds = card.getBoundingClientRect();
       card.style.transition = "transform 0.25s ease-out, box-shadow 0.25s ease, border-color 0.25s ease";
     }
 
     function handleMouseMove(e) {
-      const bounds = card.getBoundingClientRect();
-      const mouseX = e.clientX - bounds.left;
-      const mouseY = e.clientY - bounds.top;
+      if (!bounds) bounds = card.getBoundingClientRect();
+      if (rafId) return;
 
-      const halfWidth = bounds.width / 2;
-      const halfHeight = bounds.height / 2;
+      const clientX = e.clientX;
+      const clientY = e.clientY;
 
-      // Subdued micro-tilt (gentle 1.5 degrees) for clean, non-intrusive depth
-      const maxTilt = 1.5;
-      const rotateX = -((mouseY - halfHeight) / halfHeight) * maxTilt;
-      const rotateY = ((mouseX - halfWidth) / halfWidth) * maxTilt;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (!bounds) return;
 
-      card.style.transform = `perspective(1600px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+        const mouseX = clientX - bounds.left;
+        const mouseY = clientY - bounds.top;
+
+        const halfWidth = bounds.width / 2;
+        const halfHeight = bounds.height / 2;
+
+        // Subdued micro-tilt (gentle 1.5 degrees) for clean, non-intrusive depth
+        const maxTilt = 1.5;
+        const rotateX = -((mouseY - halfHeight) / halfHeight) * maxTilt;
+        const rotateY = ((mouseX - halfWidth) / halfWidth) * maxTilt;
+
+        card.style.transform = `perspective(1600px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+      });
     }
 
     function handleMouseLeave() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      bounds = null;
       card.style.transition = "transform 0.35s ease, box-shadow 0.3s ease, border-color 0.3s ease";
       card.style.transform = "perspective(1600px) rotateX(0deg) rotateY(0deg) translateY(0px)";
     }
 
-    card.addEventListener("mouseenter", handleMouseEnter);
-    card.addEventListener("mousemove", handleMouseMove);
-    card.addEventListener("mouseleave", handleMouseLeave);
+    card.addEventListener("mouseenter", handleMouseEnter, { passive: true });
+    card.addEventListener("mousemove", handleMouseMove, { passive: true });
+    card.addEventListener("mouseleave", handleMouseLeave, { passive: true });
   });
 }
 

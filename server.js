@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import multer from "multer";
+import compression from "compression";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
@@ -16,6 +17,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
+
+// Enable HTTP response compression (gzip/deflate) for massive payload reduction
+app.use(compression({ threshold: 512, level: 6 }));
 
 // Lazy-initialized Gemini Client
 let genAI = null;
@@ -564,18 +568,33 @@ function handleUpload(req, res, next) {
   });
 }
 
-// Serve static assets
-app.use("/static", express.static(path.join(__dirname, "static")));
+// Serve static assets with caching headers
+app.use("/static", express.static(path.join(__dirname, "static"), {
+  maxAge: "7d",
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.match(/\.(jpg|jpeg|png|webp|ico|svg|woff2?|ttf)$/i)) {
+      res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+    } else if (filePath.match(/\.(js|css|json)$/i)) {
+      res.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+    } else {
+      res.setHeader("Cache-Control", "public, max-age=3600");
+    }
+  }
+}));
 
-// Root service worker route for PWA scope compliance
+// Root service worker route for PWA scope compliance (must not be aggressively cached)
 app.get("/sw.js", (req, res) => {
   res.setHeader("Content-Type", "application/javascript");
   res.setHeader("Service-Worker-Allowed", "/");
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.sendFile(path.join(__dirname, "static", "sw.js"));
 });
 
 // Fallback for signedin.html linking to /static/signout.js
 app.get("/static/signout.js", (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=86400");
   res.sendFile(path.join(__dirname, "static", "js", "signout.js"));
 });
 
@@ -583,6 +602,7 @@ app.get("/static/signout.js", (req, res) => {
 // FIREBASE CONFIG API
 // ===============================
 app.get("/firebase_config", (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=3600");
   const configPath = path.join(__dirname, "firebase-applet-config.json");
   if (fs.existsSync(configPath)) {
     try {
@@ -606,11 +626,56 @@ app.get("/firebase_config", (req, res) => {
 });
 
 // ===============================
-// SESSION SET (Firebase/Client → Express)
+// SESSION SET & USER PROFILE API
 // ===============================
 app.post("/set_session", (req, res) => {
-  req.session.user = req.body;
+  req.session.user = { ...(req.session.user || {}), ...req.body };
   res.json({ status: "success" });
+});
+
+app.get("/api/user_session", (req, res) => {
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  if (req.session.user) {
+    return res.json({
+      status: "authenticated",
+      user: req.session.user
+    });
+  }
+  const guestUser = {
+    uid: "farmer-session-" + (req.sessionID ? req.sessionID.slice(0, 8) : "local"),
+    email: "farmer@smartagriculture.local",
+    name: "Smart Farmer",
+    farmLocation: "Local Agricultural Zone",
+    provider: "guest",
+    createdAt: new Date().toISOString()
+  };
+  req.session.user = guestUser;
+  res.json({
+    status: "guest",
+    user: guestUser
+  });
+});
+
+app.post("/api/update_profile", (req, res) => {
+  const { name, farmLocation, preferredLanguage } = req.body || {};
+  if (!req.session.user) {
+    req.session.user = {
+      uid: "farmer-session-" + (req.sessionID ? req.sessionID.slice(0, 8) : "local"),
+      email: "farmer@smartagriculture.local",
+      name: "Smart Farmer",
+      farmLocation: "Local Agricultural Zone",
+      provider: "guest"
+    };
+  }
+  if (name) req.session.user.name = String(name).slice(0, 100);
+  if (farmLocation) req.session.user.farmLocation = String(farmLocation).slice(0, 120);
+  if (preferredLanguage) req.session.user.preferredLanguage = String(preferredLanguage).slice(0, 10);
+  req.session.user.updatedAt = new Date().toISOString();
+
+  res.json({
+    status: "success",
+    user: req.session.user
+  });
 });
 
 // ===============================
@@ -1081,6 +1146,7 @@ app.post("/predict_yield", (req, res) => {
 // 💰 COMMODITY MARKET PRICES & PROFIT ESTIMATOR
 // ===============================
 app.get("/market_prices", (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=180, stale-while-revalidate=360");
   res.json({
     commodities: MARKET_COMMODITIES,
     last_updated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1113,6 +1179,10 @@ app.post("/calculate_profit", (req, res) => {
   });
 });
 
+// High-speed in-memory weather cache (10 min TTL)
+const weatherCache = new Map();
+const WEATHER_CACHE_TTL = 10 * 60 * 1000;
+
 // ===============================
 // 🌦️ WEATHER & SMART SPRAY ADVISORY
 // ===============================
@@ -1123,11 +1193,23 @@ app.get("/weather", async (req, res) => {
   let customPlace = req.query.place ? req.query.place.trim() : null;
   const apiKey = process.env.WEATHER_API_KEY;
 
-  // If coordinates are provided but no place name given, reverse-geocode to find local village/district
+  // Fast cache check
+  const cacheKey = (latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam))
+    ? `geo:${latParam.toFixed(2)},${lonParam.toFixed(2)}`
+    : `city:${city.toLowerCase().trim()}`;
+
+  const cached = weatherCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < WEATHER_CACHE_TTL)) {
+    res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=600");
+    res.setHeader("X-Cache-Status", "HIT");
+    return res.json(cached.data);
+  }
+
+  // If coordinates are provided but no place name given, reverse-geocode with 1.2s timeout
   if (!customPlace && latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam)) {
     try {
       const revRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latParam}&longitude=${lonParam}&localityLanguage=en`, {
-        signal: AbortSignal.timeout(3000)
+        signal: AbortSignal.timeout(1200)
       });
       if (revRes.ok) {
         const rev = await revRes.json();
@@ -1139,7 +1221,7 @@ app.get("/weather", async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn("Reverse geocode timeout or notice:", e.message);
+      // Non-blocking fallback
     }
   }
 
@@ -1269,7 +1351,7 @@ app.get("/weather", async (req, res) => {
     irrigationAdvice = "Rain/high atmospheric humidity. Postpone irrigation to avoid root fungal suffocation.";
   }
 
-  res.json({
+  const payload = {
     ...weatherData,
     source: weatherSource,
     api_key_status: apiKeyStatus,
@@ -1279,13 +1361,25 @@ app.get("/weather", async (req, res) => {
     spray_window: "6:30 AM - 9:30 AM or 4:30 PM - 7:00 PM",
     irrigation_status: irrigationStatus,
     irrigation_advice: irrigationAdvice
-  });
+  };
+
+  // Cache in server memory with bounded size
+  weatherCache.set(cacheKey, { timestamp: Date.now(), data: payload });
+  if (weatherCache.size > 200) {
+    const firstKey = weatherCache.keys().next().value;
+    weatherCache.delete(firstKey);
+  }
+
+  res.setHeader("Cache-Control", "public, max-age=300, stale-while-revalidate=600");
+  res.setHeader("X-Cache-Status", "MISS");
+  res.json(payload);
 });
 
 // ===============================
 // 📊 AI STATS
 // ===============================
 app.get("/ai_stats", (req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=3600");
   const ai = getGenAIClient();
   res.json({
     engine: ai ? "Gemini 3.8 Flash Vision + Expert Agronomic Engine" : "Expert Agronomic AI Engine",

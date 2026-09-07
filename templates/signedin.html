@@ -11,7 +11,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
 <style>
 /* ======================================================== */
@@ -193,6 +195,560 @@ body {
   color: #fff;
   border-color: rgba(239, 68, 68, 0.6);
   transform: translateY(-1px);
+}
+
+/* ======================================================== */
+/* TOP-RIGHT FARMER PROFILE WIDGET & DETAILS POPOVER       */
+/* ======================================================== */
+.user-profile-section {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-btn-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 9999px;
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  font-family: inherit;
+}
+
+.profile-btn-nav:hover,
+.user-profile-section.open .profile-btn-nav {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(52, 211, 153, 0.65);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+.profile-avatar-mini {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(52, 211, 153, 0.7);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-avatar-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-nav-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+}
+
+.profile-nav-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-nav-badge {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #34d399;
+  box-shadow: 0 0 6px #34d399;
+  animation: pulseDot 1.8s infinite;
+}
+
+.profile-chevron {
+  font-size: 0.7rem;
+  color: #a7f3d0;
+  transition: transform 0.2s ease;
+  margin-left: 2px;
+}
+
+.user-profile-section.open .profile-chevron {
+  transform: rotate(180deg);
+}
+
+/* Floating Profile Details Card */
+.profile-dropdown-card {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  background: rgba(6, 26, 19, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.15);
+  padding: 22px;
+  z-index: 2200;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.user-profile-section.open .profile-dropdown-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.profile-card-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar-large {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(52, 211, 153, 0.8);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+  overflow: hidden;
+}
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-status-indicator {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 13px;
+  height: 13px;
+  background: #10b981;
+  border: 2px solid #062b21;
+  border-radius: 50%;
+}
+
+.profile-card-identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-card-name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.profile-card-email {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-card-role-chip {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-top: 5px;
+}
+
+.profile-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.profile-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Activity Metrics Bar */
+.profile-metrics-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.profile-metric-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.profile-metric-box:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.profile-metric-box .metric-num {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #34d399;
+  font-family: var(--font-display);
+}
+
+.profile-metric-box .metric-lbl {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+
+/* Detailed Information List */
+.profile-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 6px;
+}
+
+.profile-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.8rem;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.detail-label {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.detail-val-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.detail-val {
+  color: #e2e8f0;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detail-code {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: #a7f3d0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-copy-uid {
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 6px;
+  color: #34d399;
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-copy-uid:hover {
+  background: rgba(52, 211, 153, 0.2);
+  color: #ffffff;
+}
+
+/* Edit Profile Drawer */
+.profile-edit-drawer {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  animation: slideUpFade 0.25s ease;
+}
+
+.drawer-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #34d399;
+  margin-bottom: 8px;
+}
+
+.profile-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.profile-edit-field label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.profile-edit-field input {
+  background: rgba(4, 20, 15, 0.7);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.profile-edit-field input:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+}
+
+.edit-btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.btn-save-profile {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-save-profile:hover {
+  opacity: 0.92;
+}
+
+.btn-cancel-edit {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+/* Card Bottom Actions */
+.profile-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-action-btn {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 9px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.profile-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.profile-action-btn.signout-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  flex: 0 0 auto;
+  padding: 7px 14px;
+}
+
+.profile-action-btn.signout-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #ffffff;
+}
+
+/* Sunlight Mode Theme overrides for Profile Dropdown */
+body.theme-sunlight .profile-dropdown-card {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 25px rgba(16, 185, 129, 0.1);
+}
+
+body.theme-sunlight .profile-btn-nav {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #064e3b;
+}
+
+body.theme-sunlight .profile-nav-name {
+  color: #064e3b;
+}
+
+body.theme-sunlight .profile-card-name {
+  color: #064e3b;
+}
+
+body.theme-sunlight .profile-card-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-sunlight .profile-metric-box {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+body.theme-sunlight .detail-val {
+  color: #0f172a;
+}
+
+body.theme-sunlight .detail-code {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+  color: #065f46;
+}
+
+body.theme-sunlight .profile-edit-drawer {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+body.theme-sunlight .profile-edit-field input {
+  background: #ffffff;
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #0f172a;
+}
+
+body.theme-sunlight .profile-action-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+body.theme-sunlight .profile-card-actions {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+@media(max-width: 768px) {
+  .top-navbar {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .brand-title {
+    font-size: 1.1rem;
+  }
+  .nav-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .profile-nav-name {
+    max-width: 80px;
+  }
+  .profile-dropdown-card {
+    right: -10px;
+    width: calc(100vw - 28px);
+  }
 }
 
 /* Firebase Cloud Badge & Pulse */
@@ -1679,7 +2235,135 @@ body.theme-sunlight .tactile-range {
       <span id="firebaseStatusText">☁️ Firestore Connecting...</span>
     </div>
 
-    <div id="userProfileTag" style="font-size:0.85rem; color:#a7f3d0; font-weight:600; display:none;"></div>
+    <!-- Top-Right User Profile Section -->
+    <div class="user-profile-section" id="userProfileSection">
+      <button type="button" class="profile-btn-nav" id="profileToggleBtn" onclick="toggleProfileDropdown(event)" aria-expanded="false" aria-haspopup="dialog" title="View & Edit Farmer Profile Details">
+        <div class="profile-avatar-mini" id="profileAvatarMini">🌱</div>
+        <div class="profile-nav-meta">
+          <span class="profile-nav-name" id="profileNavName">Farmer</span>
+          <span class="profile-nav-badge" id="profileNavBadge"><span class="status-pulse-dot"></span> <span id="profileNavStatusText">Online</span></span>
+        </div>
+        <span class="profile-chevron" id="profileChevron">▾</span>
+      </button>
+
+      <!-- Profile Details Floating Dropdown Card -->
+      <div class="profile-dropdown-card" id="profileDropdownCard" role="dialog" aria-modal="true" aria-labelledby="profileCardName" onclick="event.stopPropagation()">
+        <!-- Floating Card Header -->
+        <div class="profile-card-header">
+          <div class="profile-card-avatar-wrap">
+            <div class="profile-avatar-large" id="profileAvatarLarge">👨‍🌾</div>
+            <div class="avatar-status-indicator" title="Active Farmer Session"></div>
+          </div>
+          <div class="profile-card-identity">
+            <h3 class="profile-card-name" id="profileCardName">Smart Farmer</h3>
+            <div class="profile-card-email" id="profileCardEmail">farmer@smartagriculture.local</div>
+            <div class="profile-card-role-chip" id="profileCardRole">🌾 Verified AI Agronomist</div>
+          </div>
+          <button type="button" class="profile-close-btn" onclick="closeProfileDropdown()" aria-label="Close Profile">✕</button>
+        </div>
+
+        <!-- Dynamic Activity Metrics Bar -->
+        <div class="profile-metrics-bar">
+          <div class="profile-metric-box">
+            <span class="metric-num" id="profileScansCount">0</span>
+            <span class="metric-lbl">Leaf Scans</span>
+          </div>
+          <div class="profile-metric-box">
+            <span class="metric-num" id="profilePlotsCount">0</span>
+            <span class="metric-lbl">Farm Plots</span>
+          </div>
+          <div class="profile-metric-box">
+            <span class="metric-num" id="profileAiStatus">Gemini 3.8</span>
+            <span class="metric-lbl">Vision AI</span>
+          </div>
+        </div>
+
+        <!-- Detail Attributes List -->
+        <div class="profile-details-list">
+          <!-- UID Item with Quick Copy -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">🆔</span> Farmer UID
+            </div>
+            <div class="detail-val-wrap">
+              <code class="detail-code" id="profileUidDisplay">Loading...</code>
+              <button type="button" class="btn-copy-uid" onclick="copyFarmerUid()" id="btnCopyUid" title="Copy UID to Clipboard">📋 Copy</button>
+            </div>
+          </div>
+
+          <!-- Auth Provider -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">🔐</span> Authentication
+            </div>
+            <div class="detail-val" id="profileAuthProvider">Cloud Session</div>
+          </div>
+
+          <!-- Farm Location / District -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">📍</span> Farm Location
+            </div>
+            <div class="detail-val" id="profileFarmLocationDisplay">Local Agricultural Zone</div>
+          </div>
+
+          <!-- Preferred Language -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">🌐</span> Preferred Lang
+            </div>
+            <div class="detail-val" id="profileLanguageDisplay">English (en)</div>
+          </div>
+
+          <!-- Cloud Firestore Database Status -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">☁️</span> Database
+            </div>
+            <div class="detail-val" id="profileDbStatus">Cloud Firestore Live</div>
+          </div>
+
+          <!-- Member Since / Registration -->
+          <div class="profile-detail-row">
+            <div class="detail-label">
+              <span class="detail-icon">📅</span> Member Since
+            </div>
+            <div class="detail-val" id="profileCreatedDisplay">Active Season</div>
+          </div>
+        </div>
+
+        <!-- Collapsible Edit Profile Form -->
+        <div class="profile-edit-drawer" id="profileEditDrawer" style="display:none;">
+          <div class="drawer-title">✏️ Update Farmer Profile</div>
+          <div class="profile-edit-field">
+            <label for="editDisplayNameInput">Farmer / Farm Name</label>
+            <input type="text" id="editDisplayNameInput" placeholder="e.g. Gurpreet Singh" maxlength="60" />
+          </div>
+          <div class="profile-edit-field">
+            <label for="editFarmLocationInput">Farm Location / District</label>
+            <input type="text" id="editFarmLocationInput" placeholder="e.g. Ludhiana, Punjab" maxlength="100" />
+          </div>
+          <div class="edit-btn-row">
+            <button type="button" class="btn-save-profile" onclick="saveProfileChanges()" id="btnSaveProfile">💾 Save Profile</button>
+            <button type="button" class="btn-cancel-edit" onclick="toggleEditProfileDrawer(false)">Cancel</button>
+          </div>
+          <div id="profileEditFeedback" style="font-size:0.75rem; margin-top:6px; display:none;"></div>
+        </div>
+
+        <!-- Quick Profile Card Actions -->
+        <div class="profile-card-actions">
+          <button type="button" class="profile-action-btn" id="btnToggleEditProfile" onclick="toggleEditProfileDrawer()">
+            ✏️ Edit Profile
+          </button>
+          <button type="button" class="profile-action-btn" onclick="syncGpsToProfile()" title="Use Current GPS for Farm Location">
+            📍 Use GPS
+          </button>
+          <a href="/signout" class="profile-action-btn signout-btn" id="btnProfileSignout" title="Sign out of account">
+            🚪 Logout
+          </a>
+        </div>
+      </div>
+    </div>
 
     <!-- Sunlight High-Contrast Mode Toggle -->
     <button type="button" class="theme-switch-btn" id="themeToggleBtn" onclick="toggleSunlightMode()" title="Toggle High-Contrast Outdoor Sunlight Mode for bright field conditions">
@@ -3324,12 +4008,18 @@ function renderWeatherUI(d) {
       </div>
     </div>
   `;
+
+  try {
+    localStorage.setItem("kisan_last_weather", JSON.stringify(d));
+  } catch (e) {}
 }
 
 async function loadWeather(cityParam) {
   const city = cityParam || document.getElementById("weatherCityInput").value.trim() || "Delhi";
   const box = document.getElementById("weatherDisplayBox");
-  box.innerHTML = `<div style="padding:20px; text-align:center; color:var(--accent-cyan);">⏳ Retrieving atmospheric telemetry...</div>`;
+  if (!box.children.length) {
+    box.innerHTML = `<div style="padding:20px; text-align:center; color:var(--accent-cyan);">⏳ Retrieving atmospheric telemetry...</div>`;
+  }
 
   try {
     const res = await fetch(`/weather?city=${encodeURIComponent(city)}`);
@@ -3340,7 +4030,9 @@ async function loadWeather(cityParam) {
     renderWeatherUI(d);
   } catch (err) {
     console.warn("Weather telemetry notice:", err.message);
-    box.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.04); border-radius:14px; color:#cbd5e1;">Atmospheric telemetry updating for ${city}... <button type="button" class="btn-secondary" style="margin-left:10px; padding:4px 10px; font-size:0.8rem;" onclick="loadWeather('Delhi')">Retry</button></div>`;
+    if (!box.children.length) {
+      box.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.04); border-radius:14px; color:#cbd5e1;">Atmospheric telemetry updating for ${city}... <button type="button" class="btn-secondary" style="margin-left:10px; padding:4px 10px; font-size:0.8rem;" onclick="loadWeather('Delhi')">Retry</button></div>`;
+    }
   }
 }
 
@@ -3358,7 +4050,14 @@ function readWeatherAloud(city, temp, badge, reason, windowHours) {
 
 function useMyLocation() {
   const box = document.getElementById("weatherDisplayBox");
-  if (box) {
+
+  // Instantly restore cached weather for 0ms initial paint
+  const cachedWeather = localStorage.getItem("kisan_last_weather");
+  if (cachedWeather) {
+    try {
+      renderWeatherUI(JSON.parse(cachedWeather));
+    } catch (e) {}
+  } else if (box) {
     box.innerHTML = `
       <div style="padding:28px 20px; text-align:center; color:var(--accent-cyan);">
         <div style="font-size:2.2rem; margin-bottom:10px;">📍</div>
@@ -3369,10 +4068,9 @@ function useMyLocation() {
   }
 
   const fallbackToNetworkLocation = async (reason) => {
-    console.log("GPS Notice (" + reason + "), trying network IP auto-geocoding...");
     try {
       const geoRes = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client", {
-        signal: AbortSignal.timeout(4500)
+        signal: AbortSignal.timeout(2000)
       });
       if (geoRes.ok) {
         const geo = await geoRes.json();
@@ -3417,7 +4115,7 @@ function useMyLocation() {
       finished = true;
       fallbackToNetworkLocation("GPS satellite fix timed out");
     }
-  }, 7000);
+  }, 2500);
 
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
@@ -3432,7 +4130,7 @@ function useMyLocation() {
       let placeLabel = "";
       try {
         const rev = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`, {
-          signal: AbortSignal.timeout(3000)
+          signal: AbortSignal.timeout(1200)
         });
         if (rev.ok) {
           const rData = await rev.json();
@@ -3465,9 +4163,9 @@ function useMyLocation() {
       fallbackToNetworkLocation(`GPS ${msg}`);
     },
     {
-      enableHighAccuracy: true,
-      timeout: 6500,
-      maximumAge: 60000
+      enableHighAccuracy: false,
+      timeout: 2500,
+      maximumAge: 120000
     }
   );
 }
