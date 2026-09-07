@@ -4,33 +4,49 @@
 <meta charset="UTF-8">
 <title>AI Smart Agriculture • Farm Intelligence Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#00e676">
+<meta name="description" content="AI Smart Agriculture Farm Intelligence Dashboard with Vision Pathology, Spray Weather, Fertilizer & Mandi Insights">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 /* ======================================================== */
-/* DESIGN SYSTEM & 3D ENVIRONMENT                           */
+/* DESIGN SYSTEM & PROFESSIONAL AGRICULTURAL COMMAND CENTER */
 /* ======================================================== */
 :root {
-  --bg-base: #071510;
-  --bg-gradient: radial-gradient(circle at 50% 0%, #064e3b 0%, #03271d 45%, #02140f 100%);
-  --card-bg: rgba(255, 255, 255, 0.055);
-  --card-border: rgba(255, 255, 255, 0.12);
-  --card-hover-border: rgba(0, 255, 170, 0.38);
-  --accent-green: #00e676;
-  --accent-cyan: #00ffcc;
-  --accent-gold: #fbbf24;
-  --accent-red: #f87171;
-  --text-main: #f0fdf4;
+  --bg-base: #06130d;
+  --bg-gradient: radial-gradient(circle at 50% -10%, #064e3b 0%, #03241b 45%, #02120c 100%);
+  --card-bg: rgba(255, 255, 255, 0.045);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover-border: rgba(52, 211, 153, 0.45);
+  --accent-green: #10b981;
+  --accent-cyan: #06b6d4;
+  --accent-gold: #f59e0b;
+  --accent-red: #ef4444;
+  --text-main: #f8fafc;
   --text-muted: #94a3b8;
-  --glass-blur: blur(20px);
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --glass-blur: blur(24px);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .brand-title, .hero-title, .card-title-group h2, .slider-val-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 html {
@@ -80,12 +96,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 30px;
-  background: rgba(4, 20, 15, 0.78);
+  padding: 12px 32px;
+  background: rgba(6, 19, 13, 0.85);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .brand-wrapper {
@@ -95,20 +111,23 @@ body {
 }
 
 .brand-icon {
-  font-size: 28px;
-  animation: pulseLeaf 3s ease-in-out infinite;
-}
-
-@keyframes pulseLeaf {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.15) rotate(5deg); }
+  font-size: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 }
 
 .brand-title {
   font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(90deg, #ffffff, #a7f3d0, #00e676);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #ffffff 30%, #a7f3d0 70%, #34d399 100%);
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -116,7 +135,7 @@ body {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* Language selector */
@@ -124,20 +143,27 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 30px;
-  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px 12px;
+  transition: border-color 0.2s ease;
+}
+
+.lang-selector:hover {
+  border-color: rgba(52, 211, 153, 0.4);
 }
 
 .lang-selector select {
   background: transparent;
   border: none;
-  color: #00ffcc;
+  color: #34d399;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
   outline: none;
+  padding: 0;
+  width: auto;
 }
 
 .lang-selector select option {
@@ -147,16 +173,15 @@ body {
 
 /* 3D Logout Button */
 .logout-btn-nav {
-  padding: 8px 22px;
-  border-radius: 30px;
-  border: 1px solid rgba(248, 113, 113, 0.4);
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  color: #fff;
+  padding: 7px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -164,8 +189,10 @@ body {
 }
 
 .logout-btn-nav:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+  background: rgba(239, 68, 68, 0.22);
+  color: #fff;
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-1px);
 }
 
 /* Firebase Cloud Badge & Pulse */
@@ -173,14 +200,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.4);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.25);
   color: #34d399;
-  padding: 6px 14px;
-  border-radius: 30px;
+  padding: 6px 12px;
+  border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 600;
-  box-shadow: 0 0 15px rgba(52, 211, 153, 0.15);
 }
 
 .pulse-dot {
@@ -217,35 +243,40 @@ body {
 .nav-pills-bar {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  padding: 16px 20px 0;
+  padding: 14px 20px 0;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .nav-pill {
-  padding: 8px 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
   text-decoration: none;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-.nav-pill:hover, .nav-pill.active {
-  background: rgba(0, 230, 118, 0.18);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 255, 170, 0.2);
+.nav-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-pill.active {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #34d399;
+  font-weight: 600;
 }
 
 /* ======================================================== */
@@ -253,8 +284,8 @@ body {
 /* ======================================================== */
 .hero-section {
   text-align: center;
-  padding: 35px 20px 20px;
-  max-width: 1000px;
+  padding: 30px 20px 10px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -262,32 +293,32 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 18px;
-  border-radius: 30px;
-  background: rgba(0, 255, 204, 0.12);
-  border: 1px solid rgba(0, 255, 204, 0.3);
-  color: var(--accent-cyan);
-  font-size: 0.85rem;
+  padding: 5px 14px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  color: #34d399;
+  font-size: 0.8rem;
   font-weight: 600;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 15px rgba(0, 255, 204, 0.15);
-}
-
-.hero-title {
-  font-size: 3rem;
-  font-weight: 900;
-  line-height: 1.15;
-  background: linear-gradient(135deg, #ffffff 10%, #a7f3d0 45%, #00e676 80%, #00ffcc 100%);
-  -webkit-background-clip: text;
-  color: transparent;
   margin-bottom: 12px;
 }
 
+.hero-title {
+  font-size: 2.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 40%, #a7f3d0 80%, #34d399 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 10px;
+}
+
 .hero-subtitle {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: var(--text-muted);
-  max-width: 780px;
-  margin: 0 auto 30px;
+  max-width: 680px;
+  margin: 0 auto 20px;
   line-height: 1.6;
 }
 
@@ -295,41 +326,43 @@ body {
 .stats-banner {
   display: flex;
   justify-content: center;
-  gap: 18px;
+  gap: 14px;
   flex-wrap: wrap;
   margin-top: 10px;
 }
 
 .stat-3d {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.035);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--card-border);
-  border-radius: 20px;
-  padding: 16px 24px;
-  min-width: 190px;
+  border-radius: 14px;
+  padding: 14px 20px;
+  min-width: 170px;
   text-align: center;
-  transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.25s ease;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
 
 .stat-3d:hover {
   transform: translateY(-2px);
-  border-color: var(--card-hover-border);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .stat-val {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #00ffcc;
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: #34d399;
   display: block;
 }
 
 .stat-lbl {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 3px;
+  font-weight: 500;
 }
 
 /* ======================================================== */
@@ -338,28 +371,28 @@ body {
 .main-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 20px 100px;
+  padding: 20px 20px 80px;
   display: flex;
   flex-direction: column;
-  gap: 35px;
+  gap: 24px;
 }
 
 .card-3d {
   background: var(--card-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border-radius: 24px;
-  padding: 36px;
+  border-radius: 18px;
+  padding: 30px;
   border: 1px solid var(--card-border);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
-  transition: transform 0.25s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card-3d:hover {
   border-color: var(--card-hover-border);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.35);
 }
 
 .shine-layer {
@@ -370,34 +403,36 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 16px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 14px;
 }
 
 .card-title-group h2 {
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  letter-spacing: -0.01em;
 }
 
 .card-title-group p {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 3px;
+  line-height: 1.5;
 }
 
 .card-chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.74rem;
   font-weight: 600;
-  background: rgba(0, 230, 118, 0.15);
-  color: #6ee7b7;
-  border: 1px solid rgba(0, 230, 118, 0.3);
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
 /* ======================================================== */
@@ -406,17 +441,17 @@ body {
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 18px;
 }
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 18px;
 }
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 14px;
 }
 
 @media(max-width: 860px) {
@@ -428,69 +463,70 @@ body {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form-group label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #cbd5e1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
 }
 
 input, select {
   width: 100%;
-  padding: 14px 18px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(15, 23, 42, 0.6);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.5);
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   outline: none;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 input:focus, select:focus {
-  border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 255, 204, 0.22);
-  background: rgba(15, 23, 42, 0.85);
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+  background: rgba(15, 23, 42, 0.8);
 }
 
 /* Primary Action Buttons */
 .btn-primary {
   width: 100%;
-  padding: 16px 24px;
-  border-radius: 50px;
+  padding: 13px 22px;
+  border-radius: 10px;
   border: none;
-  background: linear-gradient(135deg, #00c853, #00e676, #00ffcc);
-  color: #022c22;
-  font-weight: 700;
-  font-size: 1.05rem;
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.94rem;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.35);
-  margin-top: 15px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  margin-top: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 15px 45px rgba(0, 255, 170, 0.55);
+  background: linear-gradient(135deg, #047857, #059669);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
 }
 
 .btn-secondary {
   width: 100%;
-  padding: 13px 20px;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -498,9 +534,9 @@ input:focus, select:focus {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
 /* ======================================================== */
@@ -650,6 +686,483 @@ video#camera {
 
 .btn-tts:hover {
   background: var(--accent-cyan);
+  color: #022c22;
+}
+
+/* Camera Viewfinder & Leaf Alignment Guide */
+.camera-viewfinder-box {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  margin: 15px auto;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid var(--accent-green);
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.25);
+  background: #000;
+}
+
+.camera-viewfinder-box video {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+.viewfinder-guide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.viewfinder-leaf-reticle {
+  width: 220px;
+  height: 220px;
+  border: 2px dashed rgba(0, 255, 204, 0.75);
+  border-radius: 60% 40% 60% 40% / 40% 60% 40% 60%;
+  box-shadow: 0 0 25px rgba(0, 230, 118, 0.35) inset;
+  animation: leafReticlePulse 2s ease-in-out infinite alternate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes leafReticlePulse {
+  0% { transform: scale(0.96); border-color: rgba(0, 230, 118, 0.6); }
+  100% { transform: scale(1.04); border-color: rgba(0, 255, 204, 0.95); }
+}
+
+.viewfinder-tip-badge {
+  margin-top: 14px;
+  background: rgba(3, 20, 15, 0.85);
+  border: 1px solid var(--accent-green);
+  color: #a7f3d0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+/* SCANNER MODE SWITCH TABS */
+.scanner-mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scanner-tab-btn {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.scanner-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.scanner-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 255, 204, 0.2), rgba(0, 230, 118, 0.15));
+  color: var(--accent-cyan);
+  border-color: rgba(0, 255, 204, 0.4);
+  box-shadow: 0 4px 18px rgba(0, 255, 204, 0.15);
+}
+
+/* LIVE FIELD SCANNER HUD */
+.live-scanner-panel {
+  position: relative;
+  margin-bottom: 20px;
+  animation: slideUpFade 0.4s ease;
+}
+
+.live-viewfinder-hud {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 420px;
+  margin: 0 auto 18px auto;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #020806;
+  border: 2px solid rgba(0, 255, 204, 0.45);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 255, 204, 0.15);
+}
+
+.live-viewfinder-hud video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.live-hud-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  pointer-events: none;
+}
+
+.hud-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: auto;
+  flex-wrap: wrap;
+}
+
+.hud-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(4, 20, 15, 0.85);
+  border: 1px solid rgba(0, 255, 204, 0.4);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  backdrop-filter: blur(10px);
+}
+
+.hud-blink-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 10px #00e676;
+  animation: hudPulseDot 1.2s infinite;
+}
+
+@keyframes hudPulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.hud-controls-group {
+  display: flex;
+  gap: 6px;
+}
+
+.hud-btn {
+  background: rgba(4, 20, 15, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.hud-btn:hover {
+  background: rgba(0, 255, 204, 0.25);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.hud-target-frame {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  pointer-events: none;
+}
+
+.hud-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--accent-cyan);
+  border-style: solid;
+}
+
+.hud-corner.top-left { top: 0; left: 0; border-width: 3px 0 0 3px; border-top-left-radius: 8px; }
+.hud-corner.top-right { top: 0; right: 0; border-width: 3px 3px 0 0; border-top-right-radius: 8px; }
+.hud-corner.bottom-left { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-bottom-left-radius: 8px; }
+.hud-corner.bottom-right { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-bottom-right-radius: 8px; }
+
+.hud-laser-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ffcc, #00e676, transparent);
+  box-shadow: 0 0 12px #00ffcc, 0 0 20px #00e676;
+  animation: laserScan 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes laserScan {
+  0% { top: 6%; opacity: 0.35; }
+  50% { opacity: 1; }
+  100% { top: 94%; opacity: 0.35; }
+}
+
+.hud-crosshair-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hud-focus-hint {
+  font-size: 0.72rem;
+  color: #a7f3d0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 3px 10px;
+  border-radius: 12px;
+  margin-top: 6px;
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  white-space: nowrap;
+}
+
+.hud-bottom-bar {
+  pointer-events: auto;
+  background: rgba(3, 16, 12, 0.88);
+  border-radius: 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(0, 255, 204, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.btn-live-scan {
+  background: linear-gradient(135deg, #00ffcc, #00e676);
+  color: #022c22;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 255, 204, 0.4);
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-live-scan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 255, 204, 0.6);
+}
+
+.btn-live-scan:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auto-scan-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.auto-scan-toggle input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 36px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  position: relative;
+  transition: all 0.25s ease;
+}
+
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px;
+  left: 3px;
+  transition: all 0.25s ease;
+}
+
+.auto-scan-toggle input:checked + .toggle-slider {
+  background: #00e676;
+}
+
+.auto-scan-toggle input:checked + .toggle-slider::after {
+  transform: translateX(16px);
+}
+
+/* CULPRIT & INSECT HIGHLIGHT CARD */
+.culprit-card {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin: 14px 0;
+}
+
+.culprit-card.pathogen {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.culprit-card.healthy {
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.culprit-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.culprit-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.culprit-mech {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+  margin-top: 6px;
+}
+
+.category-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cat-insect {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid #f59e0b;
+}
+
+.cat-disease {
+  background: rgba(14, 165, 233, 0.2);
+  color: #38bdf8;
+  border: 1px solid #0284c7;
+}
+
+.cat-healthy {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid #22c55e;
+}
+
+.btn-whatsapp-share {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-whatsapp-share:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.btn-report-export {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f0fdf4;
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-report-export:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.pwa-install-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pwa-install-badge:hover {
+  background: var(--accent-green);
   color: #022c22;
 }
 
@@ -880,6 +1393,264 @@ video#camera {
   50% { transform: scaleY(1); }
 }
 
+/* ======================================================== */
+/* 🌞 EXTRAORDINARY CRAFT: OUTDOOR SUNLIGHT / HIGH-CONTRAST */
+/* ======================================================== */
+body.theme-sunlight {
+  --bg-base: #f1f8f4;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #ecfdf5 0%, #e2f2e9 50%, #d5e8dd 100%);
+  --card-bg: rgba(255, 255, 255, 0.94);
+  --card-border: rgba(16, 185, 129, 0.28);
+  --card-hover-border: rgba(5, 150, 105, 0.65);
+  --accent-green: #059669;
+  --accent-cyan: #0284c7;
+  --accent-gold: #d97706;
+  --accent-red: #dc2626;
+  --text-main: #064e3b;
+  --text-muted: #4b6357;
+  --glass-blur: blur(12px);
+  color: #064e3b;
+}
+
+body.theme-sunlight .top-navbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 2px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+}
+
+body.theme-sunlight .brand-title {
+  background: linear-gradient(90deg, #065f46, #047857, #059669);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+body.theme-sunlight .card-3d {
+  background: #ffffff;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 0 10px 30px rgba(6, 78, 59, 0.08);
+}
+
+body.theme-sunlight .card-title-group h2,
+body.theme-sunlight .disease-name,
+body.theme-sunlight .weather-temp-big,
+body.theme-sunlight .hero-title {
+  color: #044e3b !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+}
+
+body.theme-sunlight input, 
+body.theme-sunlight select {
+  background: #ffffff;
+  color: #064e3b;
+  border-color: #cbd5e1;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+}
+
+body.theme-sunlight .commodity-card,
+body.theme-sunlight .stat-3d,
+body.theme-sunlight .fert-bag-card,
+body.theme-sunlight .journal-item {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+body.theme-sunlight .commodity-card b {
+  color: #0f172a !important;
+}
+
+body.theme-sunlight .nav-pill {
+  background: #ffffff;
+  color: #064e3b;
+  border: 1px solid #cbd5e1;
+}
+
+body.theme-sunlight .nav-pill:hover,
+body.theme-sunlight .nav-pill.active {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+/* THEME SWITCH PILL */
+.theme-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px 14px;
+  color: #34d399;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-switch-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(52, 211, 153, 0.4);
+  transform: translateY(-1px);
+}
+
+body.theme-sunlight .theme-switch-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #065f46;
+}
+
+/* ======================================================== */
+/* TACTILE N-P-K DUAL INPUT & RANGE SLIDER CONTROL          */
+/* ======================================================== */
+.nutrient-slider-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.nutrient-slider-card:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nutrient-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.nutrient-badge-pill {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-n { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+.badge-p { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.badge-k { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+.badge-ph { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+.slider-val-display {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+body.theme-sunlight .slider-val-display {
+  color: #064e3b;
+}
+
+.tactile-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+  margin: 12px 0 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+body.theme-sunlight .tactile-range {
+  background: #cbd5e1;
+}
+
+.tactile-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #00e676;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.8);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.tactile-range::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+.tactile-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #00e676;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+.nutrient-status-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ======================================================== */
+/* 24-HOUR CIRCULAR SPRAY SAFETY DIAL                       */
+/* ======================================================== */
+.spray-dial-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.spray-timeline-hours {
+  display: flex;
+  width: 100%;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.spray-hour-bar {
+  flex: 1;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.spray-hour-bar:hover {
+  transform: scaleY(1.2);
+  z-index: 5;
+}
+
+.bar-safe { background: #10b981; }
+.bar-caution { background: #f59e0b; }
+.bar-unsafe { background: #ef4444; }
+
+/* SPARKLINE SVG CONTAINER */
+.sparkline-svg {
+  width: 80px;
+  height: 24px;
+  overflow: visible;
+}
+
 .hidden { display: none !important; }
 </style>
 </head>
@@ -910,6 +1681,11 @@ video#camera {
 
     <div id="userProfileTag" style="font-size:0.85rem; color:#a7f3d0; font-weight:600; display:none;"></div>
 
+    <!-- Sunlight High-Contrast Mode Toggle -->
+    <button type="button" class="theme-switch-btn" id="themeToggleBtn" onclick="toggleSunlightMode()" title="Toggle High-Contrast Outdoor Sunlight Mode for bright field conditions">
+      ☀️ <span id="themeToggleLabel">Sunlight Mode</span>
+    </button>
+
     <!-- Language Selector -->
     <div class="lang-selector">
       <span>🌐</span>
@@ -922,6 +1698,11 @@ video#camera {
         <option value="bn">বাংলা (Bengali)</option>
       </select>
     </div>
+
+    <!-- PWA Install Prompt Button -->
+    <button type="button" id="pwaInstallBtn" class="pwa-install-badge hidden" onclick="triggerPwaInstall()">
+      📲 Install App
+    </button>
 
     <!-- Logout / Exit -->
     <a href="/signout" class="logout-btn-nav" id="t-logout">
@@ -959,47 +1740,123 @@ video#camera {
 <main class="main-container">
 
   <!-- ====================================================== -->
-  <!-- MODULE 1: AI PLANT DOCTOR & SCANNER                    -->
+  <!-- MODULE 1: AI PLANT DOCTOR & SCANNER (DISEASE, PEST & LIVE ANALYSIS) -->
   <!-- ====================================================== -->
   <section class="card-3d" id="section-scanner">
     <div class="card-header-3d">
       <div class="card-title-group">
-        <h2 id="t-scannerTitle">🦠 Vision-Powered AI Plant Doctor</h2>
-        <p id="t-scannerDesc">Inspect any leaf or crop. Gemini AI diagnoses disease, severity, cause, recovery plan, and treatment.</p>
+        <h2 id="t-scannerTitle">🦠 Precision Crop Doctor & Pest Pathology AI</h2>
+        <p id="t-scannerDesc">Diagnose leaf diseases, identify damaging insect pests & caterpillars, and run real-time live field video analysis.</p>
       </div>
-      <span class="card-chip">Vision AI</span>
+      <span class="card-chip">Vision AI + Live Telemetry</span>
     </div>
 
-    <form id="predictForm" enctype="multipart/form-data">
-      <div id="dropZone" class="drop-zone">
-        <div class="drop-icon">🍃</div>
-        <p id="t-dropText" style="font-weight:600; font-size:1.05rem;">Click or Drop Plant Leaf Image Here</p>
-        <span style="font-size:0.8rem; color:var(--text-muted);">Supports JPG, PNG, WEBP from phone camera or gallery</span>
-        <input type="file" id="imageInput" name="image" accept="image/*" hidden>
-        <img id="previewImg" alt="Leaf Preview">
-      </div>
-
-      <div class="grid-2" style="margin-bottom:15px;">
-        <button type="button" class="btn-secondary" onclick="openCamera()" id="t-openCamera">📷 Open Camera</button>
-        <button type="button" id="captureBtn" class="btn-primary hidden" onclick="captureImage()" id="t-capturePhoto">📸 Capture Leaf Snapshot</button>
-      </div>
-
-      <video id="camera" class="hidden" autoplay playsinline></video>
-
-      <div class="form-group" style="margin-top:10px;">
-        <label id="t-methodLabel">Preferred Treatment Protocol:</label>
-        <select name="method" id="treatmentMethodSelect">
-          <option value="Organic" id="t-optOrganic">🌱 Eco-Friendly Organic / Bio-Fungicide (Neem, Trichoderma, Compost Tea)</option>
-          <option value="Chemical" id="t-optChemical">🧪 Targeted Chemical Active (Fast Action - Mancozeb, Chlorothalonil)</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn-primary" id="analyzeBtn">
-        <span id="t-analyzeBtn">🔍 Run Multimodal Diagnosis</span>
+    <!-- SCANNER MODE TABS -->
+    <div class="scanner-mode-tabs" id="scannerModeTabs">
+      <button type="button" id="tabUploadMode" class="scanner-tab-btn active" onclick="switchScannerMode('upload')">
+        📁 Photo Upload & Snap
       </button>
-    </form>
+      <button type="button" id="tabLiveMode" class="scanner-tab-btn" onclick="switchScannerMode('live')">
+        🔴 Live Field Scanner (Real-Time Live Analysis)
+      </button>
+    </div>
 
-    <div id="diseaseResult"></div>
+    <!-- PANEL 1: PHOTO UPLOAD & FIELD SNAPSHOT -->
+    <div id="photoUploadPanel">
+      <form id="predictForm" enctype="multipart/form-data">
+        <div id="dropZone" class="drop-zone">
+          <div class="drop-icon">🍃</div>
+          <p id="t-dropText" style="font-weight:600; font-size:1.05rem;">Click or Drop Plant Leaf / Pest Image Here</p>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Supports JPG, PNG, WEBP of foliage, caterpillars, insects, or stem damage</span>
+          <input type="file" id="imageInput" name="image" accept="image/*" hidden>
+          <img id="previewImg" alt="Leaf Preview">
+        </div>
+
+        <div class="grid-2" style="margin-bottom:15px;">
+          <button type="button" class="btn-secondary" onclick="openCamera()" id="t-openCamera">📷 Open Field Camera</button>
+          <button type="button" id="captureBtn" class="btn-primary hidden" onclick="captureImage()" id="t-capturePhoto">📸 Snap Leaf/Pest in Frame</button>
+        </div>
+
+        <div id="cameraViewfinderContainer" class="camera-viewfinder-box hidden">
+          <video id="camera" autoplay playsinline></video>
+          <div class="viewfinder-guide-overlay">
+            <div class="viewfinder-leaf-reticle">
+              <span style="font-size:2rem; opacity:0.85;">🌿</span>
+            </div>
+            <div class="viewfinder-tip-badge">
+              🎯 Center foliage or insect within frame
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
+          <label id="t-methodLabel">Preferred Treatment Protocol:</label>
+          <select name="method" id="treatmentMethodSelect">
+            <option value="Organic" id="t-optOrganic">🌱 Eco-Friendly Organic / Bio-Pesticide (Neem Azadirachtin, Trichoderma, Pheromones)</option>
+            <option value="Chemical" id="t-optChemical">🧪 Targeted Agrochemical Active (Fast Knockdown - Chlorantraniliprole, Mancozeb)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary" id="analyzeBtn">
+          <span id="t-analyzeBtn">🔍 Run Pathology & Pest Diagnosis</span>
+        </button>
+      </form>
+
+      <div id="diseaseResult"></div>
+    </div>
+
+    <!-- PANEL 2: LIVE FIELD SCANNER (CONTINUOUS LIVE ANALYSIS) -->
+    <div id="liveScannerPanel" class="live-scanner-panel hidden">
+      <div class="live-viewfinder-hud">
+        <video id="liveCameraVideo" autoplay playsinline muted></video>
+        
+        <!-- Live HUD Holographic Overlay -->
+        <div class="live-hud-overlay">
+          <!-- Top Bar -->
+          <div class="hud-top-bar">
+            <div class="hud-status-pill" id="liveHudStatus">
+              <span class="hud-blink-dot" id="hudBlinkDot"></span>
+              <span id="hudStatusText">Live Stream Ready • Aim at Crop</span>
+            </div>
+            <div class="hud-controls-group">
+              <button type="button" class="hud-btn" onclick="flipLiveCamera()" title="Switch Front/Back Camera" id="btnFlipCam">🔄 Flip</button>
+              <button type="button" class="hud-btn" onclick="toggleTorch()" title="Toggle Flashlight / Torch" id="btnTorch">💡 Torch</button>
+              <button type="button" class="hud-btn" onclick="toggleFreezeLiveStream()" title="Freeze / Pause Stream" id="btnFreeze">⏸️ Freeze</button>
+            </div>
+          </div>
+
+          <!-- Target Laser Crosshair Frame -->
+          <div class="hud-target-frame">
+            <div class="hud-corner top-left"></div>
+            <div class="hud-corner top-right"></div>
+            <div class="hud-corner bottom-left"></div>
+            <div class="hud-corner bottom-right"></div>
+            <div class="hud-laser-line" id="hudLaserLine"></div>
+            <div class="hud-crosshair-center">
+              <span style="font-size:1.8rem; filter:drop-shadow(0 0 8px #00ffcc);">🔍</span>
+              <div class="hud-focus-hint" id="hudFocusHint">Aim at Foliage, Stem, or Insect</div>
+            </div>
+          </div>
+
+          <!-- Bottom HUD Control Deck -->
+          <div class="hud-bottom-bar">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; width:100%;">
+              <button type="button" class="btn-live-scan" id="btnLiveInstantScan" onclick="performLiveFrameAnalysis()">
+                ⚡ Instant Scan Live Frame
+              </button>
+              <label class="auto-scan-toggle" title="Continuously inspects live video frames every 4 seconds as you move across crops">
+                <input type="checkbox" id="chkAutoScan" onchange="toggleAutoLiveScan(this.checked)">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label">🔁 Continuous Auto-Scan (Every 4s)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Diagnosis Result Card Slot -->
+      <div id="liveDiagnosisCard"></div>
+    </div>
   </section>
 
   <!-- ====================================================== -->
@@ -1042,22 +1899,82 @@ video#camera {
       </div>
     </div>
 
-    <div class="grid-4" style="margin-top:15px;">
-      <div class="form-group">
-        <label id="t-phLabel">Soil pH (4.0 - 9.0)</label>
-        <input type="number" id="fertPhInput" value="6.5" min="4" max="9" step="0.1">
+    <!-- TACTILE N-P-K & pH INTERACTIVE SLIDERS WITH STATUS HINTS -->
+    <div class="grid-4" style="margin-top:18px;">
+      <!-- Soil pH Slider Card -->
+      <div class="nutrient-slider-card">
+        <div class="nutrient-card-header">
+          <label id="t-phLabel" style="font-size:0.85rem; font-weight:600;">Soil pH</label>
+          <span class="nutrient-badge-pill badge-ph" id="badgePhStatus">Optimal</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span class="slider-val-display" id="valPhDisplay">6.5</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Scale: 4.0 - 9.0</span>
+        </div>
+        <input type="range" class="tactile-range" id="fertPhRange" min="4.0" max="9.0" step="0.1" value="6.5" oninput="syncNutrientInput('ph', this.value)">
+        <input type="hidden" id="fertPhInput" value="6.5">
+        <div class="nutrient-status-hint">
+          <span>Acidic</span>
+          <span>Neutral</span>
+          <span>Alkaline</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label id="t-nitrogenLabel">Nitrogen (N) kg/ha</label>
-        <input type="number" id="fertNInput" value="40" min="0">
+
+      <!-- Nitrogen Slider Card -->
+      <div class="nutrient-slider-card">
+        <div class="nutrient-card-header">
+          <label id="t-nitrogenLabel" style="font-size:0.85rem; font-weight:600;">Nitrogen (N)</label>
+          <span class="nutrient-badge-pill badge-n" id="badgeNStatus">Medium</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span class="slider-val-display"><span id="valNDisplay">40</span> <small style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">kg/ha</small></span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">0 - 150 kg</span>
+        </div>
+        <input type="range" class="tactile-range" id="fertNRange" min="0" max="150" step="1" value="40" oninput="syncNutrientInput('n', this.value)">
+        <input type="hidden" id="fertNInput" value="40">
+        <div class="nutrient-status-hint">
+          <span>Low</span>
+          <span>Optimal</span>
+          <span>High</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label id="t-phosphorusLabel">Phosphorus (P) kg/ha</label>
-        <input type="number" id="fertPInput" value="28" min="0">
+
+      <!-- Phosphorus Slider Card -->
+      <div class="nutrient-slider-card">
+        <div class="nutrient-card-header">
+          <label id="t-phosphorusLabel" style="font-size:0.85rem; font-weight:600;">Phosphorus (P)</label>
+          <span class="nutrient-badge-pill badge-p" id="badgePStatus">Normal</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span class="slider-val-display"><span id="valPDisplay">28</span> <small style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">kg/ha</small></span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">0 - 100 kg</span>
+        </div>
+        <input type="range" class="tactile-range" id="fertPRange" min="0" max="100" step="1" value="28" oninput="syncNutrientInput('p', this.value)">
+        <input type="hidden" id="fertPInput" value="28">
+        <div class="nutrient-status-hint">
+          <span>Deficient</span>
+          <span>Adequate</span>
+          <span>Rich</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label id="t-potassiumLabel">Potassium (K) kg/ha</label>
-        <input type="number" id="fertKInput" value="32" min="0">
+
+      <!-- Potassium Slider Card -->
+      <div class="nutrient-slider-card">
+        <div class="nutrient-card-header">
+          <label id="t-potassiumLabel" style="font-size:0.85rem; font-weight:600;">Potassium (K)</label>
+          <span class="nutrient-badge-pill badge-k" id="badgeKStatus">Normal</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span class="slider-val-display"><span id="valKDisplay">32</span> <small style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">kg/ha</small></span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">0 - 120 kg</span>
+        </div>
+        <input type="range" class="tactile-range" id="fertKRange" min="0" max="120" step="1" value="32" oninput="syncNutrientInput('k', this.value)">
+        <input type="hidden" id="fertKInput" value="32">
+        <div class="nutrient-status-hint">
+          <span>Low</span>
+          <span>Adequate</span>
+          <span>Surplus</span>
+        </div>
       </div>
     </div>
 
@@ -1085,15 +2002,15 @@ video#camera {
 
     <div class="grid-2" style="align-items:flex-end;">
       <div class="form-group">
-        <label>Your Farming Location (City/District)</label>
-        <input type="text" id="weatherCityInput" value="Delhi" placeholder="Enter city or district (e.g. Delhi, Punjab, California)">
+        <label>Your Farming Location (City/District/Town)</label>
+        <input type="text" id="weatherCityInput" placeholder="Enter city, district, or town (e.g. Ludhiana, Pune, Patna)" onkeydown="if(event.key==='Enter') loadWeather()">
       </div>
       <div style="display:flex; gap:10px;">
         <button type="button" class="btn-primary" style="margin:0;" onclick="loadWeather()" id="t-checkWeather">
-          🔍 Check Conditions
+          🔍 Search City
         </button>
-        <button type="button" class="btn-secondary" style="width:auto; margin:0;" onclick="useMyLocation()" title="Locate my farm">
-          📍 GPS
+        <button type="button" class="btn-secondary" style="width:auto; margin:0; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;" onclick="useMyLocation()" id="btnAutoLocate" title="Detect my current location">
+          📍 My Location
         </button>
       </div>
     </div>
@@ -1390,11 +2307,13 @@ function showPreview() {
 }
 
 async function openCamera() {
+  const viewfinder = document.getElementById("cameraViewfinderContainer");
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "environment" }
     });
     camera.srcObject = cameraStream;
+    if (viewfinder) viewfinder.classList.remove("hidden");
     camera.classList.remove("hidden");
     captureBtn.classList.remove("hidden");
   } catch (err) {
@@ -1412,6 +2331,7 @@ async function openCamera() {
 }
 
 function captureImage() {
+  const viewfinder = document.getElementById("cameraViewfinderContainer");
   if (!camera || !camera.videoWidth) return;
   const canvas = document.createElement("canvas");
   canvas.width = camera.videoWidth;
@@ -1430,6 +2350,7 @@ function captureImage() {
   if (cameraStream) {
     cameraStream.getTracks().forEach(t => t.stop());
   }
+  if (viewfinder) viewfinder.classList.add("hidden");
   camera.classList.add("hidden");
   captureBtn.classList.add("hidden");
   camera.srcObject = null;
@@ -1478,11 +2399,389 @@ async function compressImageIfNeeded(file) {
 }
 
 // ==========================================
-// 🔬 MODULE 1: PLANT DISEASE DIAGNOSIS
+// 🔬 MODULE 1: ADVANCED PATHOLOGY, PEST & LIVE SCANNER
 // ==========================================
 const predictForm = document.getElementById("predictForm");
 const diseaseResult = document.getElementById("diseaseResult");
+const liveDiagnosisCard = document.getElementById("liveDiagnosisCard");
+let liveCameraStream = null;
+let currentLiveFacingMode = "environment";
+let isTorchActive = false;
+let isLiveStreamFrozen = false;
+let isLiveScanInProgress = false;
+let autoScanTimerId = null;
 
+// Scanner Mode Switching (Photo Upload vs Live Field Scanner)
+function switchScannerMode(mode) {
+  const tabUpload = document.getElementById("tabUploadMode");
+  const tabLive = document.getElementById("tabLiveMode");
+  const uploadPanel = document.getElementById("photoUploadPanel");
+  const livePanel = document.getElementById("liveScannerPanel");
+
+  if (mode === "live") {
+    if (tabUpload) tabUpload.classList.remove("active");
+    if (tabLive) tabLive.classList.add("active");
+    if (uploadPanel) uploadPanel.classList.add("hidden");
+    if (livePanel) livePanel.classList.remove("hidden");
+    startLiveCameraStream();
+  } else {
+    if (tabLive) tabLive.classList.remove("active");
+    if (tabUpload) tabUpload.classList.add("active");
+    if (livePanel) livePanel.classList.add("hidden");
+    if (uploadPanel) uploadPanel.classList.remove("hidden");
+    stopLiveCameraStream();
+  }
+}
+
+// Live Stream Initialization & Hardware Controls
+async function startLiveCameraStream() {
+  const videoEl = document.getElementById("liveCameraVideo");
+  const hudStatus = document.getElementById("hudStatusText");
+  const blinkDot = document.getElementById("hudBlinkDot");
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (hudStatus) hudStatus.innerText = "Camera API not supported in browser";
+    return;
+  }
+
+  try {
+    if (liveCameraStream) {
+      liveCameraStream.getTracks().forEach(t => t.stop());
+    }
+
+    if (hudStatus) hudStatus.innerText = "Activating Field Optics...";
+    liveCameraStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: currentLiveFacingMode,
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+
+    if (videoEl) {
+      videoEl.srcObject = liveCameraStream;
+      await videoEl.play();
+    }
+
+    isLiveStreamFrozen = false;
+    const btnFreeze = document.getElementById("btnFreeze");
+    if (btnFreeze) btnFreeze.innerText = "⏸️ Freeze";
+
+    if (hudStatus) hudStatus.innerText = "Live Telemetry Active • Center Crop or Pest";
+    if (blinkDot) blinkDot.style.background = "#00e676";
+  } catch (err) {
+    console.warn("Live stream access note:", err.message);
+    if (hudStatus) hudStatus.innerText = "Camera permission needed or busy";
+    if (blinkDot) blinkDot.style.background = "#f59e0b";
+  }
+}
+
+function stopLiveCameraStream() {
+  toggleAutoLiveScan(false);
+  const chk = document.getElementById("chkAutoScan");
+  if (chk) chk.checked = false;
+
+  if (liveCameraStream) {
+    liveCameraStream.getTracks().forEach(t => t.stop());
+    liveCameraStream = null;
+  }
+  const videoEl = document.getElementById("liveCameraVideo");
+  if (videoEl) videoEl.srcObject = null;
+  isTorchActive = false;
+  isLiveStreamFrozen = false;
+}
+
+async function flipLiveCamera() {
+  currentLiveFacingMode = currentLiveFacingMode === "environment" ? "user" : "environment";
+  await startLiveCameraStream();
+}
+
+async function toggleTorch() {
+  if (!liveCameraStream) return;
+  const track = liveCameraStream.getVideoTracks()[0];
+  if (!track) return;
+
+  const btnTorch = document.getElementById("btnTorch");
+  try {
+    const capabilities = track.getCapabilities ? track.getCapabilities() : {};
+    if (!capabilities.torch) {
+      showToastNotice("Torch/Flashlight hardware is not available on this camera.");
+      return;
+    }
+    isTorchActive = !isTorchActive;
+    await track.applyConstraints({
+      advanced: [{ torch: isTorchActive }]
+    });
+    if (btnTorch) {
+      btnTorch.style.background = isTorchActive ? "rgba(0,255,204,0.4)" : "";
+      btnTorch.innerText = isTorchActive ? "💡 Light ON" : "💡 Torch";
+    }
+  } catch (err) {
+    console.warn("Torch hardware note:", err.message);
+    showToastNotice("Flashlight control not supported by current browser device.");
+  }
+}
+
+function toggleFreezeLiveStream() {
+  const videoEl = document.getElementById("liveCameraVideo");
+  const btnFreeze = document.getElementById("btnFreeze");
+  const hudStatus = document.getElementById("hudStatusText");
+
+  if (!videoEl || !liveCameraStream) return;
+
+  if (isLiveStreamFrozen) {
+    videoEl.play();
+    isLiveStreamFrozen = false;
+    if (btnFreeze) btnFreeze.innerText = "⏸️ Freeze";
+    if (hudStatus) hudStatus.innerText = "Live Telemetry Active • Center Crop or Pest";
+  } else {
+    videoEl.pause();
+    isLiveStreamFrozen = true;
+    if (btnFreeze) btnFreeze.innerText = "▶️ Resume";
+    if (hudStatus) hudStatus.innerText = "Stream Paused • Frame Frozen";
+  }
+}
+
+// Single Live Frame Snapshot & Prediction
+async function performLiveFrameAnalysis() {
+  const videoEl = document.getElementById("liveCameraVideo");
+  const hudStatus = document.getElementById("hudStatusText");
+  const blinkDot = document.getElementById("hudBlinkDot");
+  const scanBtn = document.getElementById("btnLiveInstantScan");
+  const targetCard = document.getElementById("liveDiagnosisCard");
+
+  if (!videoEl || !videoEl.videoWidth || isLiveScanInProgress) return;
+  isLiveScanInProgress = true;
+
+  if (scanBtn) scanBtn.disabled = true;
+  if (hudStatus) hudStatus.innerText = "🔬 AI Optical Inspection in progress...";
+  if (blinkDot) blinkDot.style.background = "#00ffcc";
+
+  // Capture frame to offscreen canvas
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.min(1280, videoEl.videoWidth);
+  canvas.height = Math.round((canvas.width / videoEl.videoWidth) * videoEl.videoHeight);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) {
+      isLiveScanInProgress = false;
+      if (scanBtn) scanBtn.disabled = false;
+      return;
+    }
+
+    try {
+      const file = new File([blob], "live-field-specimen.jpg", { type: "image/jpeg" });
+      const methodChoice = document.getElementById("treatmentMethodSelect")?.value || "Chemical";
+
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("method", methodChoice);
+      formData.append("lang", currentLanguage);
+
+      const res = await fetch("/predict", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) {
+        throw new Error("Server prediction error");
+      }
+
+      const d = await res.json();
+      if (!d || !d.success) {
+        throw new Error(d?.error || "AI could not recognize frame");
+      }
+
+      latestDiagnosisData = d;
+
+      // Update HUD status banner
+      const isInsect = d.is_insect_caused || (d.category && d.category.includes("Insect"));
+      if (hudStatus) {
+        hudStatus.innerHTML = `✅ ${isInsect ? '🐛 Pest' : '🌿 Diagnosis'}: <b>${d.disease}</b> (${d.severity})`;
+      }
+      if (blinkDot) blinkDot.style.background = isInsect ? "#f59e0b" : "#00e676";
+
+      // Render comprehensive diagnosis card below HUD
+      if (targetCard) {
+        targetCard.innerHTML = generateDiagnosisCardMarkup(d, "live");
+        targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // Persist to Cloud Firestore and sync journal
+      if (typeof window.saveDiagnosisToFirestore === "function") {
+        try {
+          await window.saveDiagnosisToFirestore(d);
+        } catch (saveErr) {
+          console.warn("Background scan save note:", saveErr.message);
+        }
+      } else {
+        loadScanJournal();
+      }
+
+      // Quick audio confirmation if sound enabled
+      if (window.speechEngine && currentLanguage === "hi") {
+        window.speechEngine.speak(`पहचाना गया: ${d.disease}, गंभीरता ${d.severity}`, "hi-IN");
+      }
+
+    } catch (err) {
+      console.warn("Live scan frame notice:", err.message);
+      if (hudStatus) hudStatus.innerText = "Scan retry: Hold camera steady";
+      if (blinkDot) blinkDot.style.background = "#ef4444";
+    } finally {
+      isLiveScanInProgress = false;
+      if (scanBtn) scanBtn.disabled = false;
+    }
+  }, "image/jpeg", 0.88);
+}
+
+// Continuous Auto-Scan (Every 4.5 seconds loop)
+function toggleAutoLiveScan(enabled) {
+  if (autoScanTimerId) {
+    clearInterval(autoScanTimerId);
+    autoScanTimerId = null;
+  }
+
+  const hudStatus = document.getElementById("hudStatusText");
+
+  if (enabled) {
+    if (hudStatus) hudStatus.innerText = "🔁 Auto-Scan Active (Inspecting every 4s)...";
+    // Trigger initial scan right away
+    performLiveFrameAnalysis();
+    autoScanTimerId = setInterval(() => {
+      if (!isLiveScanInProgress && !isLiveStreamFrozen) {
+        performLiveFrameAnalysis();
+      }
+    }, 4500);
+  } else {
+    if (hudStatus && liveCameraStream) hudStatus.innerText = "Live Telemetry Active • Center Crop or Pest";
+  }
+}
+
+// Toast banner utility for user feedback
+function showToastNotice(msg) {
+  const existing = document.getElementById("appToastBanner");
+  if (existing) existing.remove();
+  const toast = document.createElement("div");
+  toast.id = "appToastBanner";
+  toast.style.cssText = "position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(3,20,15,0.92); border:1px solid #00ffcc; color:#e2e8f0; padding:10px 22px; border-radius:30px; font-size:0.85rem; font-weight:600; z-index:9999; box-shadow:0 10px 30px rgba(0,0,0,0.6); backdrop-filter:blur(10px); animation:slideUpFade 0.3s ease;";
+  toast.innerText = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => { if (toast) toast.remove(); }, 3500);
+}
+
+// Comprehensive Universal Diagnosis Card Markup Builder
+function generateDiagnosisCardMarkup(d, viewContext = "standard") {
+  const isInsect = d.is_insect_caused || (d.category && d.category.toLowerCase().includes("insect")) || (d.culprit_type && d.culprit_type.toLowerCase().includes("insect"));
+  const isHealthy = (d.severity || "").toLowerCase().includes("healthy") || (d.disease || "").toLowerCase().includes("healthy");
+
+  // Severity pill class
+  const sevClass = isHealthy ? "sev-healthy"
+    : (d.severity || "").toLowerCase().includes("mild") ? "sev-mild"
+    : (d.severity || "").toLowerCase().includes("moderate") ? "sev-moderate"
+    : "sev-critical";
+
+  // Category chip
+  const categoryBadge = isInsect 
+    ? `<span class="category-chip cat-insect">🐛 Insect / Pest Infestation</span>`
+    : isHealthy 
+    ? `<span class="category-chip cat-healthy">🌿 Healthy Plant Specimen</span>`
+    : `<span class="category-chip cat-disease">🦠 Plant Disease (Pathology)</span>`;
+
+  // Recovery protocol list
+  let protocolHtml = "";
+  if (d.recovery_protocol && d.recovery_protocol.length > 0) {
+    protocolHtml = `
+      <h4 style="color:#fff; margin-top:18px; font-size:0.95rem;">📅 Day-by-Day IPM Recovery Protocol:</h4>
+      <ul class="protocol-list">
+        ${d.recovery_protocol.map(step => `<li><span style="color:#00e676;">✅</span> <span>${step}</span></li>`).join("")}
+      </ul>
+    `;
+  }
+
+  // Prevention tips list
+  let preventionHtml = "";
+  if (d.prevention_tips && d.prevention_tips.length > 0) {
+    preventionHtml = `
+      <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">🛡️ Agronomic Prevention & Crop Protection:</h4>
+      <ul class="protocol-list">
+        ${d.prevention_tips.map(tip => `<li><span style="color:#00ffcc;">🌿</span> <span>${tip}</span></li>`).join("")}
+      </ul>
+    `;
+  }
+
+  // Organism & feeding damage mechanism highlight
+  const culpritCardHtml = `
+    <div class="culprit-card ${isInsect ? 'insect' : (isHealthy ? 'healthy' : 'pathogen')}">
+      <div class="culprit-title" style="color:${isInsect ? '#fbbf24' : isHealthy ? '#4ade80' : '#38bdf8'};">
+        ${isInsect ? '🎯 Causal Insect / Arthropod Pest' : isHealthy ? '🌱 Plant Status' : '🎯 Causal Organism / Pathogen'} (${d.culprit_type || d.cause || 'Biological'})
+      </div>
+      <div class="culprit-name">${d.culprit || (isInsect ? 'Insect Pest Organism' : 'Pathological Microbial Agent')}</div>
+      ${d.damage_mechanism ? `
+        <div class="culprit-mech">
+          <b>${isInsect ? 'Damage Mechanism & Feeding Behavior' : 'Pathological Symptomology'}:</b> ${d.damage_mechanism}
+        </div>` : ''}
+    </div>
+  `;
+
+  return `
+    <div class="diagnosis-result-card" style="border-color:${isInsect ? 'rgba(245,158,11,0.45)' : 'rgba(0,255,170,0.3)'};">
+      <div class="diagnosis-header">
+        <div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+            ${categoryBadge}
+            <span class="disease-plant" style="font-weight:700;">${d.plant || "Crop Specimen"}</span>
+          </div>
+          <div class="disease-name">${d.disease}</div>
+          <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">
+            Cause: <b>${d.cause || "Biological"}</b> • Confidence: <b>${d.confidence}%</b> • Source: <b>${d.source}</b>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+          <span class="severity-pill ${sevClass}">${d.severity}</span>
+          <button type="button" class="btn-tts" onclick="readDiagnosisAloud()">
+            🔊 Listen / आवाज
+          </button>
+        </div>
+      </div>
+
+      ${culpritCardHtml}
+
+      <p style="font-size:0.92rem; line-height:1.6; color:#e2e8f0; margin:10px 0 14px 0;">
+        ${d.summary || ""}
+      </p>
+
+      <div class="treatment-box">
+        <h4>💊 Recommended Treatment (${d.method || "Standard"} Protocol):</h4>
+        <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">
+          ${d.treatment}
+        </p>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px 0;">
+        <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Organic')">
+          🌱 View Organic / Bio-Control
+        </button>
+        <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
+          🧪 View Chemical Active
+        </button>
+        <button type="button" class="btn-report-export" onclick="exportDiagnosisPDF()">
+          📄 Download / Print PDF Report
+        </button>
+        <button type="button" class="btn-whatsapp-share" onclick="shareDiagnosisWhatsApp()">
+          💬 Share on WhatsApp
+        </button>
+      </div>
+
+      ${protocolHtml}
+      ${preventionHtml}
+    </div>
+  `;
+}
+
+// Classic Photo Upload & Single-Snapshot Submission
 predictForm.onsubmit = async (e) => {
   e.preventDefault();
 
@@ -1490,7 +2789,7 @@ predictForm.onsubmit = async (e) => {
     diseaseResult.innerHTML = `
       <div class="diagnosis-result-card" style="border-color:#fbbf24;">
         <h4 style="color:#fbbf24;">⚠️ Photo Required</h4>
-        <p style="margin-top:6px; font-size:0.88rem;">Please select or capture a crop leaf photo before clicking inspect.</p>
+        <p style="margin-top:6px; font-size:0.88rem;">Please select or capture a crop foliage, stem, or pest photo before running diagnosis.</p>
       </div>
     `;
     return;
@@ -1500,14 +2799,14 @@ predictForm.onsubmit = async (e) => {
   diseaseResult.innerHTML = `
     <div style="padding:24px; text-align:center; background:rgba(0,255,200,0.08); border-radius:18px; margin-top:20px; border:1px solid rgba(0,255,200,0.2);">
       <div style="font-size:32px; animation:pulseLeaf 1.5s infinite;">🧬</div>
-      <p style="margin-top:10px; font-weight:600; color:var(--accent-cyan);">${dict.analyzingText || "Inspecting leaf cell morphology with AI..."}</p>
+      <p style="margin-top:10px; font-weight:600; color:var(--accent-cyan);">${dict.analyzingText || "Inspecting plant pathology & insect morphology with AI..."}</p>
     </div>
   `;
 
   try {
     const rawFile = imageInput.files[0];
     const optimizedFile = await compressImageIfNeeded(rawFile);
-    const methodChoice = document.querySelector('input[name="method"]:checked')?.value || "Chemical";
+    const methodChoice = document.getElementById("treatmentMethodSelect")?.value || "Chemical";
 
     const formData = new FormData();
     formData.append("image", optimizedFile);
@@ -1520,7 +2819,7 @@ predictForm.onsubmit = async (e) => {
     });
 
     if (!res.ok) {
-      let errText = "Could not analyze the leaf image.";
+      let errText = "Could not analyze the image.";
       try {
         const errJson = await res.json();
         errText = errJson.error || errText;
@@ -1539,82 +2838,14 @@ predictForm.onsubmit = async (e) => {
       diseaseResult.innerHTML = `
         <div class="diagnosis-result-card" style="border-color:#ef4444;">
           <h3 style="color:#ef4444;">❌ Analysis Error</h3>
-          <p style="margin-top:8px;">${d?.error || "Could not analyze the leaf image."}</p>
+          <p style="margin-top:8px;">${d?.error || "Could not analyze the image."}</p>
         </div>
       `;
       return;
     }
 
     latestDiagnosisData = d;
-
-    // Severity styling class
-    const sevClass = (d.severity || "").toLowerCase().includes("healthy") ? "sev-healthy"
-      : (d.severity || "").toLowerCase().includes("mild") ? "sev-mild"
-      : (d.severity || "").toLowerCase().includes("moderate") ? "sev-moderate"
-      : "sev-critical";
-
-    let protocolHtml = "";
-    if (d.recovery_protocol && d.recovery_protocol.length > 0) {
-      protocolHtml = `
-        <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">📅 Day-by-Day Recovery Protocol:</h4>
-        <ul class="protocol-list">
-          ${d.recovery_protocol.map(step => `<li><span>✅</span> <span>${step}</span></li>`).join("")}
-        </ul>
-      `;
-    }
-
-    let preventionHtml = "";
-    if (d.prevention_tips && d.prevention_tips.length > 0) {
-      preventionHtml = `
-        <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">🛡️ Prevention & Protection:</h4>
-        <ul class="protocol-list">
-          ${d.prevention_tips.map(tip => `<li><span>🌿</span> <span>${tip}</span></li>`).join("")}
-        </ul>
-      `;
-    }
-
-    diseaseResult.innerHTML = `
-      <div class="diagnosis-result-card">
-        <div class="diagnosis-header">
-          <div>
-            <div class="disease-plant">${d.plant || "Plant Specimen"}</div>
-            <div class="disease-name">${d.disease}</div>
-            <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">
-              Cause: <b>${d.cause || "Pathological"}</b> • Confidence: <b>${d.confidence}%</b> • Source: <b>${d.source}</b>
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-            <span class="severity-pill ${sevClass}">${d.severity}</span>
-            <button type="button" class="btn-tts" onclick="readDiagnosisAloud()">
-              🔊 Listen / आवाज
-            </button>
-          </div>
-        </div>
-
-        <p style="font-size:0.92rem; line-height:1.6; color:#e2e8f0; margin-bottom:12px;">
-          ${d.summary || ""}
-        </p>
-
-        <div class="treatment-box">
-          <h4>💊 Recommended Treatment (${d.method} Protocol):</h4>
-          <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">
-            ${d.treatment}
-          </p>
-        </div>
-
-        <div style="display:flex; gap:10px; margin:10px 0;">
-          <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Organic')">
-            🌱 View Organic Remedy
-          </button>
-          <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
-            🧪 View Chemical Remedy
-          </button>
-        </div>
-
-        ${protocolHtml}
-        ${preventionHtml}
-      </div>
-    `;
+    diseaseResult.innerHTML = generateDiagnosisCardMarkup(d, "upload");
 
     // Save scan directly to Cloud Firestore in background without blocking UI
     if (typeof window.saveDiagnosisToFirestore === "function") {
@@ -1640,14 +2871,16 @@ predictForm.onsubmit = async (e) => {
 
 function switchTreatmentView(method) {
   if (!latestDiagnosisData) return;
-  const box = document.querySelector(".treatment-box");
-  if (!box) return;
+  const boxes = document.querySelectorAll(".treatment-box");
+  if (!boxes.length) return;
 
   const content = method === "Organic" ? latestDiagnosisData.organic_treatment : latestDiagnosisData.chemical_treatment;
-  box.innerHTML = `
-    <h4>💊 Recommended Treatment (${method} Protocol):</h4>
-    <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">${content}</p>
-  `;
+  boxes.forEach(box => {
+    box.innerHTML = `
+      <h4>💊 Recommended Treatment (${method} Protocol):</h4>
+      <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">${content}</p>
+    `;
+  });
 }
 
 function readDiagnosisAloud() {
@@ -1659,8 +2892,248 @@ function readDiagnosisAloud() {
     : currentLanguage === "bn" ? "bn-IN" 
     : "en-US";
 
-  const readoutText = `${latestDiagnosisData.plant}. Disease detected: ${latestDiagnosisData.disease}. Severity is ${latestDiagnosisData.severity}. ${latestDiagnosisData.summary}. Treatment recommendation: ${latestDiagnosisData.treatment}`;
+  let readoutText = "";
+  const d = latestDiagnosisData;
+  const isInsect = d.is_insect_caused || (d.category && d.category.includes("Insect"));
+
+  if (currentLanguage === "hi") {
+    if (isInsect) {
+      readoutText = `फसल: ${d.plant}। कीट की पहचान: ${d.disease}। कारक कीट: ${d.culprit || 'कीट'}। गंभीरता: ${d.severity}। रोकथाम और उपचार: ${d.treatment}`;
+    } else {
+      readoutText = `फसल: ${d.plant}। बीमारी: ${d.disease}। रोगकारक: ${d.culprit || 'रोगजनक'}। गंभीरता: ${d.severity}। रोकथाम और उपचार: ${d.treatment}`;
+    }
+  } else {
+    readoutText = `${d.plant}. Condition diagnosed: ${d.disease}. Organism: ${d.culprit || d.cause}. Severity is ${d.severity}. ${d.summary}. Recommended treatment: ${d.treatment}`;
+  }
   window.speechEngine.speak(readoutText, speechLang);
+}
+
+// 📄 PDF / Diagnostic Report Export
+function exportDiagnosisPDF() {
+  if (!latestDiagnosisData) return;
+  const d = latestDiagnosisData;
+  const isInsect = d.is_insect_caused || (d.category && d.category.includes("Insect"));
+  const printDate = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  const printTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const printWindow = window.open("", "_blank", "width=850,height=950");
+  if (!printWindow) {
+    window.print();
+    return;
+  }
+
+  const recoveryHtml = (d.recovery_protocol || d.recovery_schedule || []).map(s => `<li style="margin-bottom:6px;">${typeof s === 'object' ? `<b>${s.day}:</b> ${s.action}` : s}</li>`).join("");
+  const preventionHtml = (d.prevention_tips || []).map(t => `<li style="margin-bottom:6px;">${t}</li>`).join("");
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>KisanAI Agronomic Pathology Report - ${d.plant} (${d.disease})</title>
+      <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 35px; color: #1e293b; line-height: 1.5; }
+        .header { border-bottom: 3px solid #16a34a; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .brand { font-size: 24px; font-weight: bold; color: #16a34a; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; background: #dcfce7; color: #166534; }
+        .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        h3 { color: #0f172a; margin-top: 0; margin-bottom: 8px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; font-size: 15px; }
+        ul { margin-top: 4px; padding-left: 20px; }
+        .footer { margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 11px; color: #64748b; text-align: center; }
+        @media print {
+          body { margin: 15mm; }
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div>
+          <div class="brand">🌾 KisanAI Farm Intelligence Report</div>
+          <div style="font-size: 13px; color: #64748b;">Autonomous Multimodal Crop Disease & Insect Advisory</div>
+        </div>
+        <div style="text-align: right; font-size: 12px; color: #64748b;">
+          <div><b>Report Date:</b> ${printDate} ${printTime}</div>
+          <div><b>Diagnostic Engine:</b> Gemini 3.8 Flash Multimodal Vision</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-left: 5px solid ${isInsect ? '#f59e0b' : '#16a34a'}; background: ${isInsect ? '#fffbeb' : '#f0fdf4'};">
+        <h2 style="margin: 0 0 6px 0; color: ${isInsect ? '#b45309' : '#15803d'}; font-size: 20px;">
+          ${d.plant}: ${d.disease} ${isInsect ? '🐛 [Insect/Pest Infestation]' : '🦠 [Pathological Disease]'}
+        </h2>
+        <div style="font-size: 13px; color: #334155; margin-bottom: 10px;">
+          <b>Causal Culprit:</b> ${d.culprit || d.cause || "Pathogen"} &nbsp;|&nbsp;
+          <b>Classification:</b> ${d.culprit_type || d.cause || "Biological"} &nbsp;|&nbsp;
+          <b>AI Confidence:</b> ${d.confidence}% &nbsp;|&nbsp;
+          <b>Severity:</b> <span class="badge">${d.severity}</span>
+        </div>
+        ${d.damage_mechanism ? `<div style="font-size:12px; color:#475569; margin-bottom:8px;"><b>Feeding / Damage Mechanism:</b> ${d.damage_mechanism}</div>` : ''}
+        <p style="margin: 0; font-size: 14px; color: #1e293b;">${d.summary || ""}</p>
+      </div>
+
+      <div class="card">
+        <h3>💊 Prescribed Treatment Protocol (${d.method || "Selected"} Protocol)</h3>
+        <p style="font-size: 13px; margin: 4px 0 10px 0;">${d.treatment}</p>
+        <div style="font-size: 12px; color: #475569;">
+          <b>Organic / Bio-Pesticide Alternative:</b> ${d.organic_treatment || "Neem Azadirachtin / Bio-fungicide foliar spray"}
+          <br>
+          <b>Targeted Chemical Active:</b> ${d.chemical_treatment || "Contact / systemic active spray"}
+        </div>
+      </div>
+
+      ${recoveryHtml ? `
+      <div class="card">
+        <h3>📅 Day-by-Day Field Recovery & IPM Schedule</h3>
+        <ul style="font-size: 13px;">${recoveryHtml}</ul>
+      </div>` : ""}
+
+      ${preventionHtml ? `
+      <div class="card">
+        <h3>🛡️ Agronomic Prevention & Crop Protection Directives</h3>
+        <ul style="font-size: 13px;">${preventionHtml}</ul>
+      </div>` : ""}
+
+      <div class="footer">
+        Generated by KisanAI Precision Agriculture Portal • Validated with ICAR & FAO Plant Protection Standards • Consult your local agricultural extension officer for regulated substance permits.
+      </div>
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 400);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}
+
+// 💬 WhatsApp Share Summary
+function shareDiagnosisWhatsApp() {
+  if (!latestDiagnosisData) return;
+  const d = latestDiagnosisData;
+  const isInsect = d.is_insect_caused || (d.category && d.category.includes("Insect"));
+  const message = 
+`🌾 *KisanAI Crop Pathology & Pest Diagnosis Report*
+🌱 *Specimen:* ${d.plant}
+${isInsect ? '🐛 *Insect/Pest:*' : '🦠 *Diagnosis:*'} ${d.disease}
+🎯 *Causal Agent:* ${d.culprit || d.cause || "Biological"} (${d.culprit_type || 'Biological'})
+⚠️ *Severity:* ${d.severity} (Confidence: ${d.confidence}%)
+${d.damage_mechanism ? `🔬 *Feeding Behavior:* ${d.damage_mechanism}\n` : ''}
+📋 *Summary:* ${d.summary}
+
+💊 *Prescribed Treatment:*
+${d.treatment}
+
+🌱 *Bio/Organic Remedy:* ${d.organic_treatment || "Neem Azadirachtin spray"}
+🧪 *Chemical Remedy:* ${d.chemical_treatment || "Recommended active spray"}
+
+🛡️ *Prevention Tip:* ${d.prevention_tips ? d.prevention_tips[0] : "Maintain proper crop spacing and balanced field scouting."}
+
+🔍 Verified with KisanAI Multimodal Vision Doctor`;
+
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  window.open(waUrl, "_blank");
+}
+
+// ==========================================
+// 🌞 EXTRAORDINARY UI HELPERS
+// ==========================================
+function toggleSunlightMode() {
+  document.body.classList.toggle("theme-sunlight");
+  const isSunlight = document.body.classList.contains("theme-sunlight");
+  const btnLabel = document.getElementById("themeToggleLabel");
+  const btn = document.getElementById("themeToggleBtn");
+  if (btnLabel) {
+    btnLabel.textContent = isSunlight ? "Twilight Mode" : "Sunlight Mode";
+  }
+  if (btn) {
+    btn.innerHTML = isSunlight ? '🌙 <span id="themeToggleLabel">Twilight Mode</span>' : '☀️ <span id="themeToggleLabel">Sunlight Mode</span>';
+  }
+  try {
+    localStorage.setItem("kisan_theme_mode", isSunlight ? "sunlight" : "twilight");
+  } catch(e) {}
+}
+
+// Restore saved theme on startup
+try {
+  if (localStorage.getItem("kisan_theme_mode") === "sunlight") {
+    document.body.classList.add("theme-sunlight");
+    setTimeout(() => {
+      const btn = document.getElementById("themeToggleBtn");
+      if (btn) btn.innerHTML = '🌙 <span id="themeToggleLabel">Twilight Mode</span>';
+    }, 100);
+  }
+} catch(e) {}
+
+// Dynamic Tactile Nutrient Slider Synchronizer
+function syncNutrientInput(type, value) {
+  const v = parseFloat(value);
+  if (type === "ph") {
+    const input = document.getElementById("fertPhInput");
+    const display = document.getElementById("valPhDisplay");
+    const badge = document.getElementById("badgePhStatus");
+    if (input) input.value = v;
+    if (display) display.textContent = v.toFixed(1);
+    if (badge) {
+      if (v < 6.0) { badge.textContent = "Acidic"; badge.style.color = "#f87171"; }
+      else if (v > 7.5) { badge.textContent = "Alkaline"; badge.style.color = "#fbbf24"; }
+      else { badge.textContent = "Optimal"; badge.style.color = "#34d399"; }
+    }
+  } else if (type === "n") {
+    const input = document.getElementById("fertNInput");
+    const display = document.getElementById("valNDisplay");
+    const badge = document.getElementById("badgeNStatus");
+    if (input) input.value = v;
+    if (display) display.textContent = v;
+    if (badge) {
+      if (v < 25) { badge.textContent = "Low"; badge.style.color = "#f87171"; }
+      else if (v > 75) { badge.textContent = "High"; badge.style.color = "#38bdf8"; }
+      else { badge.textContent = "Optimal"; badge.style.color = "#34d399"; }
+    }
+  } else if (type === "p") {
+    const input = document.getElementById("fertPInput");
+    const display = document.getElementById("valPDisplay");
+    const badge = document.getElementById("badgePStatus");
+    if (input) input.value = v;
+    if (display) display.textContent = v;
+    if (badge) {
+      if (v < 20) { badge.textContent = "Deficient"; badge.style.color = "#f87171"; }
+      else if (v > 50) { badge.textContent = "Rich"; badge.style.color = "#fbbf24"; }
+      else { badge.textContent = "Adequate"; badge.style.color = "#34d399"; }
+    }
+  } else if (type === "k") {
+    const input = document.getElementById("fertKInput");
+    const display = document.getElementById("valKDisplay");
+    const badge = document.getElementById("badgeKStatus");
+    if (input) input.value = v;
+    if (display) display.textContent = v;
+    if (badge) {
+      if (v < 25) { badge.textContent = "Low"; badge.style.color = "#f87171"; }
+      else if (v > 65) { badge.textContent = "Surplus"; badge.style.color = "#c084fc"; }
+      else { badge.textContent = "Adequate"; badge.style.color = "#34d399"; }
+    }
+  }
+}
+
+// Sparkline SVG generator for commodity trend graphs
+function generateSparklineSvg(trend) {
+  let points = "";
+  let stroke = "#34d399";
+  if (trend === "up") {
+    points = "0,18 15,16 30,12 45,14 60,7 75,3";
+    stroke = "#34d399";
+  } else if (trend === "down") {
+    points = "0,4 15,7 30,11 45,9 60,16 75,20";
+    stroke = "#f87171";
+  } else {
+    points = "0,12 15,10 30,14 45,9 60,11 75,10";
+    stroke = "#38bdf8";
+  }
+  return `
+    <svg class="sparkline-svg" viewBox="0 0 75 22">
+      <polyline fill="none" stroke="${stroke}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${points}" />
+    </svg>
+  `;
 }
 
 // ==========================================
@@ -1759,6 +3232,100 @@ async function calculatePlotFertilizer() {
 // ==========================================
 // 🌦️ MODULE 3: WEATHER & SMART SPRAY ADVISORY
 // ==========================================
+function renderWeatherUI(d) {
+  const box = document.getElementById("weatherDisplayBox");
+  if (!box) return;
+  const sprayClass = d.spray_safety === "SAFE" ? "spray-safe" 
+    : d.spray_safety === "CAUTION" ? "spray-caution" : "spray-unsafe";
+
+  // Build 24-Hour Spray Timeline based on spray conditions
+  const currentHour = new Date().getHours();
+  let timelineHtml = "";
+  for (let h = 0; h < 24; h += 2) {
+    let barClass = "bar-safe";
+    let statusText = "Safe Window";
+    // Afternoon wind or midday heat (11am - 4pm) triggers caution/unsafe
+    if (h >= 11 && h <= 16) {
+      barClass = d.spray_safety === "UNSAFE" ? "bar-unsafe" : "bar-caution";
+      statusText = "Midday Thermal Drift / Sun";
+    } else if (d.spray_safety === "UNSAFE") {
+      barClass = "bar-unsafe";
+      statusText = "High Wind / Rain";
+    } else if (h >= 6 && h <= 10) {
+      barClass = "bar-safe";
+      statusText = "Prime Morning Window";
+    } else if (h >= 17 && h <= 20) {
+      barClass = "bar-safe";
+      statusText = "Prime Evening Window";
+    } else {
+      barClass = "bar-caution";
+      statusText = "Night Dew Accumulation";
+    }
+    const isNow = h <= currentHour && currentHour < h + 2;
+    timelineHtml += `
+      <div class="spray-hour-bar ${barClass}" title="${h}:00 - ${h+2}:00: ${statusText} ${isNow ? '(Current Hour)' : ''}" style="${isNow ? 'box-shadow: 0 0 8px #fff; border: 1px solid #fff;' : ''}">
+        ${h}h
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="weather-hero-card">
+      <div class="weather-orb-container">
+        <div class="weather-orb-icon">🌤️</div>
+        <div class="weather-temp-big">${d.temperature}°C</div>
+        <div style="font-size:1.1rem; font-weight:600; color:#fff;">${d.city}</div>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${d.condition}</div>
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:6px; background:rgba(255,255,255,0.06); display:inline-block; padding:2px 8px; border-radius:10px;">📡 ${d.source || 'Live Weather Telemetry'}</div>
+      </div>
+
+      <div>
+        <div class="grid-2">
+          <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Wind Speed</span>
+            <div style="font-size:1.2rem; font-weight:700; color:#fff;">🌬️ ${d.windSpeed} km/h</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Humidity</span>
+            <div style="font-size:1.2rem; font-weight:700; color:#fff;">💧 ${d.humidity}%</div>
+          </div>
+        </div>
+
+        <div class="spray-alert-box ${sprayClass}">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="font-size:1rem;">${d.spray_badge}</b>
+            <button type="button" class="btn-tts" style="padding:6px 14px; font-size:0.78rem;" onclick="readWeatherAloud('${d.city}', '${d.temperature}', '${d.spray_badge}', '${d.spray_reason}', '${d.spray_window}')">
+              🔊 Listen / सुनें
+            </button>
+          </div>
+          <p style="font-size:0.88rem; margin-top:8px; line-height:1.5;">${d.spray_reason}</p>
+          <div style="font-size:0.82rem; margin-top:6px; color:#cbd5e1;">
+            🕒 <b>Best Spray Window:</b> ${d.spray_window}
+          </div>
+
+          <!-- 24-Hour Spray Timeline Bar -->
+          <div style="margin-top:12px; font-size:0.75rem; color:#cbd5e1; font-weight:600;">
+            <span>⏱️ 24h Spray Window Forecast (Hover for Details):</span>
+            <div class="spray-timeline-hours">
+              ${timelineHtml}
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; color:var(--text-muted);">
+              <span>🟢 Safe Window</span>
+              <span>🟡 Caution</span>
+              <span>🔴 Unsafe (Drift/Rain)</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05); padding:14px 18px; border-radius:14px; margin-top:12px; border:1px solid rgba(255,255,255,0.08);">
+          <b style="font-size:0.88rem; color:var(--accent-cyan);">💧 Irrigation Directive:</b>
+          <p style="font-size:0.85rem; color:#e2e8f0; margin-top:4px;">${d.irrigation_advice}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 async function loadWeather(cityParam) {
   const city = cityParam || document.getElementById("weatherCityInput").value.trim() || "Delhi";
   const box = document.getElementById("weatherDisplayBox");
@@ -1770,51 +3337,7 @@ async function loadWeather(cityParam) {
       throw new Error(`Weather service responded with status ${res.status}`);
     }
     const d = await res.json();
-
-    const sprayClass = d.spray_safety === "SAFE" ? "spray-safe" 
-      : d.spray_safety === "CAUTION" ? "spray-caution" : "spray-unsafe";
-
-    box.innerHTML = `
-      <div class="weather-hero-card">
-        <div class="weather-orb-container">
-          <div class="weather-orb-icon">🌤️</div>
-          <div class="weather-temp-big">${d.temperature}°C</div>
-          <div style="font-size:1.1rem; font-weight:600; color:#fff;">${d.city}</div>
-          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${d.condition}</div>
-        </div>
-
-        <div>
-          <div class="grid-2">
-            <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-              <span style="font-size:0.8rem; color:var(--text-muted);">Wind Speed</span>
-              <div style="font-size:1.2rem; font-weight:700; color:#fff;">🌬️ ${d.windSpeed} km/h</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-              <span style="font-size:0.8rem; color:var(--text-muted);">Humidity</span>
-              <div style="font-size:1.2rem; font-weight:700; color:#fff;">💧 ${d.humidity}%</div>
-            </div>
-          </div>
-
-          <div class="spray-alert-box ${sprayClass}">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <b style="font-size:1rem;">${d.spray_badge}</b>
-              <button type="button" class="btn-tts" style="padding:6px 14px; font-size:0.78rem;" onclick="readWeatherAloud('${d.city}', '${d.temperature}', '${d.spray_badge}', '${d.spray_reason}', '${d.spray_window}')">
-                🔊 Listen / सुनें
-              </button>
-            </div>
-            <p style="font-size:0.88rem; margin-top:8px; line-height:1.5;">${d.spray_reason}</p>
-            <div style="font-size:0.82rem; margin-top:6px; color:#cbd5e1;">
-              🕒 <b>Best Spray Window:</b> ${d.spray_window}
-            </div>
-          </div>
-
-          <div style="background:rgba(255,255,255,0.05); padding:14px 18px; border-radius:14px; margin-top:12px; border:1px solid rgba(255,255,255,0.08);">
-            <b style="font-size:0.88rem; color:var(--accent-cyan);">💧 Irrigation Directive:</b>
-            <p style="font-size:0.85rem; color:#e2e8f0; margin-top:4px;">${d.irrigation_advice}</p>
-          </div>
-        </div>
-      </div>
-    `;
+    renderWeatherUI(d);
   } catch (err) {
     console.warn("Weather telemetry notice:", err.message);
     box.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.04); border-radius:14px; color:#cbd5e1;">Atmospheric telemetry updating for ${city}... <button type="button" class="btn-secondary" style="margin-left:10px; padding:4px 10px; font-size:0.8rem;" onclick="loadWeather('Delhi')">Retry</button></div>`;
@@ -1824,32 +3347,129 @@ async function loadWeather(cityParam) {
 function readWeatherAloud(city, temp, badge, reason, windowHours) {
   if (!window.speechEngine) return;
   const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
-  const readout = `Weather report for ${city}. Current temperature is ${temp} degrees celsius. Spray advisory is: ${badge}. ${reason}. Ideal spray hours are ${windowHours}.`;
+  let readout = "";
+  if (currentLanguage === "hi") {
+    readout = `${city} के लिए मौसम रिपोर्ट। वर्तमान तापमान ${temp} डिग्री सेल्सियस है। छिड़काव सलाह: ${badge}। ${reason}। छिड़काव का उत्तम समय ${windowHours} है।`;
+  } else {
+    readout = `Weather advisory for ${city}. Current temperature is ${temp} degrees celsius. Spray advisory: ${badge}. ${reason}. Ideal spraying hours are ${windowHours}.`;
+  }
   window.speechEngine.speak(readout, speechLang);
 }
 
 function useMyLocation() {
-  if (!navigator.geolocation) {
+  const box = document.getElementById("weatherDisplayBox");
+  if (box) {
+    box.innerHTML = `
+      <div style="padding:28px 20px; text-align:center; color:var(--accent-cyan);">
+        <div style="font-size:2.2rem; margin-bottom:10px;">📍</div>
+        <div style="font-size:1.05rem; font-weight:700; color:#fff;">Detecting Your Local Farm Telemetry...</div>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">Querying GPS satellites & network location...</div>
+      </div>
+    `;
+  }
+
+  const fallbackToNetworkLocation = async (reason) => {
+    console.log("GPS Notice (" + reason + "), trying network IP auto-geocoding...");
+    try {
+      const geoRes = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client", {
+        signal: AbortSignal.timeout(4500)
+      });
+      if (geoRes.ok) {
+        const geo = await geoRes.json();
+        const detectedPlace = geo.locality || geo.city || geo.principalSubdivision;
+        const lat = geo.latitude;
+        const lon = geo.longitude;
+        const region = geo.principalSubdivision || "";
+        const country = geo.countryName || "";
+        const fullName = detectedPlace ? `${detectedPlace}${region && region !== detectedPlace ? ', ' + region : ''}${country ? ', ' + country : ''}` : "";
+
+        const cityInput = document.getElementById("weatherCityInput");
+        if (cityInput && (detectedPlace || fullName)) {
+          cityInput.value = detectedPlace || fullName;
+        }
+
+        if (lat && lon) {
+          const wRes = await fetch(`/weather?lat=${lat}&lon=${lon}&place=${encodeURIComponent(fullName || detectedPlace || '')}`);
+          if (wRes.ok) {
+            const data = await wRes.json();
+            renderWeatherUI(data);
+            return;
+          }
+        } else if (detectedPlace) {
+          await loadWeather(detectedPlace);
+          return;
+        }
+      }
+    } catch(err) {
+      console.warn("Network IP location notice:", err);
+    }
     loadWeather("Delhi");
+  };
+
+  if (!navigator.geolocation) {
+    fallbackToNetworkLocation("Browser does not support GPS");
     return;
   }
-  navigator.geolocation.getCurrentPosition(async pos => {
-    try {
+
+  let finished = false;
+  const timer = setTimeout(() => {
+    if (!finished) {
+      finished = true;
+      fallbackToNetworkLocation("GPS satellite fix timed out");
+    }
+  }, 7000);
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
-      const res = await fetch(`/weather?lat=${lat}&lon=${lon}`);
-      if (res.ok) {
-        const data = await res.json();
-        renderWeatherUI(data);
-      } else {
-        loadWeather("Delhi");
+
+      // Reverse geocode to get locality name for UI
+      let placeLabel = "";
+      try {
+        const rev = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`, {
+          signal: AbortSignal.timeout(3000)
+        });
+        if (rev.ok) {
+          const rData = await rev.json();
+          const loc = rData.locality || rData.city || rData.principalSubdivision;
+          const sub = rData.principalSubdivision;
+          const cty = rData.countryName || "";
+          placeLabel = loc ? `${loc}${sub && sub !== loc ? ', ' + sub : ''}${cty ? ', ' + cty : ''}` : "";
+          const cityInput = document.getElementById("weatherCityInput");
+          if (cityInput && loc) cityInput.value = loc;
+        }
+      } catch(e) {}
+
+      try {
+        const res = await fetch(`/weather?lat=${lat}&lon=${lon}&place=${encodeURIComponent(placeLabel)}`);
+        if (res.ok) {
+          const data = await res.json();
+          renderWeatherUI(data);
+        } else {
+          fallbackToNetworkLocation("Weather server error for coordinates");
+        }
+      } catch (err) {
+        fallbackToNetworkLocation(err.message || "Failed to fetch weather for coordinates");
       }
-    } catch(e) {
-      loadWeather("Delhi");
+    },
+    (err) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      const msg = err.code === 1 ? "Permission denied" : (err.code === 2 ? "Position unavailable" : "Timeout");
+      fallbackToNetworkLocation(`GPS ${msg}`);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 6500,
+      maximumAge: 60000
     }
-  }, () => {
-    loadWeather("Delhi");
-  });
+  );
 }
 
 // ==========================================
@@ -1865,16 +3485,20 @@ async function loadMandiPrices() {
     container.innerHTML = data.commodities.map(c => {
       const trendIcon = c.trend === "up" ? "📈" : c.trend === "down" ? "📉" : "➖";
       const trendClass = c.trend === "up" ? "trend-up" : c.trend === "down" ? "trend-down" : "trend-stable";
+      const sparkline = generateSparklineSvg(c.trend);
       return `
         <div class="commodity-card">
           <div class="commodity-header">
             <b style="color:#fff; font-size:0.95rem;">${c.crop}</b>
             <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:12px;">${c.season}</span>
           </div>
-          <div class="commodity-price">${c.price_per_quintal.toLocaleString()} <span style="font-size:0.8rem; color:var(--text-muted);">${c.unit}</span></div>
-          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.78rem;">
-            <span class="${trendClass}">${trendIcon} ${c.trend.toUpperCase()}</span>
-            <span style="color:var(--text-muted);">Avg Yield: ${c.avg_yield} Q/ac</span>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <div class="commodity-price">₹${c.price_per_quintal.toLocaleString()} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">/ 100kg</span></div>
+            <div title="7-Day APMC Market Trajectory">${sparkline}</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:0.78rem;">
+            <span class="${trendClass}" style="font-weight:700;">${trendIcon} ${c.trend.toUpperCase()}</span>
+            <span style="color:var(--text-muted);">Avg Yield: <b>${c.avg_yield}</b> Q/ac</span>
           </div>
         </div>
       `;
@@ -2271,9 +3895,37 @@ window.deletePlot = async function(plotId) {
   }
 };
 
+// PWA Service Worker Registration and In-App Install Prompt
+let deferredPwaPrompt = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('🌾 PWA Service Worker Active, Scope:', reg.scope))
+      .catch(err => console.warn('PWA Service Worker registration notice:', err));
+  });
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const pwaBtn = document.getElementById('pwaInstallBtn');
+  if (pwaBtn) pwaBtn.classList.remove('hidden');
+});
+
+window.triggerPwaInstall = async function() {
+  if (!deferredPwaPrompt) return;
+  deferredPwaPrompt.prompt();
+  const choice = await deferredPwaPrompt.userChoice;
+  console.log('Farmer install choice:', choice.outcome);
+  deferredPwaPrompt = null;
+  const pwaBtn = document.getElementById('pwaInstallBtn');
+  if (pwaBtn) pwaBtn.classList.add('hidden');
+};
+
 // Initial boot sequence
 window.addEventListener("DOMContentLoaded", () => {
-  loadWeather("Delhi");
+  useMyLocation();
   loadMandiPrices();
   loadScanJournal();
 });

@@ -1,0 +1,48 @@
+{
+  "id": "/",
+  "name": "KisanAI Smart Agriculture Advisor",
+  "short_name": "KisanAI",
+  "description": "Precision crop leaf diagnosis, spray weather warnings, fertilizer calculators, and commodity market prices.",
+  "start_url": "/signedin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#03140f",
+  "theme_color": "#00e676",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scan Crop Leaf",
+      "short_name": "Scan Leaf",
+      "description": "Diagnose crop leaf disease instantly",
+      "url": "/signedin#section-scanner",
+      "icons": [{ "src": "/static/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Check Spray Weather",
+      "short_name": "Spray Weather",
+      "description": "Check if it is safe to spray today",
+      "url": "/signedin#section-weather",
+      "icons": [{ "src": "/static/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

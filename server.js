@@ -339,9 +339,13 @@ const KNOWLEDGE_BASE = {
   },
   "Pepper__bell___healthy": {
     plant: "Bell Pepper (Capsicum annuum)",
+    category: "Healthy",
     disease: "Healthy Plant",
     severity: "Healthy",
     cause: "None",
+    culprit: "None",
+    culprit_type: "None",
+    damage_mechanism: "Plant exhibits robust photosynthesis, balanced turgor pressure, and absence of parasitic activity.",
     summary: "Glossy deep-green leaves with sturdy branching and zero pathogen or pest blemishes.",
     chemical: "No chemical needed. Apply light calcium chelate spray to avoid blossom end rot.",
     organic: "Add organic neem cake to soil and water with fermented compost extract.",
@@ -351,6 +355,150 @@ const KNOWLEDGE_BASE = {
       "Day 14: Prune suckers to channel energy into pepper pods."
     ],
     prevention: ["Mulch to keep root temperature stable"]
+  },
+  "Tomato_Fruit_Borer_Helicoverpa": {
+    plant: "Tomato (Solanum lycopersicum) / Cotton / Gram",
+    category: "Insect/Pest Infestation",
+    disease: "Fruit Borer / American Bollworm Infestation",
+    severity: "Critical",
+    cause: "Lepidopteran Insect Larva (Helicoverpa armigera)",
+    culprit: "Helicoverpa armigera (Tomato Fruit Borer Caterpillar)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Stout green/brown striped caterpillars bore neat circular entrance holes into developing green and ripe fruits, feeding internally on pulp and seeds while leaving the posterior half exposed.",
+    summary: "Active caterpillar boring inside fruit and defoliating leaves, causing fruit drop and secondary fungal/bacterial soft rots.",
+    chemical: "Apply Chlorantraniliprole 18.5% SC (0.3 ml/L water, 60ml/acre) or Emamectin Benzoate 5% SG (0.5 g/L, 80g/acre) or Flubendiamide 39.35% SC (0.3 ml/L). Spray at egg-hatching or early instar stage.",
+    organic: "Install Helilure Pheromone Traps (5-8 traps/acre) to monitor and catch male moths. Spray Bacillus thuringiensis (Bt var. kurstaki @ 2 g/L) or HaNPV (Nuclear Polyhedrosis Virus @ 1.5 ml/L). Release Trichogramma pretiosum egg parasitoids (50,000/acre).",
+    protocol: [
+      "Day 1: Hand-pick and destroy visibly bored fruits and large caterpillars to eliminate internal larvae.",
+      "Day 2: Erect pheromone traps 30cm above crop canopy and spray biological Bt or Azadirachtin 10,000 ppm (2 ml/L).",
+      "Day 5: If severe infestation persists (>5% bored fruits), apply targeted Emamectin Benzoate or Chlorantraniliprole.",
+      "Day 10: Re-check new floral buds and young green fruit clusters for fresh pinhead entry punctures."
+    ],
+    prevention: [
+      "Plant African Marigold (Tagetes erecta) as a trap crop (1 row of marigold every 16 rows of tomato)",
+      "Deep summer plowing to expose resting soil pupae to predatory birds and intense solar heat",
+      "Monitor moth flights using pheromone traps and spray as soon as egg laying begins"
+    ]
+  },
+  "Corn_Fall_Armyworm_Spodoptera": {
+    plant: "Maize / Corn (Zea mays)",
+    category: "Insect/Pest Infestation",
+    disease: "Fall Armyworm (FAW) Central Whorl Infestation",
+    severity: "Critical",
+    cause: "Invasive Noctuid Pest (Spodoptera frugiperda)",
+    culprit: "Spodoptera frugiperda (Fall Armyworm Larva)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Caterpillars feed hidden inside the funnel/whorl of the maize plant, chewing large ragged irregular holes (windowpane effect), producing dark sawdust-like frass, and cutting the growing point (dead-heart).",
+    summary: "Destructive armyworm larvae feeding inside central corn whorls, resulting in extensive leaf skeletonization and stunted ear development.",
+    chemical: "Apply Chlorantraniliprole 18.5% SC (0.4 ml/L) or Spinetoram 11.7% SC (0.5 ml/L) or Emamectin Benzoate 5% SG (0.4 g/L). Direct spray nozzle specifically into the central leaf whorl funnel.",
+    organic: "Apply coarse sand or wood ash mixed with lime (9:1 ratio) directly into the whorl to mechanically suffocate and abrade larvae. Spray Metarhizium rileyi or Beauveria bassiana bio-fungicide (5 g/L).",
+    protocol: [
+      "Day 1: Inspect central whorls for moist sawdust-like fecal pellets and young caterpillars.",
+      "Day 2: Direct targeted whorl application early morning or late afternoon when larvae are active.",
+      "Day 5: Apply granular neem cake or soil drench around root base.",
+      "Day 8: Re-inspect emerging central leaves; verify absence of new windowpane feeding punctures."
+    ],
+    prevention: [
+      "Intercrop maize with legumes (cowpea, desmodium) for the 'Push-Pull' pest repellent mechanism",
+      "Install FAW pheromone lure traps immediately upon crop seedling emergence",
+      "Avoid staggered plantings in adjacent fields which allow continuous breeding cycles"
+    ]
+  },
+  "Crop_Aphids_Cluster": {
+    plant: "Mustard / Tomato / Cotton / Vegetables",
+    category: "Insect/Pest Infestation",
+    disease: "Aphid Colony Sap-Depletion & Sooty Mold",
+    severity: "Moderate",
+    cause: "Piercing-Sucking Hemipteran Insect (Aphidoidea / Aphis gossypii)",
+    culprit: "Aphis gossypii / Lipaphis erysimi (Plant Lice / Aphids)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Dense colonies of wingless and winged aphids insert needle-like stylets into tender leaves and buds, draining vital nutrients, stunting shoots, and exuding copious sugary honeydew that fosters black fungal sooty mold.",
+    summary: "Heavy cluster of sap-sucking aphids under leaves and terminal shoots causing leaf curling, leaf yellowing, and black sooty mold coverage.",
+    chemical: "Spray Acetamiprid 20% SP (0.4 g/L) or Thiamethoxam 25% WG (0.5 g/L) or Imidacloprid 17.8% SL (0.5 ml/L). Repeat after 10-12 days if pest resurgence occurs.",
+    organic: "Spray Cold-Pressed Neem Oil (5-7 ml/L) with 2 ml liquid dish soap or potassium soap. Release predatory Ladybug Beetles (Coccinella septempunctata) or Green Lacewings (Chrysoperla carnea).",
+    protocol: [
+      "Day 1: Spray high-velocity water jet onto shoot tips to mechanically dislodge and drown aphid colonies.",
+      "Day 2: Install bright yellow sticky cards (12 traps/acre) at crop height to catch winged alate aphids.",
+      "Day 4: Apply foliar neem oil or insecticidal soap, taking care to spray leaf undersides thoroughly.",
+      "Day 8: Inspect leaf undersides; wash off residual honeydew and black sooty coating."
+    ],
+    prevention: [
+      "Avoid excessive synthetic nitrogen fertilizer which stimulates soft, succulently vulnerable foliage",
+      "Conserve natural beneficial predators (hoverfly larvae, ladybird beetles, lacewings)",
+      "Maintain reflective aluminum/silver plastic mulch to disorient incoming flying aphids"
+    ]
+  },
+  "Crop_Whitefly_Outbreak": {
+    plant: "Cotton / Tomato / Chili / Cucurbits",
+    category: "Insect/Pest Infestation",
+    disease: "Whitefly Infestation & Begomovirus Vectoring",
+    severity: "Critical",
+    cause: "Aleyrodid Sap-Sucking Insect (Bemisia tabaci)",
+    culprit: "Bemisia tabaci (Silverleaf Whitefly / Cotton Whitefly)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Thousands of miniature moth-like white adults and stationary scale-like nymphs feed on the abaxial leaf surface, extracting sap, causing leaf chlorosis, and transmitting severe viral pathogens like Tomato Leaf Curl and Cotton Leaf Curl Virus.",
+    summary: "Severe whitefly invasion with swarms of white insects fluttering on disturbance, leading to leaf chlorosis, vector virus spread, and premature leaf drop.",
+    chemical: "Spray Pyriproxyfen 10% + Fenpropathrin 10% EC (1.5 ml/L) or Diafenthiuron 50% WP (1.2 g/L) or Spiromesifen 22.9% SC (1 ml/L) targeting nymphal stages under leaves.",
+    organic: "Set up 15-20 Yellow Sticky Traps per acre. Spray entomopathogenic fungus Verticillium lecanii (5 g/L) or Beauveria bassiana (5 g/L) combined with Azadirachtin 10,000 ppm (2 ml/L).",
+    protocol: [
+      "Day 1: Install canopy-level yellow sticky cards across field grid to arrest adult breeding populations.",
+      "Day 2: Apply under-leaf bio-spray with entomopathogenic fungus during humid late afternoon hours.",
+      "Day 5: Apply insect growth regulator (Pyriproxyfen or Buprofezin) to break the egg-to-nymph cycle.",
+      "Day 9: Rogue out and bury any plants exhibiting viral leaf crinkling to prevent secondary spread."
+    ],
+    prevention: [
+      "Surround crop field with 2-3 barrier rows of tall fodder crops (maize, sorghum, or pearl millet)",
+      "Avoid planting susceptible crops near unmanaged weed reservoirs (Parthenium, Abutilon)",
+      "Strictly adopt whitefly-resistant or tolerant crop cultivars"
+    ]
+  },
+  "Crop_Serpentine_Leaf_Miner": {
+    plant: "Tomato / Beans / Pea / Watermelon / Cucurbits",
+    category: "Insect/Pest Infestation",
+    disease: "Serpentine Leaf Miner Maggot Damage",
+    severity: "Moderate",
+    cause: "Agromyzid Fly Larva (Liriomyza trifolii / Liriomyza sativae)",
+    culprit: "Liriomyza trifolii (Leafminer Fly Larva)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Minute yellowish fly maggots feed internally between the upper and lower leaf epidermises, tunneling winding white/silvery serpentine mines that destroy chlorophyll and induce leaf scorch.",
+    summary: "Clear winding white serpentine trails across leaf blades caused by leaf miner maggots burrowing in mesophyll tissue, reducing photosynthetic capacity.",
+    chemical: "Apply translaminar or systemic insecticide: Abamectin 1.9% EC (0.5 ml/L) or Cyromazine 75% WP (0.3 g/L insect growth regulator) or Spinosad 45% SC (0.3 ml/L).",
+    organic: "Hand-crush active maggots visible at the end of mines. Spray Neem Azadirachtin (3 ml/L) or Pongamia oil. Release larval parasitoid Diglyphus isaea wasps.",
+    protocol: [
+      "Day 1: Hand-pinch or prune heavily mined leaves containing live active larvae.",
+      "Day 3: Spray translaminar Abamectin or neem oil to penetrate into leaf interior and kill feeding larvae.",
+      "Day 7: Hang yellow sticky cards to capture adult black-and-yellow female flies.",
+      "Day 12: Check newly emerged leaves; ensure new foliage remains unmarred by trails."
+    ],
+    prevention: [
+      "Collect and incinerate crop residue immediately following final harvest",
+      "Maintain yellow sticky traps to detect initial fly arrival into field",
+      "Avoid broad-spectrum pyrethroid sprays that eliminate beneficial parasitoid wasps"
+    ]
+  },
+  "Crop_Mealybug_Infestation": {
+    plant: "Cotton / Papaya / Hibiscus / Guava / Citrus",
+    category: "Insect/Pest Infestation",
+    disease: "Cotton Mealybug Infestation & Wax Encrustation",
+    severity: "Critical",
+    cause: "Pseudococcid Scale Insect (Phenacoccus solenopsis)",
+    culprit: "Phenacoccus solenopsis (Cotton Mealybug / Wax Scale)",
+    culprit_type: "Insect/Pest",
+    damage_mechanism: "Dense colonies of oval pinkish bodies enveloped in powdery white hydrophobic wax congregate on apical buds, nodes, and leaf axils, draining copious sap and secreting honeydew tended by aggressive ants.",
+    summary: "Thick white cottony-wax masses encrusting stems, shoots, and leaf junctions, causing terminal bunching, defoliation, and shoot dieback.",
+    chemical: "Apply Profenofos 50% EC (2 ml/L) or Buprofezin 25% SC (1.5 ml/L) or Chlorpyrifos 20% EC (2.5 ml/L). Always mix with a non-ionic organosilicone surfactant/sticker (1 ml/L) to pierce waxy coat.",
+    organic: "Spray strong soap-diesel oil emulsion (50g washing powder + 50ml diesel in 10L water). Release predatory Australian Ladybird Beetles (Cryptolaemus montrouzieri @ 5-10 beetles/infested plant).",
+    protocol: [
+      "Day 1: Physically prune and burn severely encrusted branch terminals; eradicate ant trails with sticky bands on stems.",
+      "Day 3: Power-spray with surfactant-mixed insecticidal active to strip away the protective waxy bloom.",
+      "Day 7: Release predatory ladybird beetles once chemical residue dissipates.",
+      "Day 14: Inspect root collars and weed borders for residual hidden mealybug crawlers."
+    ],
+    prevention: [
+      "Destroy alternative weed hosts like Congress grass (Parthenium hysterophorus) and Xanthium",
+      "Band tree trunks with grease/plastic to prevent attending ants from moving crawlers up plants",
+      "Never leave harvested infested stalks piled near active crop rows"
+    ]
   }
 };
 
@@ -418,6 +566,13 @@ function handleUpload(req, res, next) {
 
 // Serve static assets
 app.use("/static", express.static(path.join(__dirname, "static")));
+
+// Root service worker route for PWA scope compliance
+app.get("/sw.js", (req, res) => {
+  res.setHeader("Content-Type", "application/javascript");
+  res.setHeader("Service-Worker-Allowed", "/");
+  res.sendFile(path.join(__dirname, "static", "sw.js"));
+});
 
 // Fallback for signedin.html linking to /static/signout.js
 app.get("/static/signout.js", (req, res) => {
@@ -543,14 +698,15 @@ async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
         }
       } catch (err) {
         const msg = err.message || "";
-        const isTransient = msg.includes("503") || msg.includes("UNAVAILABLE") || msg.includes("high demand") || msg.includes("429");
+        const isQuota = msg.includes("quota") || msg.includes("Quota") || msg.includes("resource_exhausted") || msg.includes("RESOURCE_EXHAUSTED");
+        const isTransient = !isQuota && (msg.includes("503") || msg.includes("UNAVAILABLE") || msg.includes("high demand") || msg.includes("429"));
 
         if (isTransient && attempt === 1) {
           // Brief pause before retry
           await new Promise(r => setTimeout(r, 650));
           continue;
         }
-        // Move to next candidate model if this one is experiencing high demand
+        // Move to next candidate model if this one is experiencing high demand or quota
         break;
       }
     }
@@ -582,35 +738,43 @@ app.post("/predict", handleUpload, async (req, res) => {
   const ai = getGenAIClient();
   if (ai) {
     try {
-      console.log("🔍 Running Gemini Multimodal leaf pathology analysis...");
+      console.log("🔍 Running Gemini Multimodal leaf pathology & entomology analysis...");
       const base64Image = req.file.buffer.toString("base64");
       const mimeType = req.file.mimetype || "image/jpeg";
 
-      const prompt = `You are a plant pathologist and master agricultural advisor. Inspect this crop/plant leaf image thoroughly.
+      const prompt = `You are a plant pathologist, agricultural entomologist, and precision crop protection specialist. Inspect this crop foliage/stem/fruit image thoroughly.
 Determine:
-1. Exact plant/crop name
-2. Disease/condition name (or 'Healthy')
-3. Is plant healthy (boolean)
-4. Severity level: "Healthy", "Mild", "Moderate", or "Critical"
-5. Primary cause category: "Fungal", "Bacterial", "Viral", "Pest/Insect", "Nutrient Deficiency", or "None"
-6. Confidence score (number between 88 and 99.5)
-7. Concise diagnostic summary (2 sentences)
-8. Organic treatment: Exact natural remedy, neem oil/baking soda/biofungicide preparation, dosage, and spray interval
-9. Chemical treatment: Specific active ingredients (e.g., Mancozeb, Metalaxyl, Chlorothalonil, Imidacloprid), exact dosage per liter, and pre-harvest interval
-10. Recovery protocol: Array of 3-4 sequential day-by-day actionable steps (e.g. Day 1-2, Day 3-5, Day 7-10)
-11. Prevention tips: Array of 3 key agronomic practices
+1. Exact plant/crop name (e.g. Tomato, Potato, Maize, Cotton, Chili, Rice, Wheat)
+2. Condition category: "Plant Disease", "Insect/Pest Infestation", "Nutrient Deficiency", or "Healthy"
+3. Disease / Condition name (e.g., "Fall Armyworm Infestation", "Tomato Yellow Leaf Curl Virus", "Two-Spotted Spider Mite Damage", "Late Blight", "Bacterial Leaf Spot", "Aphid Colony", "Healthy Foliage")
+4. Is plant healthy (boolean)
+5. Severity level: "Healthy", "Mild", "Moderate", or "Critical"
+6. Primary cause / Causal agent: Scientific and common classification of the pathogen or pest
+7. Culprit / Causal organism: Exact insect pest species (e.g., Helicoverpa armigera, Spodoptera frugiperda, Bemisia tabaci, Tetranychus urticae, Aphis gossypii, Liriomyza trifolii) OR pathogen (e.g., Phytophthora infestans, Alternaria solani, Xanthomonas perforans)
+8. Culprit Type: "Insect/Pest", "Fungus", "Bacterium", "Virus", "Oomycete", "Abiotic", or "None"
+9. Damage mechanism & insect behavior: How this pest feeds (chewing, piercing-sucking, leaf-mining, stem-boring), vectors viruses, or how the fungal/bacterial pathogen invades leaf tissue
+10. Confidence score (number between 89.0 and 99.5)
+11. Concise diagnostic summary (2-3 sentences explaining visual symptoms, active larvae/insects or lesions)
+12. Organic / Bio-control treatment: Specific botanical sprays (e.g. Neem Azadirachtin 10,000 ppm), biological predators (Ladybird beetles, Trichogramma wasps), entomopathogenic fungi (Beauveria bassiana, Metarhizium), pheromone traps, sticky cards, or bio-fungicides with exact dilution rates and spray schedules
+13. Chemical agrochemical treatment: Specific modern active ingredients (e.g. Chlorantraniliprole, Emamectin Benzoate, Imidacloprid, Spiromesifen, Mancozeb, Metalaxyl, Azoxystrobin) with precise dosage per liter of water and pre-harvest interval (PHI)
+14. Day-by-day Integrated Pest Management (IPM) recovery protocol: Array of 3-4 sequential actionable steps (Day 1-2, Day 3-5, Day 7-10, Day 14)
+15. Prevention & Crop Protection: Array of 3 specific long-term agricultural practices (crop rotation, trap crops, resistant hybrids, pheromone monitoring)
 
 Return ONLY valid JSON matching this schema:
 {
-  "plant": "Plant Name",
-  "disease": "Disease Name",
+  "plant": "Crop / Plant Name",
+  "category": "Plant Disease" | "Insect/Pest Infestation" | "Nutrient Deficiency" | "Healthy",
+  "disease": "Diagnosis Name",
   "is_healthy": true/false,
   "severity": "Healthy" | "Mild" | "Moderate" | "Critical",
-  "cause": "Cause",
-  "confidence": 95.5,
-  "summary": "Diagnostic summary",
-  "organic_treatment": "Detailed organic instructions",
-  "chemical_treatment": "Detailed chemical instructions",
+  "cause": "Causal classification",
+  "culprit": "Specific Insect / Pathogen species",
+  "culprit_type": "Insect/Pest" | "Fungus" | "Bacterium" | "Virus" | "Oomycete" | "Abiotic" | "None",
+  "damage_mechanism": "Feeding or infection mechanism description",
+  "confidence": 96.5,
+  "summary": "Concise agronomic diagnostic summary",
+  "organic_treatment": "Detailed bio-control & botanical recommendations with dosage",
+  "chemical_treatment": "Detailed targeted chemical active ingredients with dosage",
   "recovery_protocol": ["Day 1-2: ...", "Day 3-5: ...", "Day 7-10: ..."],
   "prevention_tips": ["Tip 1", "Tip 2", "Tip 3"]
 }`;
@@ -620,22 +784,28 @@ Return ONLY valid JSON matching this schema:
       if (aiResult && aiResult.data) {
         const result = aiResult.data;
         const chosenTreatment = method === "Organic" ? result.organic_treatment : result.chemical_treatment;
+        const isInsect = result.category === "Insect/Pest Infestation" || result.culprit_type === "Insect/Pest" || (result.cause || "").toLowerCase().includes("pest") || (result.cause || "").toLowerCase().includes("insect");
 
         const record = {
           id: crypto.randomUUID(),
           timestamp: new Date().toISOString(),
           plant: result.plant || "Crop Plant",
-          disease: result.disease || "Healthy",
+          category: result.category || (isInsect ? "Insect/Pest Infestation" : "Plant Disease"),
+          disease: result.disease || "Crop Diagnosis",
           severity: result.severity || "Mild",
-          cause: result.cause || "Fungal",
-          confidence: typeof result.confidence === "number" ? result.confidence : 94.5,
-          summary: result.summary || "Visual leaf inspection completed.",
+          cause: result.cause || (isInsect ? "Insect Pest" : "Pathological"),
+          culprit: result.culprit || (isInsect ? "Insect/Pest Vector" : "Fungal/Bacterial Pathogen"),
+          culprit_type: result.culprit_type || (isInsect ? "Insect/Pest" : "Fungus"),
+          damage_mechanism: result.damage_mechanism || "Symptomatic foliage damage impacting plant photosynthesis.",
+          is_insect_caused: isInsect,
+          confidence: typeof result.confidence === "number" ? result.confidence : 95.5,
+          summary: result.summary || "Multimodal leaf & pest pathology inspection completed.",
           method,
-          treatment: chosenTreatment || "Apply standard protective fungicide or bio-spray.",
-          organic_treatment: result.organic_treatment || "Neem oil spray (5ml/L water) every 7 days.",
-          chemical_treatment: result.chemical_treatment || "Chlorothalonil or Mancozeb spray as per label.",
-          recovery_protocol: Array.isArray(result.recovery_protocol) && result.recovery_protocol.length ? result.recovery_protocol : ["Day 1-2: Isolate affected foliage", "Day 3-5: Apply targeted spray", "Day 7-10: Assess recovery"],
-          prevention_tips: Array.isArray(result.prevention_tips) && result.prevention_tips.length ? result.prevention_tips : ["Ensure good air circulation", "Avoid overhead wetting of leaves", "Maintain balanced soil fertility"],
+          treatment: chosenTreatment || "Apply targeted crop protection treatment.",
+          organic_treatment: result.organic_treatment || "Neem oil spray (5ml/L water) with bio-control agent every 7 days.",
+          chemical_treatment: result.chemical_treatment || "Targeted protective agrochemical spray as per label directions.",
+          recovery_protocol: Array.isArray(result.recovery_protocol) && result.recovery_protocol.length ? result.recovery_protocol : ["Day 1-2: Isolate affected foliage and inspect for active pests", "Day 3-5: Apply targeted spray under foliage", "Day 7-10: Assess regrowth and trap counts"],
+          prevention_tips: Array.isArray(result.prevention_tips) && result.prevention_tips.length ? result.prevention_tips : ["Maintain balanced crop nutrition", "Install monitoring traps across field border", "Promote natural predatory beneficials"],
           source: `Gemini AI (${aiResult.modelUsed})`,
           user: req.session.user.name || "Farmer"
         };
@@ -649,7 +819,7 @@ Return ONLY valid JSON matching this schema:
         });
       }
     } catch (geminiError) {
-      console.info("Notice: Seamlessly using Agronomic Engine for leaf pathology.");
+      console.info("Notice: Seamlessly using Agronomic Engine for leaf pathology & entomology.");
     }
   }
 
@@ -684,14 +854,20 @@ Return ONLY valid JSON matching this schema:
     const confidence = parseFloat((92.5 + pseudoScore).toFixed(1));
 
     const chosenTreatment = method === "Organic" ? info.organic : info.chemical;
+    const isInsect = (info.category === "Insect/Pest Infestation") || (info.culprit_type === "Insect/Pest") || (info.cause || "").toLowerCase().includes("insect") || (info.cause || "").toLowerCase().includes("pest");
 
     const record = {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       plant: info.plant,
+      category: info.category || (isInsect ? "Insect/Pest Infestation" : (info.severity === "Healthy" ? "Healthy" : "Plant Disease")),
       disease: info.disease,
       severity: info.severity,
       cause: info.cause,
+      culprit: info.culprit || (isInsect ? "Arthropod / Insect Pest" : "Microbial Pathogen"),
+      culprit_type: info.culprit_type || (isInsect ? "Insect/Pest" : "Fungus"),
+      damage_mechanism: info.damage_mechanism || "Pathological foliage damage reducing photosynthetic leaf capacity.",
+      is_insect_caused: isInsect,
       confidence,
       summary: info.summary,
       method,
@@ -944,52 +1120,90 @@ app.get("/weather", async (req, res) => {
   const city = req.query.city || "Delhi";
   const latParam = req.query.lat ? parseFloat(req.query.lat) : null;
   const lonParam = req.query.lon ? parseFloat(req.query.lon) : null;
+  let customPlace = req.query.place ? req.query.place.trim() : null;
   const apiKey = process.env.WEATHER_API_KEY;
 
-  let weatherData = null;
+  // If coordinates are provided but no place name given, reverse-geocode to find local village/district
+  if (!customPlace && latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam)) {
+    try {
+      const revRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latParam}&longitude=${lonParam}&localityLanguage=en`, {
+        signal: AbortSignal.timeout(3000)
+      });
+      if (revRes.ok) {
+        const rev = await revRes.json();
+        const loc = rev.locality || rev.city || rev.principalSubdivision;
+        const sub = rev.principalSubdivision;
+        const cty = rev.countryName || "";
+        if (loc) {
+          customPlace = `${loc}${sub && sub !== loc ? ", " + sub : ""}${cty ? ", " + cty : ""}`;
+        }
+      }
+    } catch (e) {
+      console.warn("Reverse geocode timeout or notice:", e.message);
+    }
+  }
 
-  // Direct lat/lon query if provided
-  if (latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam)) {
+  let weatherData = null;
+  let weatherSource = "Open-Meteo Meteorological Telemetry";
+  let apiKeyStatus = apiKey ? "configured" : "omitted";
+
+  // 1. Try OpenWeatherMap first if API key is provided
+  if (apiKey) {
+    try {
+      let owmUrl = "";
+      if (latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam)) {
+        owmUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latParam}&lon=${lonParam}&appid=${apiKey}&units=metric`;
+      } else {
+        owmUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+      }
+
+      const response = await fetch(owmUrl);
+      if (response.ok) {
+        const data = await response.json();
+        const displayCity = customPlace || `${data.name || city}, ${data.sys?.country || ""}`;
+        weatherData = {
+          city: displayCity,
+          temperature: Math.round(data.main.temp * 10) / 10,
+          humidity: data.main.humidity,
+          windSpeed: Math.round(data.wind.speed * 3.6 * 10) / 10, // m/s to km/h
+          condition: data.weather?.[0]?.description ? (data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1)) : "Clear",
+          weathercode: data.weather?.[0]?.id ? (data.weather[0].id < 700 ? 51 : 1) : 1
+        };
+        weatherSource = "OpenWeatherMap API";
+        apiKeyStatus = "active";
+      } else if (response.status === 401) {
+        apiKeyStatus = "invalid_or_pending_activation (401 - OpenWeather keys take up to 2 hours after creation to activate)";
+        console.warn("OpenWeatherMap 401: Key pending activation or invalid. Falling back to Open-Meteo.");
+      }
+    } catch (err) {
+      console.warn("OpenWeatherMap request failed, falling back to Open-Meteo:", err.message);
+    }
+  }
+
+  // 2. Direct lat/lon query via Open-Meteo if OpenWeatherMap was not used/failed
+  if (!weatherData && latParam !== null && lonParam !== null && !isNaN(latParam) && !isNaN(lonParam)) {
     try {
       const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latParam}&longitude=${lonParam}&current_weather=true&hourly=relativehumidity_2m,apparent_temperature,pressure_msl`);
       if (weatherRes.ok) {
         const result = await weatherRes.json();
         const current = result.current_weather;
+        const displayCity = customPlace ? `${customPlace} (${latParam.toFixed(2)}°, ${lonParam.toFixed(2)}°)` : `Field Location (${latParam.toFixed(2)}°, ${lonParam.toFixed(2)}°)`;
         weatherData = {
-          city: `GPS Field (${latParam.toFixed(2)}°, ${lonParam.toFixed(2)}°)`,
+          city: displayCity,
           temperature: current.temperature,
           humidity: result.hourly?.relativehumidity_2m?.[0] || 62,
           windSpeed: current.windspeed,
           condition: current.weathercode <= 3 ? "Clear / Partly Sunny" : current.weathercode <= 48 ? "Overcast" : "Rain / Showers",
           weathercode: current.weathercode
         };
+        weatherSource = "Open-Meteo Satellite Feed (GPS)";
       }
     } catch (e) {
       console.warn("Direct GPS weather fetch failed:", e.message);
     }
   }
 
-  if (!weatherData && apiKey) {
-    try {
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
-      const response = await fetch(url);
-      if (response.ok) {
-        const data = await response.json();
-        weatherData = {
-          city: `${data.name}, ${data.sys?.country || ""}`,
-          temperature: data.main.temp,
-          humidity: data.main.humidity,
-          windSpeed: data.wind.speed * 3.6, // m/s to km/h
-          condition: data.weather?.[0]?.description || "Clear",
-          weathercode: 1
-        };
-      }
-    } catch (err) {
-      console.warn("OpenWeatherMap fetch failed, falling back to Open-Meteo:", err.message);
-    }
-  }
-
-  // Free fallback via Open-Meteo
+  // 3. Geocoded City search via Open-Meteo fallback
   if (!weatherData) {
     try {
       const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
@@ -1007,6 +1221,7 @@ app.get("/weather", async (req, res) => {
           condition: current.weathercode <= 3 ? "Clear / Partly Sunny" : current.weathercode <= 48 ? "Overcast" : "Rain / Showers",
           weathercode: current.weathercode
         };
+        weatherSource = "Open-Meteo Satellite Telemetry";
       }
     } catch (e) {
       console.error("Open-Meteo weather fetch failed:", e);
@@ -1056,6 +1271,8 @@ app.get("/weather", async (req, res) => {
 
   res.json({
     ...weatherData,
+    source: weatherSource,
+    api_key_status: apiKeyStatus,
     spray_safety: spraySafety,
     spray_badge: sprayBadge,
     spray_reason: sprayReason,

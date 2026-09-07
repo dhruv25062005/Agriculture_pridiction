@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: agriculture-prediction
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: GEMINI_API_KEY
+        sync: false

@@ -49,14 +49,15 @@ export function handleFirestoreError(error, operationType, path) {
   return errInfo;
 }
 
-const staticConfig = {
-  projectId: "agriculture-e0418",
-  appId: "1:312855717764:web:de5fe4b5c7ed01cfc25fd1",
-  apiKey: "AIzaSyBl-5RAER1M79gcDo9W-ylHlz2KNufsllU",
-  authDomain: "agriculture-e0418.firebaseapp.com",
+// Fallback empty placeholder config (overridden dynamically by /firebase_config)
+const defaultPlaceholderConfig = {
+  projectId: "",
+  appId: "",
+  apiKey: "",
+  authDomain: "",
   firestoreDatabaseId: "ai-studio-agriculturepridi-19ab2f13-4ebd-42d7-aaf0-74a8af5164fb",
-  storageBucket: "agriculture-e0418.firebasestorage.app",
-  messagingSenderId: "312855717764"
+  storageBucket: "",
+  messagingSenderId: ""
 };
 
 export async function testConnection() {
@@ -82,7 +83,7 @@ async function initFirebase() {
     console.warn("Using local configuration fallback:", e.message);
   }
 
-  const finalConfig = (cfg && cfg.apiKey && !cfg.apiKey.includes("your")) ? cfg : staticConfig;
+  const finalConfig = (cfg && cfg.apiKey && !cfg.apiKey.includes("your")) ? cfg : defaultPlaceholderConfig;
 
   try {
     app = initializeApp(finalConfig);
