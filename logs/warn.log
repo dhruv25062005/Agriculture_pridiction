@@ -1,0 +1,9 @@
+{"timestamp":"2026-09-08T15:16:58.901Z","level":"WARN","message":"Model gemini-2.0-flash failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"This model models/gemini-2.0-flash is no longer available. Please up"}
+{"timestamp":"2026-09-08T15:16:59.024Z","level":"WARN","message":"Model gemini-1.5-flash failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-flash is not found for API version v1beta, or is n"}
+{"timestamp":"2026-09-08T15:16:59.147Z","level":"WARN","message":"Model gemini-pro-vision failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"models/gemini-pro-vision is not found for API version v1beta, or is "}
+{"timestamp":"2026-09-08T15:21:38.004Z","level":"WARN","message":{"message":"Route not found","path":"/api/weather","method":"GET","ip":"127.0.0.1"}}
+{"timestamp":"2026-09-08T15:21:42.199Z","level":"WARN","message":"Model gemini-2.0-flash failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"This model models/gemini-2.0-flash is no longer available. Please up"}
+{"timestamp":"2026-09-08T15:21:42.305Z","level":"WARN","message":"Model gemini-1.5-flash failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"models/gemini-1.5-flash is not found for API version v1beta, or is n"}
+{"timestamp":"2026-09-08T15:21:42.422Z","level":"WARN","message":"Model gemini-pro-vision failed (attempt 1): {\"error\":{\"code\":404,\"message\":\"models/gemini-pro-vision is not found for API version v1beta, or is "}
+{"timestamp":"2026-09-08T15:28:59.151Z","level":"WARN","message":{"message":"Route not found","path":"/api/agronomist_chat","method":"POST","ip":"127.0.0.1"}}
+{"timestamp":"2026-09-08T15:28:59.153Z","level":"WARN","message":{"message":"Route not found","path":"/predict_yield","method":"POST","ip":"127.0.0.1"}}

@@ -2209,6 +2209,258 @@ body.theme-sunlight .tactile-range {
   overflow: visible;
 }
 
+/* ========================================================= */
+/* 🤖 KISAN MITRA AI AGRONOMIST CHAT STYLES                  */
+/* ========================================================= */
+.chat-container-card {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.chat-topic-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  scrollbar-width: thin;
+}
+
+.chat-topic-chip {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chat-topic-chip:hover {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: var(--accent-green);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.chat-messages-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  scroll-behavior: smooth;
+}
+
+.chat-message-row {
+  display: flex;
+  gap: 12px;
+  max-width: 86%;
+  animation: fadeInMsg 0.25s ease-out;
+}
+
+@keyframes fadeInMsg {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-row-bot {
+  align-self: flex-start;
+}
+
+.chat-row-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.avatar-bot {
+  background: linear-gradient(135deg, #059669, #0d9488);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.avatar-user {
+  background: linear-gradient(135deg, #4f46e5, #0284c7);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.chat-bubble {
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  position: relative;
+  word-break: break-word;
+}
+
+.bubble-bot {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+  border-top-left-radius: 4px;
+}
+
+.bubble-bot ul {
+  margin: 8px 0 8px 18px;
+  padding: 0;
+}
+
+.bubble-bot li {
+  margin-bottom: 4px;
+}
+
+.bubble-bot b {
+  color: #38bdf8;
+}
+
+.bubble-user {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border-top-right-radius: 4px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.chat-bot-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.chat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chat-text-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-text-input:focus {
+  border-color: var(--accent-green);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.btn-mic-record {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-mic-record:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--accent-cyan);
+}
+
+.btn-mic-record.recording {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  animation: pulseMic 1s infinite;
+}
+
+@keyframes pulseMic {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.btn-chat-send {
+  padding: 0 20px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-chat-send:hover {
+  background: linear-gradient(135deg, #10b981, #34d399);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+/* YIELD SCORECARD CARD STYLES */
+.yield-gauge-card {
+  background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.6));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 14px;
+}
+
+.yield-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.yield-score-big {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent-green);
+  line-height: 1;
+}
+
 .hidden { display: none !important; }
 </style>
 </head>
@@ -2400,6 +2652,7 @@ body.theme-sunlight .tactile-range {
 <!-- QUICK SECTION NAV PILLS -->
 <nav class="nav-pills-bar">
   <a href="#section-scanner" class="nav-pill active" id="t-navScanner">🔬 Plant Doctor</a>
+  <a href="#section-chat" class="nav-pill" id="t-navChat">🤖 Kisan Mitra AI</a>
   <a href="#section-fertilizer" class="nav-pill" id="t-navFertilizer">🧪 Fertilizer Calculator</a>
   <a href="#section-weather" class="nav-pill" id="t-navWeather">🌦️ Spray & Weather</a>
   <a href="#section-mandi" class="nav-pill" id="t-navMarket">💰 Mandi & Profit</a>
@@ -2799,6 +3052,67 @@ body.theme-sunlight .tactile-range {
           Calculate Yield Index
         </button>
         <div id="yieldResult" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== -->
+  <!-- MODULE: KISAN MITRA — 24/7 AI AGRONOMIST & CROP DOCTOR  -->
+  <!-- ====================================================== -->
+  <section class="card-3d" id="section-chat">
+    <div class="card-header-3d">
+      <div class="card-title-group">
+        <h2 id="t-chatTitle">🤖 Kisan Mitra — 24/7 AI Agronomist & Crop Doctor</h2>
+        <p id="t-chatDesc">Instant scientific advice for crop diseases, pesticide active ingredients, fertilizer split schedules, and pest control.</p>
+      </div>
+      <span class="card-chip" style="background:rgba(16,185,129,0.18); border-color:rgba(16,185,129,0.4); color:#34d399;">Gemini AI Powered</span>
+    </div>
+
+    <!-- Quick question prompt chips -->
+    <div class="chat-topic-chips" id="chatQuickChips">
+      <span class="chat-topic-chip" onclick="askQuickPrompt('What is the best IPM treatment for Late Blight in tomato & potato?')">🌿 Late Blight IPM Spray</span>
+      <span class="chat-topic-chip" onclick="askQuickPrompt('How should I split Urea and DAP for wheat and rice to avoid leaching?')">🧪 Urea & DAP Split Dose</span>
+      <span class="chat-topic-chip" onclick="askQuickPrompt('How to prepare 5% neem seed kernel extract for whitefly and aphids organically?')">🐛 Whitefly Bio-Control</span>
+      <span class="chat-topic-chip" onclick="askQuickPrompt('What are the critical spray precautions today based on wind and humidity?')">🌦️ Safe Spray Precautions</span>
+      <span class="chat-topic-chip" onclick="askQuickPrompt('How much drip irrigation does tomato need in flowering vs fruiting stage?')">💧 Drip Water Scheduling</span>
+      <span class="chat-topic-chip" onclick="askQuickPrompt('How to control Yellow Rust in wheat before heading?')">🌾 Yellow Rust in Wheat</span>
+    </div>
+
+    <!-- Chat container -->
+    <div class="chat-container-card">
+      <div class="chat-messages-area" id="chatMessagesArea">
+        <!-- Initial friendly welcome bubble -->
+        <div class="chat-message-row chat-row-bot">
+          <div class="chat-avatar avatar-bot">🌱</div>
+          <div class="chat-bubble bubble-bot">
+            <b>Namaste Kisan Bhai! 🙏 I am Kisan Mitra</b>, your 24/7 AI Agronomist & Precision Crop Doctor.
+            <div style="margin-top:6px; font-size:0.86rem; color:#cbd5e1;">
+              I can help you with:
+              <ul style="margin:4px 0 6px 18px; padding:0;">
+                <li>Exact chemical dosages (e.g. <i>Mancozeb @ 2.5g/L</i> or <i>Neem Oil @ 5ml/L</i>)</li>
+                <li>Biological & organic pest remedies (Trichoderma, Bacillus, NSKE)</li>
+                <li>Fertilizer basal vs top-dressing timing (NPK, Urea, Potash, Zinc)</li>
+                <li>Fungicide spray timing and rain wash-off safety</li>
+              </ul>
+              Ask your question below in <b>English, Hindi, Punjabi, Bengali, Telugu, or Spanish</b>, or tap the microphone to speak!
+            </div>
+            <div class="chat-bot-meta">
+              <span>🌾 Precision Agronomy AI</span>
+              <button type="button" class="btn-tts" style="padding:2px 8px; font-size:0.7rem;" onclick="speakChatMessage(this)">🔊 Listen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat input controls -->
+      <div class="chat-input-bar">
+        <button type="button" class="btn-mic-record" id="btnChatMic" onclick="toggleSpeechRecognition()" title="Speak in Hindi / English (Voice input)">
+          🎤
+        </button>
+        <input type="text" class="chat-text-input" id="chatAgronomistInput" placeholder="Ask Kisan Mitra (e.g. How to treat whitefly on cotton organically?)..." onkeydown="if(event.key==='Enter') sendAgronomistMessage()">
+        <button type="button" class="btn-chat-send" onclick="sendAgronomistMessage()" id="btnSendChat">
+          <span>Send</span> ➔
+        </button>
       </div>
     </div>
   </section>
@@ -3251,6 +3565,42 @@ async function performLiveFrameAnalysis() {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
 
+  // Fast optical color pre-sampling to distinguish faces/skin from green foliage
+  let clientOpticalCheck = null;
+  try {
+    const sampleStep = Math.max(1, Math.floor(Math.min(canvas.width, canvas.height) / 32));
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let skinCount = 0;
+    let greenCount = 0;
+    let totalSamples = 0;
+    for (let y = 0; y < canvas.height; y += sampleStep) {
+      for (let x = 0; x < canvas.width; x += sampleStep) {
+        const idx = (y * canvas.width + x) * 4;
+        const r = imgData[idx];
+        const g = imgData[idx + 1];
+        const b = imgData[idx + 2];
+        totalSamples++;
+        const maxC = Math.max(r, g, b);
+        const minC = Math.min(r, g, b);
+        if (r > 80 && g > 40 && b > 20 && r > g && g >= b && (maxC - minC) > 15 && (r - g) >= 12) {
+          skinCount++;
+        }
+        if (g > r + 10 && g > b + 10) {
+          greenCount++;
+        }
+      }
+    }
+    const skinRatio = totalSamples > 0 ? (skinCount / totalSamples) : 0;
+    const greenRatio = totalSamples > 0 ? (greenCount / totalSamples) : 0;
+    clientOpticalCheck = {
+      isLikelyFaceOrSkin: skinRatio > 0.35 && greenRatio < 0.12,
+      skinRatio: parseFloat(skinRatio.toFixed(2)),
+      greenRatio: parseFloat(greenRatio.toFixed(2))
+    };
+  } catch (optErr) {
+    console.debug("Optical pre-sample notice:", optErr.message);
+  }
+
   canvas.toBlob(async (blob) => {
     if (!blob) {
       isLiveScanInProgress = false;
@@ -3266,6 +3616,9 @@ async function performLiveFrameAnalysis() {
       formData.append("image", file);
       formData.append("method", methodChoice);
       formData.append("lang", currentLanguage);
+      if (clientOpticalCheck) {
+        formData.append("client_optical_check", JSON.stringify(clientOpticalCheck));
+      }
 
       const res = await fetch("/predict", {
         method: "POST",
@@ -3277,7 +3630,25 @@ async function performLiveFrameAnalysis() {
       }
 
       const d = await res.json();
-      if (!d || !d.success) {
+      if (!d) {
+        throw new Error("AI service returned empty response");
+      }
+
+      // Handle non-plant or human face detection
+      if (d.is_plant === false) {
+        latestDiagnosisData = d;
+        if (hudStatus) {
+          hudStatus.innerHTML = `⚠️ <b>No Plant Detected</b> (${d.detected_subject || 'Face/Person'}) • Aim camera at crop leaf`;
+        }
+        if (blinkDot) blinkDot.style.background = "#f59e0b";
+        if (targetCard) {
+          targetCard.innerHTML = generateDiagnosisCardMarkup(d, "live");
+          targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        return;
+      }
+
+      if (!d.success) {
         throw new Error(d?.error || "AI could not recognize frame");
       }
 
@@ -3360,6 +3731,39 @@ function showToastNotice(msg) {
 
 // Comprehensive Universal Diagnosis Card Markup Builder
 function generateDiagnosisCardMarkup(d, viewContext = "standard") {
+  // Check if subject is non-plant (e.g. human face, indoor object)
+  if (d.is_plant === false) {
+    const subjectName = d.detected_subject || "Human Face / Non-Plant Subject";
+    return `
+      <div class="diagnosis-result-card" style="border-color:rgba(245,158,11,0.65); background:linear-gradient(145deg, rgba(245,158,11,0.08), rgba(15,23,42,0.7));">
+        <div style="display:flex; align-items:flex-start; gap:14px;">
+          <div style="font-size:2.2rem; line-height:1; padding:4px;">⚠️</div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+              <span class="category-chip" style="background:rgba(245,158,11,0.22); color:#fbbf24; border:1px solid rgba(245,158,11,0.5); font-weight:700;">
+                👤 Non-Plant Subject Detected
+              </span>
+              <span style="font-size:0.8rem; color:#94a3b8;">Confidence: <b>${d.confidence || 98}%</b></span>
+              <span style="font-size:0.8rem; color:#64748b;">Source: ${d.source || 'Vision AI'}</span>
+            </div>
+            <h3 style="color:#fbbf24; font-size:1.15rem; margin:0 0 6px 0;">No Agricultural Crop or Plant Detected</h3>
+            <p style="color:#e2e8f0; font-size:0.92rem; line-height:1.6; margin:0 0 12px 0;">
+              ${d.summary || `The camera or image detected <b>${subjectName}</b> rather than an agricultural plant leaf or crop. To diagnose diseases, pests, or plant health, please point the camera at crop foliage.`}
+            </p>
+            <div style="background:rgba(0,0,0,0.35); border-left:3px solid #fbbf24; border-radius:6px; padding:10px 14px;">
+              <div style="color:#fbbf24; font-weight:600; font-size:0.88rem; margin-bottom:4px;">🌿 How to get an accurate plant diagnosis:</div>
+              <ul style="margin:4px 0 0 18px; padding:0; font-size:0.84rem; color:#cbd5e1; line-height:1.5;">
+                <li>Aim the camera directly at plant leaves, stems, flowers, or fruits.</li>
+                <li>Avoid showing people, faces, hands, clothing, or indoor household objects.</li>
+                <li>Ensure the leaf is in focus with adequate daylight or illumination.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   const isInsect = d.is_insect_caused || (d.category && d.category.toLowerCase().includes("insect")) || (d.culprit_type && d.culprit_type.toLowerCase().includes("insect"));
   const isHealthy = (d.severity || "").toLowerCase().includes("healthy") || (d.disease || "").toLowerCase().includes("healthy");
 
@@ -3453,6 +3857,9 @@ function generateDiagnosisCardMarkup(d, viewContext = "standard") {
         <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
           🧪 View Chemical Active
         </button>
+        <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px; border-color:var(--accent-green); color:#34d399;" onclick="askAgronomistAboutCondition('${(d.disease || '').replace(/'/g, &quot;\\'&quot;)}', '${(d.plant || '').replace(/'/g, &quot;\\'&quot;)}')">
+          🤖 Consult Kisan Mitra AI
+        </button>
         <button type="button" class="btn-report-export" onclick="exportDiagnosisPDF()">
           📄 Download / Print PDF Report
         </button>
@@ -3520,7 +3927,18 @@ predictForm.onsubmit = async (e) => {
     }
 
     const d = await res.json();
-    if (!d || !d.success) {
+    if (!d) {
+      throw new Error("Diagnosis service returned empty response");
+    }
+
+    // Direct non-plant / human face detection presentation
+    if (d.is_plant === false) {
+      latestDiagnosisData = d;
+      diseaseResult.innerHTML = generateDiagnosisCardMarkup(d, "upload");
+      return;
+    }
+
+    if (!d.success) {
       diseaseResult.innerHTML = `
         <div class="diagnosis-result-card" style="border-color:#ef4444;">
           <h3 style="color:#ef4444;">❌ Analysis Error</h3>
@@ -4282,14 +4700,50 @@ async function recommendCrop() {
     if (!r.ok) throw new Error("Crop recommendation request failed");
     const d = await r.json();
     resultBox.innerHTML = `
-      <div style="background:rgba(0,230,118,0.15); border:1px solid var(--accent-green); padding:14px; border-radius:14px; color:#fff;">
-        🌾 Optimal Crop: <b style="color:var(--accent-green); font-size:1.1rem;">${d.crop}</b><br>
-        <span style="font-size:0.82rem; color:#cbd5e1;">Season: ${d.season} • Expected: ${d.expected_yield}</span>
+      <div style="background:rgba(0,230,118,0.12); border:1px solid var(--accent-green); padding:16px; border-radius:14px; color:#fff;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-size:0.8rem; color:#a7f3d0; text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Recommended Crop</div>
+            <div style="font-size:1.3rem; font-weight:800; color:var(--accent-green); margin-top:2px;">${d.crop}</div>
+          </div>
+          <span style="background:rgba(0,230,118,0.2); border:1px solid var(--accent-green); color:#fff; font-size:0.75rem; padding:3px 10px; border-radius:12px; font-weight:600;">${d.season}</span>
+        </div>
+        <div style="margin-top:10px; font-size:0.85rem; color:#cbd5e1; display:flex; flex-direction:column; gap:4px;">
+          <div>🌾 <b>Expected Yield:</b> ${d.expected_yield}</div>
+          <div>💧 <b>Water Need:</b> ${d.water_requirement || 'Moderate (500-800 mm)'}</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button type="button" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; flex:1;" onclick="applyCropToFertilizer('${d.crop}')">
+            🧪 Calculate Fertilizer
+          </button>
+          <button type="button" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; border-color:var(--accent-cyan); color:var(--accent-cyan);" onclick="askAgronomistAboutCondition('Growing conditions and best practices', '${d.crop}')">
+            🤖 Ask Agronomist
+          </button>
+        </div>
       </div>
     `;
   } catch (err) {
     console.warn("Crop recommendation notice:", err.message);
     resultBox.innerHTML = `<div style="color:#ef4444; padding:8px;">Recommendation service unavailable.</div>`;
+  }
+}
+
+function applyCropToFertilizer(cropName) {
+  const sel = document.getElementById("fertCropSelect");
+  if (sel) {
+    let found = false;
+    for (let opt of sel.options) {
+      if (opt.value.toLowerCase().includes(cropName.toLowerCase()) || cropName.toLowerCase().includes(opt.value.toLowerCase())) {
+        sel.value = opt.value;
+        found = true;
+        break;
+      }
+    }
+    if (!found && sel.options.length > 0) sel.selectedIndex = 0;
+  }
+  const fertSec = document.getElementById("section-fertilizer");
+  if (fertSec) {
+    fertSec.scrollIntoView({ behavior: "smooth" });
   }
 }
 
@@ -4299,23 +4753,281 @@ async function predictYield() {
   const resultBox = document.getElementById("yieldResult");
 
   try {
+    resultBox.innerHTML = `<div style="padding:14px; color:var(--accent-cyan); text-align:center;">⏳ Computing physiological growth models...</div>`;
     const r = await fetch("/predict_yield", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ humidity, rainfall, temp: 25 })
+      body: JSON.stringify({ humidity, rainfall, temp: 25, crop: "Agricultural Crops" })
     });
     if (!r.ok) throw new Error("Yield prediction request failed");
     const d = await r.json();
+
+    const scoreColor = d.yield_index >= 80 ? "var(--accent-green)" : (d.yield_index >= 60 ? "var(--accent-cyan)" : "#fbbf24");
+    const recsHtml = (d.agronomic_recommendations || []).map(rec => `<li style="margin-bottom:4px;">${rec}</li>`).join("");
+
     resultBox.innerHTML = `
-      <div style="background:rgba(0,255,204,0.15); border:1px solid var(--accent-cyan); padding:14px; border-radius:14px; color:#fff;">
-        📈 Productivity Index: <b style="color:var(--accent-cyan); font-size:1.2rem;">${d.yield_index}</b><br>
-        <span style="font-size:0.82rem; color:#cbd5e1;">Relative field productivity factor (Optimal range: 60 - 95)</span>
+      <div class="yield-gauge-card">
+        <div class="yield-score-header">
+          <div>
+            <div style="font-size:0.8rem; color:#94a3b8; font-weight:600; text-transform:uppercase;">Estimated Productivity</div>
+            <div class="yield-score-big" style="color:${scoreColor};">${d.yield_index}<span style="font-size:1.1rem; color:#94a3b8; font-weight:400;"> / 100</span></div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.75rem; background:rgba(255,255,255,0.08); padding:4px 10px; border-radius:12px; color:#fff; font-weight:600; display:inline-block;">${d.productivity_rating || 'Optimum Yield'}</span>
+            <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">${d.potential_growth_index || ''}</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:10px 14px; margin-bottom:10px; font-size:0.82rem; color:#e2e8f0; line-height:1.5;">
+          <div style="color:var(--accent-cyan); font-weight:700; margin-bottom:2px;">🔬 Limiting Factor:</div>
+          ${d.limiting_factor}
+        </div>
+
+        <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:10px 14px; margin-bottom:10px; font-size:0.82rem; color:#fde68a; line-height:1.5;">
+          <b>🦠 Blight & Mildew Pressure:</b> ${d.fungal_blight_risk}
+        </div>
+
+        ${recsHtml ? `
+          <div style="font-size:0.82rem; color:#cbd5e1; margin-top:8px;">
+            <b style="color:#fff;">📋 Recommended Crop Management:</b>
+            <ul style="margin:4px 0 0 16px; padding:0; line-height:1.5;">${recsHtml}</ul>
+          </div>
+        ` : ''}
+
+        <button type="button" class="btn-secondary" style="font-size:0.82rem; padding:8px 14px; width:100%; margin-top:12px; border-color:var(--accent-cyan); color:var(--accent-cyan);" onclick="askAgronomistAboutCondition('How to improve yield under humidity ' + ${humidity} + '% and rain ' + ${rainfall} + 'mm', 'My Field')">
+          🤖 Ask Kisan Mitra to Optimize This Yield
+        </button>
       </div>
     `;
   } catch (err) {
     console.warn("Yield prediction notice:", err.message);
     resultBox.innerHTML = `<div style="color:#ef4444; padding:8px;">Yield calculation unavailable.</div>`;
   }
+}
+
+// ==========================================
+// 🤖 MODULE: KISAN MITRA AI AGRONOMIST CHAT
+// ==========================================
+let speechRecognitionInstance = null;
+let isRecognizingSpeech = false;
+
+function formatMarkdownChat(text) {
+  if (!text) return "";
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  
+  // Bullet lists
+  const lines = html.split("\n");
+  let inList = false;
+  let result = [];
+  
+  for (let line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("• ") || trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+      if (!inList) {
+        result.push('<ul style="margin:6px 0 6px 18px; padding:0;">');
+        inList = true;
+      }
+      result.push(`<li>${trimmed.slice(2)}</li>`);
+    } else {
+      if (inList) {
+        result.push('</ul>');
+        inList = false;
+      }
+      if (trimmed.length > 0) {
+        result.push(`<div style="margin-bottom:6px;">${trimmed}</div>`);
+      }
+    }
+  }
+  if (inList) result.push('</ul>');
+  return result.join("");
+}
+
+async function sendAgronomistMessage(customMsg = null) {
+  const inputEl = document.getElementById("chatAgronomistInput");
+  const msg = (customMsg !== null ? customMsg : (inputEl ? inputEl.value : "")).trim();
+  if (!msg) return;
+
+  if (inputEl) inputEl.value = "";
+
+  const chatArea = document.getElementById("chatMessagesArea");
+  if (!chatArea) return;
+
+  // Append user message bubble
+  const userRow = document.createElement("div");
+  userRow.className = "chat-message-row chat-row-user";
+  userRow.innerHTML = `
+    <div class="chat-avatar avatar-user">🧑‍🌾</div>
+    <div class="chat-bubble bubble-user">${msg.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>
+  `;
+  chatArea.appendChild(userRow);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  // Append thinking bubble
+  const thinkingRow = document.createElement("div");
+  thinkingRow.className = "chat-message-row chat-row-bot";
+  thinkingRow.id = "chatThinkingIndicator";
+  thinkingRow.innerHTML = `
+    <div class="chat-avatar avatar-bot">🌱</div>
+    <div class="chat-bubble bubble-bot" style="color:var(--accent-cyan);">
+      ⏳ Kisan Mitra is analyzing agronomic protocols & active ingredients...
+    </div>
+  `;
+  chatArea.appendChild(thinkingRow);
+  chatArea.scrollTop = chatArea.scrollHeight;
+
+  try {
+    const currentCrop = (window.latestDiagnosisData?.plant || "").trim();
+    const res = await fetch("/api/agronomist_chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: msg,
+        lang: currentLanguage || "en",
+        crop: currentCrop
+      })
+    });
+
+    const indicator = document.getElementById("chatThinkingIndicator");
+    if (indicator) indicator.remove();
+
+    if (!res.ok) throw new Error("Agronomist response error");
+    const d = await res.json();
+
+    const formattedReply = formatMarkdownChat(d.reply || "No response received.");
+    const botRow = document.createElement("div");
+    botRow.className = "chat-message-row chat-row-bot";
+    botRow.innerHTML = `
+      <div class="chat-avatar avatar-bot">🌱</div>
+      <div class="chat-bubble bubble-bot">
+        ${formattedReply}
+        <div class="chat-bot-meta">
+          <span>📡 ${d.source || 'Gemini AI'} • ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+          <button type="button" class="btn-tts" style="padding:2px 8px; font-size:0.7rem;" onclick="speakChatMessage(this)">🔊 Listen</button>
+        </div>
+      </div>
+    `;
+    chatArea.appendChild(botRow);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    // Speak aloud if sound enabled
+    if (window.speechEngine && isRecognizingSpeech) {
+      const cleanText = (d.reply || "").replace(/[*#•_-]/g, " ").slice(0, 200);
+      window.speechEngine.speak(cleanText, currentLanguage === "hi" ? "hi-IN" : "en-US");
+    }
+  } catch (err) {
+    console.warn("Chat error:", err.message);
+    const indicator = document.getElementById("chatThinkingIndicator");
+    if (indicator) indicator.remove();
+
+    const errRow = document.createElement("div");
+    errRow.className = "chat-message-row chat-row-bot";
+    errRow.innerHTML = `
+      <div class="chat-avatar avatar-bot">🌱</div>
+      <div class="chat-bubble bubble-bot" style="border-color:#ef4444; color:#fca5a5;">
+        ⚠️ Kisan Mitra service temporarily unavailable. Please check your query or retry.
+      </div>
+    `;
+    chatArea.appendChild(errRow);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+}
+
+function askQuickPrompt(promptText) {
+  const inputEl = document.getElementById("chatAgronomistInput");
+  if (inputEl) inputEl.value = promptText;
+  sendAgronomistMessage(promptText);
+}
+
+function askAgronomistAboutCondition(disease, plant) {
+  const query = `What is the detailed dosage, spray schedule, and organic IPM alternatives for ${disease}${plant ? ' on ' + plant : ''}?`;
+  const chatSec = document.getElementById("section-chat");
+  if (chatSec) {
+    chatSec.scrollIntoView({ behavior: "smooth" });
+  }
+  const inputEl = document.getElementById("chatAgronomistInput");
+  if (inputEl) inputEl.value = query;
+  setTimeout(() => {
+    sendAgronomistMessage(query);
+  }, 400);
+}
+
+function toggleSpeechRecognition() {
+  const btn = document.getElementById("btnChatMic");
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRec) {
+    alert("Speech recognition is not supported in this browser. Please type your message.");
+    return;
+  }
+
+  if (isRecognizingSpeech && speechRecognitionInstance) {
+    speechRecognitionInstance.stop();
+    isRecognizingSpeech = false;
+    if (btn) btn.classList.remove("recording");
+    return;
+  }
+
+  try {
+    speechRecognitionInstance = new SpeechRec();
+    speechRecognitionInstance.continuous = false;
+    speechRecognitionInstance.interimResults = false;
+    
+    if (currentLanguage === "hi") speechRecognitionInstance.lang = "hi-IN";
+    else if (currentLanguage === "pa") speechRecognitionInstance.lang = "pa-Guru-IN";
+    else if (currentLanguage === "te") speechRecognitionInstance.lang = "te-IN";
+    else if (currentLanguage === "bn") speechRecognitionInstance.lang = "bn-IN";
+    else if (currentLanguage === "es") speechRecognitionInstance.lang = "es-ES";
+    else speechRecognitionInstance.lang = "en-US";
+
+    speechRecognitionInstance.onstart = () => {
+      isRecognizingSpeech = true;
+      if (btn) btn.classList.add("recording");
+    };
+
+    speechRecognitionInstance.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const inputEl = document.getElementById("chatAgronomistInput");
+      if (inputEl) inputEl.value = transcript;
+      sendAgronomistMessage(transcript);
+    };
+
+    speechRecognitionInstance.onerror = (e) => {
+      console.warn("Speech recognition error:", e.error);
+      isRecognizingSpeech = false;
+      if (btn) btn.classList.remove("recording");
+    };
+
+    speechRecognitionInstance.onend = () => {
+      isRecognizingSpeech = false;
+      if (btn) btn.classList.remove("recording");
+    };
+
+    speechRecognitionInstance.start();
+  } catch (err) {
+    console.warn("Could not start speech recognition:", err);
+    isRecognizingSpeech = false;
+    if (btn) btn.classList.remove("recording");
+  }
+}
+
+function speakChatMessage(btn) {
+  if (!window.speechEngine) return;
+  const bubble = btn.closest(".chat-bubble");
+  if (!bubble) return;
+
+  const clone = bubble.cloneNode(true);
+  const meta = clone.querySelector(".chat-bot-meta");
+  if (meta) meta.remove();
+
+  const text = clone.innerText.trim();
+  const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+  window.speechEngine.speak(text, speechLang);
 }
 
 // ==========================================

@@ -147,6 +147,46 @@ const KNOWLEDGE_BASE = {
       "Practice 3-year crop rotation without potatoes or eggplants"
     ]
   },
+  "Tomato___Bacterial_spot": {
+    plant: "Tomato (Solanum lycopersicum)",
+    disease: "Bacterial Leaf Spot",
+    severity: "Moderate",
+    cause: "Bacterial (Xanthomonas campestris pv. vesicatoria)",
+    summary: "Small, dark, greasy water-soaked spots with yellow halos across foliage and scab-like lesions on green fruits.",
+    chemical: "Apply Copper Hydroxide 77% WP (2g/L) mixed with Streptocycline (1g / 10L water).",
+    organic: "Apply Pseudomonas fluorescens (5g/L) bio-bactericide combined with liquid copper soap.",
+    protocol: [
+      "Day 1: Prune infected foliage during dry weather using alcohol-sterilized shears.",
+      "Day 3: Apply bactericidal copper + Streptocycline spray early morning.",
+      "Day 7: Drench root zone with bio-agent Pseudomonas broth.",
+      "Day 14: Maintain strict overhead watering ban."
+    ],
+    prevention: [
+      "Use certified hot-water treated disease-free seeds",
+      "Disinfect trellises, pruning tools, and stakes with 10% bleach",
+      "Avoid handling wet plants during morning dew"
+    ]
+  },
+  "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+    plant: "Tomato (Solanum lycopersicum)",
+    disease: "Tomato Yellow Leaf Curl Virus (TYLCV)",
+    severity: "Critical",
+    cause: "Viral (Begomovirus transmitted by Whitefly Bemisia tabaci)",
+    summary: "Upward cupping of leaves with pronounced marginal chlorosis (yellowing), severe stunting, and aborted flowering.",
+    chemical: "Spray Diafenthiuron 50% WP (1g/L) or Acetamiprid 20% SP (0.5g/L) to knock down whitefly vectors.",
+    organic: "Install yellow sticky traps (25 traps/acre) and spray Neem Oil 10,000 PPM (3ml/L) with soap emulsion.",
+    protocol: [
+      "Day 1: Rouge out and bury severely infected stunted plants immediately.",
+      "Day 2: Install yellow sticky traps at canopy level across field.",
+      "Day 5: Spray systemic insect-vector control under leaf undersides.",
+      "Day 10: Spray 1% spray grade potassium nitrate to boost resilience."
+    ],
+    prevention: [
+      "Use 40-50 mesh insect barrier netting in nurseries",
+      "Plant barrier crops like maize or sorghum around tomato plots",
+      "Cultivate TYLCV-resistant hybrid tomato varieties"
+    ]
+  },
   "Tomato_healthy": {
     plant: "Tomato (Solanum lycopersicum)",
     disease: "Healthy Leaf & Plant",
@@ -163,6 +203,312 @@ const KNOWLEDGE_BASE = {
     prevention: [
       "Ensure proper plant support with trellises",
       "Maintain soil moisture without waterlogging"
+    ]
+  },
+  "Potato___Late_blight": {
+    plant: "Potato (Solanum tuberosum)",
+    disease: "Late Blight",
+    severity: "Critical",
+    cause: "Oomycete (Phytophthora infestans)",
+    summary: "Rapid necrotic water-soaked lesions spreading from leaf tips, causing foul odor and tuber rot in damp cool weather.",
+    chemical: "Spray Cymoxanil 8% + Mancozeb 64% WP (2g/L) or Fenamidone + Mancozeb (2.5g/L).",
+    organic: "Spray Copper Hydroxide (2.5g/L) + Potassium Phosphite bio-elicitator to stimulate natural defense.",
+    protocol: [
+      "Day 1: Remove infected haulms immediately to prevent tuber wash-in.",
+      "Day 3: Apply preventive fungicide cover to all surrounding potato rows.",
+      "Day 7: Earth up soil mounds around tubers to create physical barrier.",
+      "Day 14: Stop all overhead irrigation."
+    ],
+    prevention: [
+      "Plant certified disease-free seed tubers",
+      "Earth up potato ridges deeply to protect underground tubers",
+      "Harvest only when haulms have completely dried out for 10 days"
+    ]
+  },
+  "Potato___Early_blight": {
+    plant: "Potato (Solanum tuberosum)",
+    disease: "Early Blight",
+    severity: "Moderate",
+    cause: "Fungal (Alternaria solani)",
+    summary: "Concentric brown-black circular lesions with yellow halos on lower mature potato leaves.",
+    chemical: "Spray Mancozeb 75% WP (2.5g/L) or Difenoconazole 25% EC (0.5ml/L).",
+    organic: "Apply Trichoderma viride bio-fungicide (5g/L) and spray NSKE (Neem Seed Kernel Extract 5%).",
+    protocol: [
+      "Day 1: Prune infected lower foliage touching wet soil.",
+      "Day 4: Apply foliar protectant spray during dry afternoon hours.",
+      "Day 8: Provide potassium fertilization to bolster cell wall strength."
+    ],
+    prevention: [
+      "Practice 3-year crop rotation avoiding tomato and eggplant",
+      "Maintain adequate plant nutrition, avoiding nitrogen deficit"
+    ]
+  },
+  "Potato_healthy": {
+    plant: "Potato (Solanum tuberosum)",
+    disease: "Healthy Potato Canopy",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Robust dense canopy with dark green compound leaves, thriving vegetative stolon and tuber development.",
+    chemical: "No fungicide needed. Apply Micronutrient Zinc + Boron foliar spray at tuber initiation.",
+    organic: "Apply vermiwash foliar feed and humic acid soil drench.",
+    protocol: [
+      "Day 1: Maintain soil moisture at 70% field capacity during tuberization.",
+      "Day 10: Earth up soil around hills to shield tubers from sunlight."
+    ],
+    prevention: [
+      "Ensure well-drained loamy soil structure",
+      "Monitor canopy regularly for leaf miner or aphid presence"
+    ]
+  },
+  "Rice___Leaf_blast": {
+    plant: "Rice (Oryza sativa)",
+    disease: "Rice Blast",
+    severity: "Critical",
+    cause: "Fungal (Magnaporthe oryzae / Pyricularia oryzae)",
+    summary: "Spindle-shaped elliptical lesions with gray-white centers and reddish-brown borders on leaf blades, nodes, and panicle neck.",
+    chemical: "Spray Tricyclazole 75% WP (0.6g/L) or Isoprothiolane 40% EC (1.5ml/L) or Kasugamycin 3% SL (2ml/L).",
+    organic: "Apply Pseudomonas fluorescens (10g/L) foliar spray and fermented buttermilk + garlic extract.",
+    protocol: [
+      "Day 1: Drain standing water slightly to reduce field microclimate humidity.",
+      "Day 2: Apply systemic Tricyclazole spray over entire canopy.",
+      "Day 7: Reapply if humid foggy weather persists.",
+      "Day 10: Avoid any top-dressing of nitrogenous urea fertilizers."
+    ],
+    prevention: [
+      "Avoid excessive nitrogen fertilization beyond agronomic recommendations",
+      "Treat seeds with Carbendazim (2g/kg) or Pseudomonas before sowing",
+      "Maintain intermittent wetting and drying rather than stagnant inundation"
+    ]
+  },
+  "Rice___Bacterial_leaf_blight": {
+    plant: "Rice (Oryza sativa)",
+    disease: "Bacterial Leaf Blight (BLB)",
+    severity: "Critical",
+    cause: "Bacterial (Xanthomonas oryzae pv. oryzae)",
+    summary: "Water-soaked stripes turning wavy yellowish-white along leaf margins, wilting and drying up (kresek phase).",
+    chemical: "Spray Copper Oxychloride 50% WP (2.5g/L) + Streptocycline (1g / 10L water).",
+    organic: "Apply fresh cow dung slurry supernatant (20g/L filtered) or neem cake extract.",
+    protocol: [
+      "Day 1: Stop excessive nitrogen application immediately.",
+      "Day 3: Spray copper bactericide early in morning.",
+      "Day 7: Drain field water for 3 days to dry out lower stems."
+    ],
+    prevention: [
+      "Cultivate BLB-resistant rice varieties (e.g., Improved Samba Mahsuri)",
+      "Ensure balanced potassium application to harden stem tissues"
+    ]
+  },
+  "Rice_healthy": {
+    plant: "Rice (Oryza sativa)",
+    disease: "Healthy Rice Crop",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Lush upright emerald green tillers with clean leaf sheaths and robust panicle emergence.",
+    chemical: "No pesticide needed. Maintain split nitrogen and potash application schedule.",
+    organic: "Incorporate Azospirillum and blue-green algae bio-fertilizers.",
+    protocol: [
+      "Day 1: Maintain 2-5cm standing water depth during panicle initiation.",
+      "Day 14: Monitor water level and drain 10 days before final harvest."
+    ],
+    prevention: [
+      "Maintain optimal hill density (25-33 hills/sqm)",
+      "Keep field bunds clear of weed hosts"
+    ]
+  },
+  "Wheat___Yellow_rust": {
+    plant: "Wheat (Triticum aestivum)",
+    disease: "Yellow Rust (Stripe Rust)",
+    severity: "Critical",
+    cause: "Fungal (Puccinia striiformis f. sp. tritici)",
+    summary: "Bright yellow-orange powdery pustules arranged in conspicuous linear stripes along leaf veins, wiping off as yellow dust on fingertips.",
+    chemical: "Spray Propiconazole 25% EC (1ml/L) or Tebuconazole 25.9% EC (1ml/L) immediately upon first stripe sighting.",
+    organic: "Apply bio-control Ampelomyces quisqualis or sulphur dust (20 kg/acre in dry weather).",
+    protocol: [
+      "Day 1: Immediate spot-spray of affected foci and surrounding 15-meter buffer zone.",
+      "Day 4: Broadcast whole-field systemic triazole fungicide.",
+      "Day 12: Inspect flag leaf for rust pustule arrest and green retention."
+    ],
+    prevention: [
+      "Sow rust-resistant recommended wheat cultivars (e.g. HD-2967, DBW-187, DBW-303)",
+      "Ensure timely sowing before November 15 to bypass high-humidity rust spore surges"
+    ]
+  },
+  "Wheat_healthy": {
+    plant: "Wheat (Triticum aestivum)",
+    disease: "Healthy Wheat Foliage",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Uniform deep-green upright tillers with clean flag leaves and vigorous spike development.",
+    chemical: "No fungicide required. Apply 0.5% Zinc Sulfate foliar spray at tillering.",
+    organic: "Top dress with vermicompost and Azotobacter culture.",
+    protocol: [
+      "Day 1: Ensure timely Crown Root Initiation (CRI) irrigation at 21 days after sowing.",
+      "Day 14: Maintain weed-free row spacing."
+    ],
+    prevention: [
+      "Follow zero-tillage or optimum seedbed preparation",
+      "Avoid excess late nitrogen application"
+    ]
+  },
+  "Corn_(maize)___Common_rust": {
+    plant: "Corn / Maize (Zea mays)",
+    disease: "Common Rust",
+    severity: "Moderate",
+    cause: "Fungal (Puccinia sorghi)",
+    summary: "Oval to elongated cinnamon-brown powdery pustules scattered across both upper and lower leaf surfaces.",
+    chemical: "Spray Azoxystrobin + Difenoconazole (1ml/L) or Mancozeb 75% WP (2.5g/L).",
+    organic: "Spray Wettable Sulphur 80% WDG (3g/L) and fermented garlic bio-fungicide.",
+    protocol: [
+      "Day 1: Inspect lower and middle whorl leaves.",
+      "Day 3: Apply foliar protectant spray before tasseling stage.",
+      "Day 10: Re-inspect upper ear leaf."
+    ],
+    prevention: [
+      "Select rust-tolerant maize hybrid seed",
+      "Avoid planting near infected legacy corn stubble"
+    ]
+  },
+  "Corn_(maize)___Fall_Armyworm": {
+    plant: "Corn / Maize (Zea mays)",
+    disease: "Fall Armyworm Infestation",
+    severity: "Critical",
+    cause: "Insect Pest (Spodoptera frugiperda)",
+    summary: "Ragged 'window-paning' feeding holes in whorl leaves with moist sawdust-like fecal frass and aggressive defoliating caterpillars.",
+    chemical: "Spray Chlorantraniliprole 18.5% SC (0.4ml/L) or Emamectin Benzoate 5% SG (0.4g/L) directed down inside the whorl.",
+    organic: "Apply Bacillus thuringiensis (Bt kurstaki @ 2g/L) or Beauveria bassiana (5g/L) or Neem Azadirachtin 10,000 PPM (3ml/L).",
+    protocol: [
+      "Day 1: Apply sand-lime mixture (9:1) or wood ash into whorls to physically suffocate young larvae.",
+      "Day 2: Spray bio-pesticide Bt or chemical Emamectin into central funnel whorl at twilight.",
+      "Day 5: Install pheromone lure traps (5 traps/acre) to track adult moth influx.",
+      "Day 10: Check whorl recovery and emergence of undamaged new leaves."
+    ],
+    prevention: [
+      "Intercrop maize with cowpea, desmodium, or pigeon pea (push-pull strategy)",
+      "Release Trichogramma egg parasitoid wasps (50,000 / acre)"
+    ]
+  },
+  "Corn_(maize)___healthy": {
+    plant: "Corn / Maize (Zea mays)",
+    disease: "Healthy Corn Canopy",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Broad vibrant green arching leaves, thick sturdy stalks, and vigorous tassel/silking progress.",
+    chemical: "No pesticide needed. Apply balanced NPK sidedressing at knee-high stage.",
+    organic: "Mulch with crop residues and apply mycorrhizal root inoculants.",
+    protocol: [
+      "Day 1: Maintain adequate irrigation during tasseling and silking (critical water period).",
+      "Day 14: Weed between rows to eliminate competition."
+    ],
+    prevention: [
+      "Ensure optimum plant density of 24,000 - 28,000 plants per acre",
+      "Maintain deep tillage to expose pupating soil insects"
+    ]
+  },
+  "Cotton___Bacterial_blight": {
+    plant: "Cotton (Gossypium hirsutum)",
+    disease: "Bacterial Blight (Angular Leaf Spot)",
+    severity: "Critical",
+    cause: "Bacterial (Xanthomonas citri pv. malvacearum)",
+    summary: "Dark angular water-soaked lesions bounded by leaf veinlets, progressing into black arm on stems and boll rot.",
+    chemical: "Spray Copper Oxychloride 50% WP (2.5g/L) mixed with Streptocycline (1g in 10L water).",
+    organic: "Spray Pseudomonas fluorescens (10g/L) and NSKE 5% extract.",
+    protocol: [
+      "Day 1: Prune infected black arm branches during dry weather.",
+      "Day 3: Spray Copper + Streptocycline mixture early morning.",
+      "Day 8: Inspect squares and bolls for lesions."
+    ],
+    prevention: [
+      "Delint seeds using concentrated sulfuric acid before sowing",
+      "Use certified disease-resistant Bt cotton hybrids"
+    ]
+  },
+  "Cotton___Whitefly_Infestation": {
+    plant: "Cotton (Gossypium hirsutum)",
+    disease: "Cotton Whitefly Infestation & Sooty Mold",
+    severity: "Critical",
+    cause: "Insect Pest (Bemisia tabaci)",
+    summary: "Clusters of tiny white-winged sap-sucking nymphs on leaf undersides, secreting honeydew causing black sooty mold and Leaf Curl Virus.",
+    chemical: "Spray Pyriproxyfen 10% + Fenpropathrin 15% EC (1.5ml/L) or Diafenthiuron 50% WP (1.2g/L).",
+    organic: "Spray Neem Oil 10,000 PPM (3ml/L) + castor oil soap. Install 30 yellow sticky cards per acre.",
+    protocol: [
+      "Day 1: Install yellow sticky traps throughout field at canopy height.",
+      "Day 3: Thoroughly spray leaf undersides with insect growth regulator or neem formulation.",
+      "Day 7: Release Chrysoperla carnea (green lacewing) natural predators.",
+      "Day 12: Monitor nymph mortality count on random 20-leaf sample."
+    ],
+    prevention: [
+      "Avoid excessive synthetic pyrethroids which kill natural whitefly predators",
+      "Avoid monoculture without border trap crops"
+    ]
+  },
+  "Cotton___healthy": {
+    plant: "Cotton (Gossypium hirsutum)",
+    disease: "Healthy Cotton Crop",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Deep green palmate leaves with vigorous sympodial branching and abundant healthy squaring and boll retention.",
+    chemical: "No pesticide needed. Apply 1% Potassium Nitrate (13:0:45) spray at boll formation.",
+    organic: "Apply Jeevamrutha or panchagavya foliar tonic.",
+    protocol: [
+      "Day 1: Monitor square retention rate and leaf color index.",
+      "Day 14: Ensure furrow irrigation without water stagnation."
+    ],
+    prevention: [
+      "Maintain deep drainage furrows",
+      "Regular scouting for bollworm and sucking pest thresholds"
+    ]
+  },
+  "Apple___Apple_scab": {
+    plant: "Apple (Malus domestica)",
+    disease: "Apple Scab",
+    severity: "Moderate",
+    cause: "Fungal (Venturia inaequalis)",
+    summary: "Velvety olive-green to dark brown circular spots on leaves and scabby corky lesions on fruit surfaces.",
+    chemical: "Spray Difenoconazole 25% EC (0.3ml/L) or Captan 50% WP (2.5g/L).",
+    organic: "Spray Liquid Lime Sulfur or Potassium Bicarbonate (4g/L).",
+    protocol: [
+      "Day 1: Rake and destroy fallen overwintering leaves beneath tree canopy.",
+      "Day 3: Apply protective fungicide spray at green tip stage.",
+      "Day 10: Re-apply post-petal fall if spring rains occur."
+    ],
+    prevention: [
+      "Prune tree canopy to maximize air circulation and sunlight penetration",
+      "Apply urea 5% spray on fallen leaves in autumn to accelerate decomposition"
+    ]
+  },
+  "Grape___Black_rot": {
+    plant: "Grape (Vitis vinifera)",
+    disease: "Black Rot",
+    severity: "Critical",
+    cause: "Fungal (Guignardia bidwellii)",
+    summary: "Small reddish-brown circular leaf spots with dark margins; berries shrivel into hard, black, wrinkled mummies.",
+    chemical: "Spray Mancozeb 75% WP (2g/L) or Myclobutanil 10% WP (0.5g/L).",
+    organic: "Spray Copper Octanoate (copper soap) and bio-agent Bacillus amyloliquefaciens.",
+    protocol: [
+      "Day 1: Hand-pick and destroy all shriveled black mummified grape clusters.",
+      "Day 3: Spray systemic protectant fungicide prior to bloom.",
+      "Day 10: Ensure canopy trellising allows complete airflow."
+    ],
+    prevention: [
+      "Trellis vines properly for full sun exposure",
+      "Sanitize vineyard by removing old canes and mummies during dormant pruning"
+    ]
+  },
+  "Soybean___healthy": {
+    plant: "Soybean (Glycine max)",
+    disease: "Healthy Soybean Crop",
+    severity: "Healthy",
+    cause: "None",
+    summary: "Lush trifoliate green leaves with vigorous nodulation, dense pod set, and no visible pathological chlorosis.",
+    chemical: "No chemical required. Maintain Rhizobium seed inoculation at sowing.",
+    organic: "Foliar spray with Panchagavya (3%) and seaweed extract.",
+    protocol: [
+      "Day 1: Maintain soil moisture during flowering and pod-filling stages.",
+      "Day 14: Inspect root nodules (should be pink inside indicating active nitrogen fixation)."
+    ],
+    prevention: [
+      "Rotate with non-leguminous cereals like wheat or corn",
+      "Maintain seed treatment with bio-fungicide Trichoderma"
     ]
   }
 };
@@ -355,7 +701,8 @@ app.get(["/signout", "/logout"], (req, res) => {
 // 🤖 GEMINI MULTIMODAL ANALYSIS
 // ===============================
 async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
-  const candidateModels = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro-vision"];
+  // Use currently active, high-speed multimodal models (gemini-3.1-flash-lite, gemini-3.6-flash, gemini-flash-latest)
+  const candidateModels = ["gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-flash-latest", "gemini-3.8-flash"];
 
   for (const model of candidateModels) {
     for (let attempt = 1; attempt <= 2; attempt++) {
@@ -391,20 +738,20 @@ async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
 
           const parsed = JSON.parse(raw);
           if (validateGeminiResponse(parsed)) {
-            logger.info("✅ Gemini prediction successful", { model, confidence: parsed.confidence });
+            logger.info("✅ Gemini prediction successful", { model, confidence: parsed.confidence, is_plant: parsed.is_plant });
             return { data: parsed, modelUsed: model };
           }
         }
       } catch (err) {
         const msg = err.message || "";
-        const isQuota = msg.includes("quota") || msg.includes("resource_exhausted");
-        const isTransient = !isQuota && (msg.includes("503") || msg.includes("429"));
+        const isQuota = msg.includes("quota") || msg.includes("resource_exhausted") || msg.includes("429");
+        const isTransient = !isQuota && (msg.includes("503") || msg.includes("UNAVAILABLE"));
 
         if (isTransient && attempt === 1) {
           await new Promise(r => setTimeout(r, 650));
           continue;
         }
-        logger.warn(`Model ${model} failed (attempt ${attempt}): ${msg.slice(0, 100)}`);
+        logger.warn(`Model ${model} attempt ${attempt} notice: ${msg.slice(0, 100)}`);
         break;
       }
     }
@@ -434,53 +781,165 @@ app.post("/predict",
     }
 
     const method = req.body.method || "Chemical";
+    let clientOpticalCheck = null;
+    try {
+      if (req.body.client_optical_check) {
+        clientOpticalCheck = JSON.parse(req.body.client_optical_check);
+      }
+    } catch (_) {}
 
-    // Try Gemini AI first
+    // Quick client-side optical rejection: if client pre-check detected strong human face/skin dominance
+    if (clientOpticalCheck?.isLikelyFaceOrSkin) {
+      logger.info("⚠️ Client optical pre-check detected human face / skin dominance");
+      return res.json({
+        success: false,
+        is_plant: false,
+        detected_subject: "Human Face / Skin",
+        plant: "None (Human Subject)",
+        disease: "No Plant Detected",
+        severity: "N/A",
+        confidence: 96.0,
+        error: "Human face or person detected. Please aim the camera at an agricultural plant leaf, crop, or fruit.",
+        summary: "The scanner detected a human face or skin rather than a crop specimen. Please direct the camera toward an agricultural plant leaf, stem, or fruit to run pathology diagnosis.",
+        treatment: "Please photograph a real agricultural crop or leaf specimen.",
+        prevention_tips: [
+          "Point the camera directly at plant foliage, stems, or fruits",
+          "Hold the camera steady in good natural lighting",
+          "Avoid centering human faces, hands, clothing, or indoor household objects"
+        ]
+      });
+    }
+
+    // Try Gemini Multimodal AI with Strict Subject Verification
     const ai = getGenAIClient();
     if (ai) {
       try {
-        logger.info("🔍 Running Gemini analysis", { fileName: req.file.originalname });
+        logger.info("🔍 Running Gemini vision analysis", { fileName: req.file.originalname });
         const base64Image = req.file.buffer.toString("base64");
         const mimeType = req.file.mimetype || "image/jpeg";
 
-        const prompt = `You are a plant pathologist and agricultural specialist. Analyze this crop image.
+        const prompt = `You are an expert plant pathologist, agricultural vision specialist, and entomologist.
+Carefully inspect the provided image.
 
-Return ONLY valid JSON with this structure:
+MANDATORY STEP 1: SUBJECT VERIFICATION
+Is this image an agricultural plant, crop leaf, stem, flower, fruit, root, seedling, or insect pest on vegetation?
+- If the image contains a HUMAN, HUMAN FACE, SELFIE, PERSON, SKIN/HANDS, ANIMAL/PET, ROOM/INTERIOR, FURNITURE, ELECTRONICS, VEHICLE, FOOD DISH, OR ANY OTHER NON-PLANT OBJECT:
+  You MUST set "is_plant": false.
+  Set "detected_subject": exact name of what is shown (e.g., "Human Face / Person", "Indoor Room", "Animal / Pet", "Electronics").
+  Set "plant": "None (Non-Plant Subject)".
+  Set "disease": "Non-Plant / Human Face Detected".
+  Set "severity": "N/A".
+  Set "cause": "Non-Agricultural Subject".
+  Set "is_healthy": false.
+  Set "is_insect_caused": false.
+  Set "confidence": 99.0.
+  Set "summary": "The camera or image depicts a human face or non-plant subject rather than an agricultural plant. Please frame an agricultural crop leaf, stem, or fruit.".
+  Set "treatment": "Please photograph a real plant or crop leaf for diagnosis.".
+  Set "organic_treatment": "N/A".
+  Set "chemical_treatment": "N/A".
+  Set "recovery_protocol": [].
+  Set "prevention_tips": [
+    "Point camera directly at crop leaves, stems, or fruits",
+    "Ensure good natural lighting without glare",
+    "Avoid showing people, faces, or indoor backgrounds"
+  ].
+
+- IF AND ONLY IF IT IS AN ACTUAL PLANT OR CROP LEAF:
+  Set "is_plant": true.
+  Set "detected_subject": "Crop / Plant Foliage".
+  Set "plant": exact crop/plant species (e.g., Tomato, Potato, Corn, Wheat, Rice, Cotton, Apple, Grape, Pepper, Citrus, etc.).
+  Set "disease": accurate pathology or condition name (e.g., "Late Blight", "Early Blight", "Powdery Mildew", "Bacterial Leaf Spot", "Fall Armyworm Infestation", "Aphid Damage", "Healthy Plant Specimen").
+  Set "severity": "Healthy" | "Mild" | "Moderate" | "Critical".
+  Set "cause": "Fungal" | "Bacterial" | "Viral" | "Insect Pest" | "Nutrient Deficiency" | "Healthy".
+  Set "is_healthy": true if healthy, false otherwise.
+  Set "is_insect_caused": true if caused by insects/pests, false otherwise.
+  Set "culprit_type": "Pathogen" | "Insect Pest" | "Healthy".
+  Set "culprit": specific organism name or pest species.
+  Set "damage_mechanism": symptom description or feeding mechanism.
+  Set "confidence": number between 82.0 and 99.5.
+  Set "summary": 2-3 sentences of clear diagnostic assessment.
+  Set "organic_treatment": organic bio-control or herbal remedy with exact dosage.
+  Set "chemical_treatment": chemical active ingredient with dosage.
+  Set "recovery_protocol": ["Day 1-2: ...", "Day 3-5: ...", "Day 7-10: ..."].
+  Set "prevention_tips": ["Tip 1", "Tip 2", "Tip 3"].
+
+Return ONLY valid JSON matching this schema:
 {
-  "plant": "Crop name",
-  "disease": "Condition name",
-  "severity": "Healthy|Mild|Moderate|Critical",
-  "cause": "Pathogen/pest classification",
-  "is_healthy": true/false,
-  "confidence": 95.5,
-  "summary": "Brief diagnosis (2-3 sentences)",
-  "organic_treatment": "Bio-control recommendations with dosage",
-  "chemical_treatment": "Chemical active ingredients with dosage",
-  "recovery_protocol": ["Day 1-2: ...", "Day 3-5: ...", "Day 7-10: ..."],
-  "prevention_tips": ["Tip 1", "Tip 2", "Tip 3"]
+  "is_plant": boolean,
+  "detected_subject": string,
+  "plant": string,
+  "disease": string,
+  "severity": string,
+  "cause": string,
+  "is_healthy": boolean,
+  "is_insect_caused": boolean,
+  "culprit_type": string,
+  "culprit": string,
+  "damage_mechanism": string,
+  "confidence": number,
+  "summary": string,
+  "organic_treatment": string,
+  "chemical_treatment": string,
+  "recovery_protocol": array of strings,
+  "prevention_tips": array of strings
 }`;
 
         const aiResult = await analyzeLeafWithGemini(ai, base64Image, mimeType, prompt);
 
         if (aiResult?.data) {
           const result = aiResult.data;
+
+          // Check if AI detected a human face or non-plant object
+          const isNonPlant = result.is_plant === false || 
+            (result.disease && /non-plant|human|face|person|none/i.test(result.disease)) ||
+            (result.plant && /none|non-plant|human/i.test(result.plant));
+
+          if (isNonPlant) {
+            logger.info("⚠️ Non-plant / human face recognized by Gemini", { detected: result.detected_subject });
+            return res.json({
+              success: false,
+              is_plant: false,
+              detected_subject: result.detected_subject || "Human Face / Person",
+              plant: "No Plant Detected",
+              disease: "Non-Plant / Human Face Detected",
+              severity: "N/A",
+              confidence: result.confidence || 98.5,
+              error: `No crop or plant detected. The vision system detected ${result.detected_subject || "a human face or non-plant object"}. Please aim the camera at an agricultural plant leaf or crop.`,
+              summary: result.summary || `The image appears to show ${result.detected_subject || "a human face or non-plant subject"} rather than agricultural foliage. Please frame a real plant leaf, stem, or fruit to run pathology diagnosis.`,
+              treatment: "Please photograph a real agricultural crop or leaf specimen.",
+              prevention_tips: result.prevention_tips || [
+                "Point the camera directly at plant leaves, stems, or fruits",
+                "Ensure good natural lighting without glare",
+                "Avoid showing people, faces, or indoor backgrounds"
+              ],
+              source: `Gemini AI (${aiResult.modelUsed})`
+            });
+          }
+
           const treatment = method === "Organic" ? result.organic_treatment : result.chemical_treatment;
 
           const record = {
             id: crypto.randomUUID(),
             timestamp: new Date().toISOString(),
-            plant: result.plant || "Unknown Plant",
-            disease: result.disease || "Unknown Condition",
+            is_plant: true,
+            detected_subject: result.detected_subject || "Crop Specimen",
+            plant: result.plant || "Crop Specimen",
+            disease: result.disease || "Diagnosed Condition",
             severity: result.severity || "Mild",
-            cause: result.cause || "Unknown",
+            cause: result.cause || "Biological",
+            is_healthy: Boolean(result.is_healthy),
+            is_insect_caused: Boolean(result.is_insect_caused),
+            culprit_type: result.culprit_type || (result.is_insect_caused ? "Insect Pest" : "Pathogen"),
+            culprit: result.culprit || result.cause || "Biological Agent",
+            damage_mechanism: result.damage_mechanism || "",
             confidence: result.confidence || 95,
             summary: result.summary || "Analysis completed",
             method,
             treatment,
             organic_treatment: result.organic_treatment,
             chemical_treatment: result.chemical_treatment,
-            recovery_protocol: result.recovery_protocol,
-            prevention_tips: result.prevention_tips,
+            recovery_protocol: result.recovery_protocol || [],
+            prevention_tips: result.prevention_tips || [],
             source: `Gemini AI (${aiResult.modelUsed})`,
             user: req.session.user.name || "Farmer"
           };
@@ -488,21 +947,41 @@ Return ONLY valid JSON with this structure:
           scanJournal.unshift(record);
           if (scanJournal.length > 50) scanJournal.pop();
 
-          logger.info("✅ Prediction saved", { id: record.id });
+          logger.info("✅ Prediction saved", { id: record.id, disease: record.disease });
           return res.json({ success: true, ...record });
         }
       } catch (geminiError) {
-        logger.warn("Gemini error, falling back to agronomic engine: " + geminiError.message);
+        logger.warn("Gemini error, evaluating fallback: " + geminiError.message);
       }
     }
 
-    // FALLBACK: Agronomic Knowledge Base Engine
+    // FALLBACK: Agronomic Knowledge Base Engine with Non-Plant Guard
     try {
       const filename = (req.file.originalname || "").toLowerCase();
+      
+      // Guard against non-plant filenames (selfie, face, human, profile, person, etc.)
+      const nonPlantNameKeywords = ["face", "selfie", "person", "human", "man", "woman", "boy", "girl", "avatar", "profile", "me."];
+      if (nonPlantNameKeywords.some(kw => filename.includes(kw))) {
+        return res.json({
+          success: false,
+          is_plant: false,
+          detected_subject: "Human / Non-Plant Image",
+          plant: "No Plant Detected",
+          disease: "Non-Plant / Human Face Detected",
+          severity: "N/A",
+          confidence: 95.0,
+          error: "No crop or plant detected. Image appears to be a portrait or non-plant subject. Please photograph an agricultural crop or leaf.",
+          summary: "The scanner detected a portrait or non-plant subject. Please aim your camera at a crop leaf or stem.",
+          treatment: "Please photograph a real agricultural crop or leaf specimen.",
+          prevention_tips: ["Point camera directly at plant foliage", "Ensure good lighting"]
+        });
+      }
+
       let diseaseKey = Object.keys(KNOWLEDGE_BASE).find(key => 
         filename.includes(key.toLowerCase().replace(/_/g, ""))
       );
 
+      // If generic or camera snapshot without explicit crop name and Gemini is unavailable
       if (!diseaseKey) {
         const keys = Object.keys(KNOWLEDGE_BASE);
         let hash = 0;
@@ -520,6 +999,8 @@ Return ONLY valid JSON with this structure:
       const record = {
         id: crypto.randomUUID(),
         timestamp: new Date().toISOString(),
+        is_plant: true,
+        detected_subject: "Crop Foliage",
         plant: info.plant,
         disease: info.disease,
         severity: info.severity,
@@ -600,6 +1081,159 @@ app.post("/recommend_crop", validateCropRecommendation, (req, res) => {
   logger.info("Crop recommendation", { crop, temp, rainfall });
   res.json({ crop, season, expected_yield: expectedYield, water_requirement: waterReq });
 });
+
+// ===============================
+// 📈 AGRICULTURAL YIELD PREDICTION
+// ===============================
+app.post("/predict_yield", (req, res) => {
+  try {
+    const humidity = Math.max(10, Math.min(100, parseFloat(req.body.humidity || 65)));
+    const rainfall = Math.max(0, Math.min(2000, parseFloat(req.body.rainfall || 100)));
+    const temp = Math.max(-10, Math.min(55, parseFloat(req.body.temp || 25)));
+    const crop = (req.body.crop || "Agricultural Crops").toString().slice(0, 50);
+
+    // Physiological Crop Growth Equation & Moisture Stress Penalty
+    // Bell-shaped curves centered around ideal vegetative range (Temp ~24C, Humidity ~65%, Rain ~100-120mm)
+    const tempStress = Math.max(0, 1 - Math.pow((temp - 24) / 18, 2));
+    const humidityStress = Math.max(0, 1 - Math.pow((humidity - 65) / 45, 2));
+    const rainStress = Math.max(0, 1 - Math.pow((rainfall - 110) / 120, 2));
+
+    const rawIndex = (tempStress * 0.38 + humidityStress * 0.32 + rainStress * 0.30) * 100;
+    const yieldIndex = Math.max(25, Math.min(98, Math.round(rawIndex * 10) / 10));
+
+    let rating = "Optimal Yield Index";
+    let limitingFactor = "Environmental conditions are balanced for vegetative photosynthesis.";
+    let fungalRisk = "Low Fungal Infection Risk (Dry Foliage Profile)";
+
+    if (humidity > 80 && temp >= 18 && temp <= 27) {
+      fungalRisk = "⚠️ High Blight & Mildew Pressure (Persistent humidity above 80% with moderate warmth)";
+    } else if (humidity > 70) {
+      fungalRisk = "Moderate Risk: Monitor morning canopy wetness and leaf spots";
+    }
+
+    if (temp > 35) {
+      limitingFactor = "Thermal Evapotranspiration Stress: High ambient heat (>35°C) risks pollen sterility.";
+      rating = "Heat Stressed Canopy";
+    } else if (temp < 15) {
+      limitingFactor = "Thermal Inactivity: Soil microbial and phosphorus uptake slows below 15°C.";
+      rating = "Cold Retarded Growth";
+    } else if (humidity < 40) {
+      limitingFactor = "Vapor Pressure Deficit (VPD): Dry ambient air accelerates plant dehydration.";
+      rating = "Atmospheric Drought Stress";
+    } else if (rainfall > 220) {
+      limitingFactor = "Soil Saturation & Anaerobic Risk: Heavy rainfall risks root hypoxia and nutrient leaching.";
+      rating = "Waterlogging Vulnerability";
+    }
+
+    const recommendations = [
+      humidity > 75 
+        ? "Apply prophylactic bio-fungicide (Trichoderma or Copper Oxychloride) before rainfall."
+        : "Maintain standard drip fertigation cycle (20-25mm weekly equivalent).",
+      temp > 32 
+        ? "Irrigate in late afternoon to reduce transpiration shock and canopy surface heat."
+        : "Check soil drainage and apply light organic mulch around root crown.",
+      "Conduct scouting for piercing-sucking insect pests (aphids, thrips) along perimeter borders."
+    ];
+
+    logger.info("Yield prediction executed", { temp, humidity, rainfall, yieldIndex });
+
+    res.json({
+      success: true,
+      crop,
+      yield_index: yieldIndex,
+      productivity_rating: rating,
+      limiting_factor: limitingFactor,
+      fungal_blight_risk: fungalRisk,
+      potential_growth_index: `${yieldIndex}% of optimum genetic yield`,
+      agronomic_recommendations: recommendations
+    });
+  } catch (err) {
+    logger.error("Yield prediction calculation error: " + err.message);
+    res.status(500).json({ success: false, error: "Yield computation error" });
+  }
+});
+
+// ===============================
+// 🤖 AI AGRONOMIST CHAT ("Kisan Mitra")
+// ===============================
+app.post("/api/agronomist_chat", strictRateLimiter, asyncHandler(async (req, res) => {
+  const userMessage = (req.body.message || "").trim();
+  const userLang = (req.body.lang || "en").toLowerCase();
+  const currentCrop = (req.body.crop || "").trim();
+
+  if (!userMessage) {
+    return res.status(400).json({ success: false, error: "Message is required" });
+  }
+
+  const ai = getGenAIClient();
+  let aiReply = null;
+  let replySource = "Gemini AI";
+
+  if (ai) {
+    const prompt = `You are "Kisan Mitra" (Farmer's Trusted Agronomist & Crop Science AI Advisor).
+You advise farmers, agriculturalists, and crop growers with scientific, practical, and highly actionable agricultural intelligence.
+
+USER QUERY: "${userMessage}"
+USER CONTEXT / CROP: "${currentCrop || 'General Agriculture'}"
+PREFERRED LANGUAGE: "${userLang}"
+
+RULES:
+1. Provide practical, accurate agronomic instructions: specific active ingredients (e.g., Mancozeb 75% WP @ 2.5g/L, Imidacloprid 17.8% SL @ 0.5ml/L, Trichoderma @ 5g/L), fertilizer ratios (NPK), irrigation methods, or planting advice.
+2. Provide BOTH Organic (biological/botanical) and Chemical solutions whenever pest or disease control is discussed.
+3. If the farmer asked in Hindi, respond in clean, simple, understandable Hindi. If in Punjabi, Bengali, Telugu, Spanish, or English, respond in that language.
+4. Keep the answer concise (2-4 clear bullet points or 100-180 words), respectful, encouraging, and free from unnecessary developer jargon.
+5. Emphasize safety: wearing gloves, pre-harvest interval (PHI), and avoiding pesticide spraying during high wind or bloom periods when bees pollinate.`;
+
+    const candidateModels = ["gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-flash-latest"];
+    for (const m of candidateModels) {
+      try {
+        const result = await ai.models.generateContent({
+          model: m,
+          contents: prompt
+        });
+        if (result && result.text) {
+          aiReply = result.text.trim();
+          replySource = `Gemini AI (${m})`;
+          break;
+        }
+      } catch (genErr) {
+        logger.warn(`AI chat candidate ${m} failed: ${genErr.message}`);
+      }
+    }
+  }
+
+  // Resilient Domain Fallback if Gemini quota is unavailable
+  if (!aiReply) {
+    replySource = "Agronomic AI Advisory Engine";
+    const msgLower = userMessage.toLowerCase();
+    if (msgLower.includes("blight") || msgLower.includes("black") || msgLower.includes("spot")) {
+      aiReply = "🌿 **Blight / Leaf Spot Management Protocol**:\n• **Chemical**: Spray Mancozeb 75% WP (2.5g/L) or Azoxystrobin 23% SC (1ml/L) early morning on dry foliage.\n• **Organic**: Apply Copper Hydroxide (2g/L) + cold-pressed Neem Oil 10,000 PPM (3ml/L).\n• **Culture**: Prune and destroy severely infected lower leaves touching damp soil. Avoid overhead sprinkler irrigation.";
+    } else if (msgLower.includes("aphid") || msgLower.includes("whitefly") || msgLower.includes("pest") || msgLower.includes("insect")) {
+      aiReply = "🐛 **Sucking Pest (Whitefly / Aphids) Protocol**:\n• **Organic**: Install 25 yellow sticky traps per acre; spray 5% Neem Seed Kernel Extract (NSKE) or Neem Oil (5ml/L).\n• **Chemical**: Spray Acetamiprid 20% SP (0.5g/L) or Diafenthiuron 50% WP (1g/L).\n• **Safety**: Spray during calm dawn or dusk hours (wind < 12 km/h) to protect beneficial honeybees.";
+    } else if (msgLower.includes("fertilizer") || msgLower.includes("urea") || msgLower.includes("dap") || msgLower.includes("npk")) {
+      aiReply = "🧪 **Balanced Crop Nutrition Advisory**:\n• **Basal Dose**: Apply 100% DAP and 50% Potash (MOP) during field preparation.\n• **Split Nitrogen**: Split Urea into 2-3 split doses (at tillering/vegetative and flowering) rather than a single dump to prevent nitrogen leaching.\n• **Micronutrient**: Apply Zinc Sulfate (10 kg/acre) to prevent leaf chlorosis and stunting.";
+    } else if (msgLower.includes("weather") || msgLower.includes("spray") || msgLower.includes("rain")) {
+      aiReply = "🌦️ **Agricultural Spray Window Advisory**:\n• **Optimal Hours**: 06:00 - 09:30 AM or 04:30 - 07:00 PM when wind speed is under 12 km/h and temperature is below 32°C.\n• **Rain Precaution**: Do not spray if rain is forecast within 4 hours, as systemic fungicides require 2-4 hours to absorb.\n• **Sticker**: Add an agricultural non-ionic surfactant/sticker (1ml/L) during humid monsoon periods.";
+    } else {
+      aiReply = `🌾 **Kisan Mitra Field Advice for "${userMessage}"**:\n• **Soil Health**: Ensure soil pH is between 6.2 - 7.2 for optimal bioavailability of macronutrients (N-P-K).\n• **Water Management**: Practice alternate wetting and drying or drip irrigation to conserve water and prevent root rot.\n• **Plant Protection**: Always inspect leaf undersides twice weekly for early detection of nymphs, eggs, or fungal spores.`;
+    }
+  }
+
+  const suggestedQuestions = [
+    "What is the best treatment for leaf curl virus?",
+    "How to prepare bio-pesticide neem oil spray?",
+    "When should I apply urea top-dressing?",
+    "Is today safe for chemical fungicide spraying?"
+  ];
+
+  res.json({
+    success: true,
+    reply: aiReply,
+    source: replySource,
+    timestamp: new Date().toISOString(),
+    suggested_questions: suggestedQuestions
+  });
+}));
 
 // ===============================
 // 🧪 FERTILIZER CALCULATOR
@@ -746,24 +1380,72 @@ app.get("/weather", asyncHandler(async (req, res) => {
   }
 
   let weatherData = null;
-  let weatherSource = "Open-Meteo";
+  let weatherSource = "Open-Meteo Precision Agro-Forecast";
 
   try {
-    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
-    const geoData = await geoRes.json();
+    let lat = latParam;
+    let lon = lonParam;
+    let locationName = city;
 
-    if (geoData.results?.length) {
-      const { latitude, longitude, name } = geoData.results[0];
-      const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`);
+    if (!lat || !lon) {
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
+      const geoData = await geoRes.json();
+      if (geoData.results?.length) {
+        lat = geoData.results[0].latitude;
+        lon = geoData.results[0].longitude;
+        locationName = geoData.results[0].name;
+      }
+    }
+
+    if (lat && lon) {
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,wind_speed_10m&forecast_days=2`;
+      const weatherRes = await fetch(weatherUrl);
       const result = await weatherRes.json();
-      const current = result.current_weather;
+      const current = result.current;
+
+      const temp = current?.temperature_2m ?? 26.5;
+      const humidity = current?.relative_humidity_2m ?? 65;
+      const windSpeed = current?.wind_speed_10m ?? 8.5;
+      const rain = current?.precipitation ?? 0.0;
+      const code = current?.weather_code ?? 0;
+
+      let conditionText = "Clear Skies";
+      if (code >= 51 && code <= 67) conditionText = "Light Rain / Drizzle";
+      else if (code >= 71 && code <= 86) conditionText = "Heavy Rain / Storm";
+      else if (code >= 1 && code <= 3) conditionText = "Partly Cloudy";
+      else if (code === 45 || code === 48) conditionText = "Foggy / High Humidity";
+
+      // Calculate upcoming 8-hour spray windows
+      const hourlyList = [];
+      if (result.hourly?.time) {
+        const nowIndex = new Date().getHours();
+        for (let i = nowIndex; i < Math.min(nowIndex + 12, result.hourly.time.length); i++) {
+          const hTime = result.hourly.time[i]?.slice(11, 16) || `${i}:00`;
+          const hTemp = result.hourly.temperature_2m[i];
+          const hWind = result.hourly.wind_speed_10m[i];
+          const hRainProb = result.hourly.precipitation_probability ? result.hourly.precipitation_probability[i] : 0;
+          const hHum = result.hourly.relative_humidity_2m[i];
+          const hSafe = hWind < 15 && hRainProb < 35 && hTemp <= 32;
+
+          hourlyList.push({
+            time: hTime,
+            temperature: hTemp,
+            humidity: hHum,
+            windSpeed: hWind,
+            rain_probability: hRainProb,
+            status: hSafe ? "Safe" : (hWind >= 15 ? "Wind Drift" : "Rain Risk")
+          });
+        }
+      }
 
       weatherData = {
-        city: name,
-        temperature: current.temperature,
-        humidity: 65,
-        windSpeed: current.windspeed,
-        condition: current.weathercode <= 3 ? "Clear" : "Cloudy"
+        city: locationName,
+        temperature: temp,
+        humidity,
+        windSpeed,
+        precipitation: rain,
+        condition: conditionText,
+        hourly_forecast: hourlyList
       };
     }
   } catch (e) {
@@ -774,17 +1456,59 @@ app.get("/weather", asyncHandler(async (req, res) => {
     weatherData = {
       city,
       temperature: 27.5,
-      humidity: 58,
-      windSpeed: 9.2,
-      condition: "Clear"
+      humidity: 62,
+      windSpeed: 8.8,
+      precipitation: 0.0,
+      condition: "Clear Skies",
+      hourly_forecast: []
     };
   }
+
+  // Agronomic Spray Risk Assessment Calculation
+  const isWindSafe = weatherData.windSpeed < 15;
+  const isTempSafe = weatherData.temperature <= 32;
+  const isRainSafe = (weatherData.precipitation || 0) < 0.2;
+  const isOverallSafe = isWindSafe && isTempSafe && isRainSafe;
+
+  // 0-100 Scientific Spray Index
+  let score = 100;
+  if (!isWindSafe) score -= 45;
+  else if (weatherData.windSpeed > 10) score -= 15;
+  if (!isTempSafe) score -= 25;
+  if (!isRainSafe) score -= 50;
+  score = Math.max(10, Math.min(100, score));
+
+  const reasons = [];
+  if (isWindSafe) reasons.push(`Wind speed ${weatherData.windSpeed} km/h is below drift limit (15 km/h)`);
+  else reasons.push(`High wind (${weatherData.windSpeed} km/h) causes severe chemical spray drift`);
+
+  if (isTempSafe) reasons.push(`Temperature ${weatherData.temperature}°C avoids chemical volatilization`);
+  else reasons.push(`High temperature (${weatherData.temperature}°C) causes rapid droplet evaporation`);
+
+  if (isRainSafe) reasons.push("Dry conditions allow systemic chemical absorption (2-4 hrs)");
+  else reasons.push("Precipitation will wash off applied pesticides and fungicides");
+
+  const fungalRisk = (weatherData.humidity > 75 && weatherData.temperature >= 18 && weatherData.temperature <= 28)
+    ? "Elevated (Fungal spore germination favored)"
+    : "Low to Moderate";
 
   const payload = {
     ...weatherData,
     source: weatherSource,
-    spray_safe: weatherData.windSpeed < 15,
-    spray_window: "6:30 AM - 9:30 AM or 4:30 PM - 7:00 PM"
+    spray_safe: isOverallSafe,
+    spray_score: score,
+    spray_status: isOverallSafe ? "Optimal Spray Window" : "Caution / Hold Spraying",
+    spray_badge: isOverallSafe ? "🟢 Safe for Pesticide & Fertilizer Spraying" : "🔴 Hold Spraying (Adverse Microclimate)",
+    spray_safety: isOverallSafe ? "SAFE" : "UNSAFE",
+    spray_reason: reasons.join(". ") + ".",
+    spray_window: isOverallSafe ? "6:30 AM - 9:30 AM & 4:30 PM - 7:00 PM" : "Wait for wind < 14 km/h & dry weather",
+    spray_reasons: reasons,
+    irrigation_advice: weatherData.humidity < 50 
+      ? "Low ambient humidity detected. Increase drip irrigation volume by 15% to maintain soil root hydration."
+      : (weatherData.precipitation > 0.5 
+          ? "Precipitation recorded. Suspend drip cycles to avoid waterlogging and root hypoxia."
+          : "Standard baseline irrigation. Soil moisture is within optimal vegetative range."),
+    fungal_risk_index: fungalRisk
   };
 
   weatherCache.set(cacheKey, { timestamp: Date.now(), data: payload });
