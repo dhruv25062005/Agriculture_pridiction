@@ -38,7 +38,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// Port configuration:
+// In AI Studio Dev environment, internal NGINX reverse proxy runs on NGINX_PORT (8080) and proxies to port 3000.
+// In deployed Cloud Run or Render, no internal NGINX proxy exists, so bind to process.env.PORT.
+const isInternalNginxSandbox = Boolean(process.env.NGINX_PORT || process.env.DEFAULT_APP_PORT);
+const PORT = isInternalNginxSandbox
+  ? parseInt(process.env.DEFAULT_APP_PORT || "3000", 10)
+  : parseInt(process.env.PORT || "3000", 10);
+
+// Trust reverse proxy for Cloud Run and Render deployment
+app.set("trust proxy", 1);
 
 // ===============================
 // SECURITY MIDDLEWARE (MUST BE FIRST)
@@ -183,7 +193,7 @@ const upload = multer({
 // SESSION MANAGEMENT MIDDLEWARE
 // ===============================
 app.use((req, res, next) => {
-  let sessionId = req.cookies.sid;
+  let sessionId = req.signedCookies?.sid || req.cookies?.sid;
   if (!sessionId || !sessionStore.has(sessionId)) {
     sessionId = crypto.randomUUID();
     sessionStore.set(sessionId, { user: null });
@@ -821,13 +831,24 @@ app.use(errorHandler);
 // ===============================
 // START SERVER
 // ===============================
-app.listen(PORT, "0.0.0.0", () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   logger.info(`🚀 Agriculture Prediction Server running`, {
     port: PORT,
     env: process.env.NODE_ENV || "development",
     nodeVersion: process.version
   });
   console.log(`✅ Server: http://localhost:${PORT}`);
+});
+
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE" && PORT !== 3000) {
+    logger.warn(`Port ${PORT} in use, falling back to port 3000...`);
+    app.listen(3000, "0.0.0.0", () => {
+      console.log(`✅ Server fallback: http://localhost:3000`);
+    });
+  } else {
+    logger.error("Server listen error: " + err.message);
+  }
 });
 
 // ===============================
