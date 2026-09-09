@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node --import ./app-hardening.js server.js",
-    "lint": "node --check server.js && node --check app-hardening.js",
+    "dev": "node --import ./app-hardening.js --import ./weather-hardening.js server.js",
+    "lint": "node --check server.js && node --check app-hardening.js && node --check weather-hardening.js",
     "build": "node -e \"console.log('Build complete')\"",
-    "start": "node --import ./app-hardening.js server.js"
+    "start": "node --import ./app-hardening.js --import ./weather-hardening.js server.js"
   },
   "engines": {
     "node": ">=20.0.0"
