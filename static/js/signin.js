@@ -9,7 +9,6 @@ import {
 } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -41,20 +40,34 @@ document.getElementById("signin-password")?.addEventListener("input", clearLogin
 export async function syncUserProfile(user, additionalData = {}) {
   const currentDB = db || getFirebaseDB();
   if (!currentDB || !user) return;
-  const now = new Date().toISOString();
+
   const userRef = doc(currentDB, "users", user.uid);
-  await setDoc(userRef, {
+  let existing = null;
+  try {
+    existing = await getDoc(userRef);
+  } catch (error) {
+    console.warn("Could not read existing user profile:", error.message);
+  }
+
+  const profile = {
     userId: user.uid,
     email: user.email || "",
     displayName: user.displayName || additionalData.displayName || "Smart Farmer",
-    preferredLanguage: "en",
-    createdAt: additionalData.createdAt || now,
-    updatedAt: now
-  }, { merge: true });
+    preferredLanguage: additionalData.preferredLanguage || "en",
+    updatedAt: new Date().toISOString()
+  };
+
+  // Firestore rules require createdAt to stay unchanged on updates.
+  // Only write it when creating the profile for the first time.
+  if (!existing?.exists()) {
+    profile.createdAt = new Date().toISOString();
+  }
+
+  await setDoc(userRef, profile, { merge: true });
 }
 
 // Exchange a Firebase ID token for the server's secure HttpOnly session cookie.
-async function establishServerSession(user, provider) {
+export async function establishServerSession(user, provider) {
   const idToken = await user.getIdToken(true);
   const response = await fetch("/set_session", {
     method: "POST",
@@ -98,7 +111,7 @@ if (signinForm) {
     try {
       await firebaseReady;
       const currentAuth = auth || getFirebaseAuth();
-      if (!currentAuth) throw new Error("Firebase Authentication is not configured. Please check the Firebase environment variables and /firebase_config endpoint.");
+      if (!currentAuth) throw new Error("Firebase Authentication is not configured. Check the Firebase environment variables.");
 
       const userCredential = await signInWithEmailAndPassword(currentAuth, email, password);
       await syncUserProfile(userCredential.user);
@@ -107,17 +120,15 @@ if (signinForm) {
       showLoginMessage("success", "✅ Welcome back! Entering your agricultural dashboard...");
       window.location.href = "/signedin";
     } catch (error) {
-      console.warn("Login attempt result:", error.code || error.message);
+      console.warn("Login failed:", error.code || error.message);
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
       }
 
       const errCode = error.code || "";
-      if (errCode === "auth/invalid-credential" || errCode === "auth/user-not-found") {
+      if (errCode === "auth/invalid-credential" || errCode === "auth/user-not-found" || errCode === "auth/wrong-password") {
         showLoginMessage("error", "⚠️ Invalid email or password.");
-      } else if (errCode === "auth/wrong-password") {
-        showLoginMessage("error", "⚠️ Incorrect password. Please try again or use Forgot password.");
       } else if (errCode === "auth/too-many-requests") {
         showLoginMessage("error", "⚠️ Too many attempts. Please wait a few minutes and try again.");
       } else if (errCode === "auth/invalid-api-key" || errCode === "auth/api-key-not-valid") {
@@ -136,7 +147,7 @@ const handleGoogleSignIn = async () => {
   try {
     await firebaseReady;
     const currentAuth = auth || getFirebaseAuth();
-    if (!currentAuth) throw new Error("Firebase Authentication is not configured. Please check the Firebase environment variables and /firebase_config endpoint.");
+    if (!currentAuth) throw new Error("Firebase Authentication is not configured. Check the Firebase environment variables.");
 
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(currentAuth, provider);
