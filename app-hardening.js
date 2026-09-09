@@ -1,17 +1,119 @@
+import "dotenv/config";
 import path from "node:path";
 import crypto from "node:crypto";
 import express from "express";
 
-// Never use a hard-coded session secret. Render production gets a random
-// process secret if the environment variable is missing; configure
-// SESSION_SECRET in Render to keep sessions valid across restarts.
+// The main server uses req.session but does not install a session middleware.
+// Install a small signed, HTTP-only cookie session before the first route.
+// Firebase remains the source of truth: only /set_session can create a
+// dashboard session, and that route is protected by Firebase Admin token
+// verification in config/security.js.
 if (!process.env.SESSION_SECRET) {
+  if (process.env.NODE_ENV === "production" || process.env.RENDER === "true") {
+    throw new Error("SESSION_SECRET must be configured in production.");
+  }
   process.env.SESSION_SECRET = crypto.randomBytes(32).toString("hex");
-  console.warn("⚠️ SESSION_SECRET is not configured; generated a temporary process secret. Set SESSION_SECRET in Render for persistent sessions across restarts.");
+  console.warn("⚠️ SESSION_SECRET is not configured; generated a temporary development secret.");
+}
+
+const SESSION_COOKIE = "agri_session";
+const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+function sign(value) {
+  return crypto.createHmac("sha256", SESSION_SECRET).update(value).digest("base64url");
+}
+
+function encodeSession(session) {
+  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
+  return `${payload}.${sign(payload)}`;
+}
+
+function decodeSession(value) {
+  try {
+    const [payload, signature] = String(value || "").split(".");
+    if (!payload || !signature) return null;
+    const expected = sign(payload);
+    const a = Buffer.from(signature);
+    const b = Buffer.from(expected);
+    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    if (!data || !data.exp || Date.now() > Number(data.exp)) return null;
+    return data;
+  } catch (_) {
+    return null;
+  }
+}
+
+function parseCookieHeader(header = "") {
+  const out = {};
+  for (const part of header.split(";")) {
+    const index = part.indexOf("=");
+    if (index < 0) continue;
+    const key = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+    try { out[key] = decodeURIComponent(value); } catch (_) { out[key] = value; }
+  }
+  return out;
+}
+
+function sessionMiddleware(req, res, next) {
+  const cookies = parseCookieHeader(req.headers.cookie || "");
+  const stored = decodeSession(cookies[SESSION_COOKIE]);
+  req.session = stored?.user ? { user: stored.user } : {};
+
+  const originalEnd = res.end;
+  res.end = function patchedEnd(...args) {
+    if (!res.headersSent) {
+      const sessionData = {
+        user: req.session?.user || null,
+        iat: Date.now(),
+        exp: Date.now() + SESSION_MAX_AGE
+      };
+      const value = encodeSession(sessionData);
+      const secure = process.env.NODE_ENV === "production" || process.env.RENDER === "true";
+      const cookie = `${SESSION_COOKIE}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${Math.floor(SESSION_MAX_AGE / 1000)}${secure ? "; Secure" : ""}`;
+      const existing = res.getHeader("Set-Cookie");
+      res.setHeader("Set-Cookie", existing ? [].concat(existing, cookie) : cookie);
+    }
+    return originalEnd.apply(this, args);
+  };
+  next();
 }
 
 const originalPost = express.application.post;
 const originalGet = express.application.get;
+const originalUse = express.application.use;
+let sessionInstalled = false;
+
+function isRouteRegistration(route) {
+  if (typeof route === "string") return route.startsWith("/");
+  if (Array.isArray(route)) return route.some(item => typeof item === "string" && item.startsWith("/"));
+  return false;
+}
+
+function ensureSessionMiddleware(app) {
+  if (!sessionInstalled) {
+    sessionInstalled = true;
+    originalUse.call(app, sessionMiddleware);
+  }
+}
+
+// Never allow an arbitrary client-supplied UID/password/session to become a
+// dashboard session. Firebase ID token verification happens in security.js.
+express.application.get = function(route, ...handlers) {
+  if (isRouteRegistration(route)) ensureSessionMiddleware(this);
+  if (route === "/ai_stats") return originalGet.call(this, route, aiStats);
+  if (route === "/signedin") return originalGet.call(this, route, signedIn);
+  return originalGet.call(this, route, ...handlers);
+};
+
+express.application.post = function(route, ...handlers) {
+  if (isRouteRegistration(route)) ensureSessionMiddleware(this);
+  if (route === "/predict_yield") return originalPost.call(this, route, predictYield);
+  if (route === "/recommend_crop") return originalPost.call(this, route, recommendCrop);
+  return originalPost.call(this, route, ...handlers);
+};
 
 const CROP_PROFILES = {
   wheat: { label: "Wheat", temp: [15, 24], humidity: [45, 70], rain: [350, 550], season: "Rabi" },
@@ -37,7 +139,6 @@ function rangeScore(v, range, tolerance) {
   const distance = v < range[0] ? range[0] - v : v - range[1];
   return clamp(100 - (distance / tolerance) * 100, 0, 100);
 }
-
 function forecast(body = {}, sessionUser = {}) {
   const temp = clamp(num(body.temp, 25), -10, 55);
   const humidity = clamp(num(body.humidity, 65), 0, 100);
@@ -65,7 +166,6 @@ function forecast(body = {}, sessionUser = {}) {
   const disease = humidity > 88 && temp >= 18 && temp <= 30 ? "High" : humidity > 75 ? "Moderate" : "Low";
   return { success: true, crop: p.label, season: p.season, forecast_type: "crop_specific_environmental_suitability", yield_index: score, confidence: 65, confidence_note: "Indicative suitability score, not a measured yield prediction. Soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: limiting, fungal_blight_risk: disease, inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, preferred_ranges: { temperature_c: p.temp, relative_humidity_pct: p.humidity, seasonal_rainfall_mm: p.rain }, agronomic_recommendations: [temp > p.temp[1] ? "Use heat-management practices such as timely irrigation where appropriate." : temp < p.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.", rainfall < p.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > p.rain[1] ? "Check field drainage and avoid irrigation until the root zone has drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.", disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."] };
 }
-
 function predictYield(req, res) { try { return res.json(forecast(req.body, req.session?.user)); } catch (e) { console.error("Yield forecast error:", e); return res.status(400).json({ success: false, error: "Invalid forecast inputs." }); } }
 function recommendCrop(req, res) {
   const temp = clamp(num(req.body?.temp, 25), -10, 55), rainfall = clamp(num(req.body?.rainfall, 100), 0, 3000);
@@ -73,22 +173,8 @@ function recommendCrop(req, res) {
   return res.json({ success: true, recommendation: ranked[0].crop, score: ranked[0].score, alternatives: ranked.slice(0, 3), inputs_used: { temperature_c: temp, seasonal_rainfall_mm: rainfall }, note: "Climate-based recommendation only; soil, market, water availability and crop rotation should also be considered." });
 }
 function aiStats(_req, res) { return res.json({ success: true, accuracy: null, validation_status: "not_validated", model_type: "rule_based_environmental_suitability", message: "No validated historical yield dataset is connected, so an accuracy percentage is not claimed." }); }
-
-// A dashboard session is accepted only when it was created from a Firebase
-// ID token that the backend verified. Old guest/fake sessions are rejected.
 function signedIn(req, res) {
   const user = req.session?.user;
   if (!user?.firebaseVerified || !user?.uid) return res.redirect("/signin.html");
   return res.sendFile(path.join(process.cwd(), "templates", "signedin.html"));
 }
-
-express.application.post = function(route, ...handlers) {
-  if (route === "/predict_yield") return originalPost.call(this, route, predictYield);
-  if (route === "/recommend_crop") return originalPost.call(this, route, recommendCrop);
-  return originalPost.call(this, route, ...handlers);
-};
-express.application.get = function(route, ...handlers) {
-  if (route === "/ai_stats") return originalGet.call(this, route, aiStats);
-  if (route === "/signedin") return originalGet.call(this, route, signedIn);
-  return originalGet.call(this, route, ...handlers);
-};
