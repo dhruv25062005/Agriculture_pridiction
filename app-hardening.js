@@ -1,5 +1,13 @@
 import path from "node:path";
+import crypto from "node:crypto";
 import express from "express";
+
+if (!process.env.SESSION_SECRET) {
+  if (process.env.NODE_ENV === "production" || process.env.RENDER === "true") {
+    throw new Error("SESSION_SECRET must be configured in production.");
+  }
+  process.env.SESSION_SECRET = crypto.randomBytes(32).toString("hex");
+}
 
 const originalPost = express.application.post;
 const originalGet = express.application.get;
@@ -16,141 +24,69 @@ const CROP_PROFILES = {
   soybean: { label: "Soybean", temp: [20, 30], humidity: [55, 75], rain: [450, 700], season: "Kharif" }
 };
 
-function cleanNumber(value, fallback) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function clamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function normalizeCrop(value) {
-  const raw = String(value ?? "").trim().toLowerCase();
+const num = (v, fallback) => Number.isFinite(Number(v)) ? Number(v) : fallback;
+const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+function cropKey(v) {
+  const raw = String(v ?? "").trim().toLowerCase();
   if (!raw || raw === "agricultural crops" || raw === "crop") return null;
-  const key = Object.keys(CROP_PROFILES).find(k => raw.includes(k));
-  return key || null;
+  return Object.keys(CROP_PROFILES).find(k => raw.includes(k)) || null;
 }
-
-function rangeScore(value, [low, high], tolerance) {
-  if (value >= low && value <= high) return 100;
-  const distance = value < low ? low - value : value - high;
+function rangeScore(v, range, tolerance) {
+  if (v >= range[0] && v <= range[1]) return 100;
+  const distance = v < range[0] ? range[0] - v : v - range[1];
   return clamp(100 - (distance / tolerance) * 100, 0, 100);
 }
 
-function calculateForecast(body = {}) {
-  const temp = clamp(cleanNumber(body.temp, 25), -10, 55);
-  const humidity = clamp(cleanNumber(body.humidity, 65), 0, 100);
-  const rainfall = clamp(cleanNumber(body.rainfall, 100), 0, 3000);
-  const cropKey = normalizeCrop(body.crop);
-  const profile = cropKey ? CROP_PROFILES[cropKey] : null;
+function forecast(body = {}, sessionUser = {}) {
+  const temp = clamp(num(body.temp, 25), -10, 55);
+  const humidity = clamp(num(body.humidity, 65), 0, 100);
+  const rainfall = clamp(num(body.rainfall, 100), 0, 3000);
+  const key = cropKey(body.crop) || cropKey(sessionUser.crop) || cropKey(sessionUser.primaryCrop);
+  const p = key ? CROP_PROFILES[key] : null;
 
-  if (!profile) {
-    const heat = rangeScore(temp, [18, 32], 15);
-    const moisture = rangeScore(humidity, [45, 80], 35);
-    const rain = rangeScore(rainfall, [300, 900], 900);
-    const score = Math.round(heat * 0.4 + moisture * 0.25 + rain * 0.35);
-    return {
-      success: true,
-      crop: "General crop",
-      forecast_type: "environmental_suitability",
-      yield_index: score,
-      confidence: 45,
-      confidence_note: "Low confidence: select a crop and provide crop-specific conditions for a more useful estimate.",
-      productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions",
-      limiting_factor: temp > 35 ? "High temperature stress" : temp < 12 ? "Low temperature stress" : humidity > 85 ? "Excess humidity and disease pressure" : rainfall > 1600 ? "Excess rainfall / waterlogging risk" : rainfall < 250 ? "Low seasonal rainfall" : "No single severe environmental constraint",
-      fungal_blight_risk: humidity >= 85 && temp >= 18 && temp <= 30 ? "High" : humidity >= 75 ? "Moderate" : "Low",
-      inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall },
-      agronomic_recommendations: [
-        humidity >= 80 ? "Increase canopy scouting and avoid unnecessary overhead irrigation." : "Maintain balanced irrigation and inspect soil moisture before watering.",
-        rainfall < 250 ? "Plan supplemental irrigation according to soil moisture and crop stage." : rainfall > 1200 ? "Check drainage and watch for waterlogging after heavy rain." : "Maintain normal irrigation while checking root-zone moisture.",
-        "Use crop-stage and soil observations before making fertilizer or pesticide decisions."
-      ]
-    };
+  if (!p) {
+    const score = Math.round(rangeScore(temp, [18, 32], 15) * 0.4 + rangeScore(humidity, [45, 80], 35) * 0.25 + rangeScore(rainfall, [300, 900], 900) * 0.35);
+    return { success: true, crop: "General crop", forecast_type: "environmental_suitability", yield_index: score, confidence: 45, confidence_note: "Indicative only. Select a crop for crop-specific ranges; this is not a validated yield forecast.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: temp > 35 ? "High temperature stress" : temp < 12 ? "Low temperature stress" : humidity > 85 ? "Excess humidity and disease pressure" : rainfall > 1600 ? "Excess rainfall / waterlogging risk" : rainfall < 250 ? "Low seasonal rainfall" : "No single severe environmental constraint", fungal_blight_risk: humidity >= 85 && temp >= 18 && temp <= 30 ? "High" : humidity >= 75 ? "Moderate" : "Low", inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, agronomic_recommendations: [humidity >= 80 ? "Increase canopy scouting and avoid unnecessary overhead irrigation." : "Maintain balanced irrigation and inspect soil moisture before watering.", rainfall < 250 ? "Plan supplemental irrigation according to soil moisture and crop stage." : rainfall > 1200 ? "Check drainage and watch for waterlogging after heavy rain." : "Maintain normal irrigation while checking root-zone moisture.", "Use crop-stage and soil observations before fertilizer or pesticide decisions."] };
   }
 
-  const tempScore = rangeScore(temp, profile.temp, 12);
-  const humidityScore = rangeScore(humidity, profile.humidity, 30);
-  const rainScore = rangeScore(rainfall, profile.rain, Math.max(250, profile.rain[1] - profile.rain[0]));
-  let score = Math.round(tempScore * 0.4 + humidityScore * 0.2 + rainScore * 0.4);
-
+  const ts = rangeScore(temp, p.temp, 12);
+  const hs = rangeScore(humidity, p.humidity, 30);
+  const rs = rangeScore(rainfall, p.rain, Math.max(250, p.rain[1] - p.rain[0]));
+  let score = Math.round(ts * 0.4 + hs * 0.2 + rs * 0.4);
   if (temp > 38) score -= 10;
   if (temp < 8) score -= 8;
   if (humidity > 92) score -= 8;
-  if (rainfall > profile.rain[1] * 1.5) score -= 8;
+  if (rainfall > p.rain[1] * 1.5) score -= 8;
   score = clamp(score, 0, 100);
 
   let limiting = "Environmental conditions are within a generally suitable range.";
-  if (temp < profile.temp[0]) limiting = `Temperature is below the preferred range (${profile.temp[0]}–${profile.temp[1]}°C).`;
-  else if (temp > profile.temp[1]) limiting = `Temperature is above the preferred range (${profile.temp[0]}–${profile.temp[1]}°C).`;
-  else if (rainfall < profile.rain[0]) limiting = `Seasonal rainfall is below the preferred range (${profile.rain[0]}–${profile.rain[1]} mm).`;
-  else if (rainfall > profile.rain[1]) limiting = `Seasonal rainfall is above the preferred range (${profile.rain[0]}–${profile.rain[1]} mm).`;
-  else if (humidity < profile.humidity[0]) limiting = "Low relative humidity may increase atmospheric water demand.";
-  else if (humidity > profile.humidity[1]) limiting = "High humidity increases disease pressure and canopy wetness risk.";
+  if (temp < p.temp[0]) limiting = `Temperature is below the preferred range (${p.temp[0]}–${p.temp[1]}°C).`;
+  else if (temp > p.temp[1]) limiting = `Temperature is above the preferred range (${p.temp[0]}–${p.temp[1]}°C).`;
+  else if (rainfall < p.rain[0]) limiting = `Seasonal rainfall is below the preferred range (${p.rain[0]}–${p.rain[1]} mm).`;
+  else if (rainfall > p.rain[1]) limiting = `Seasonal rainfall is above the preferred range (${p.rain[0]}–${p.rain[1]} mm).`;
+  else if (humidity < p.humidity[0]) limiting = "Low relative humidity may increase atmospheric water demand.";
+  else if (humidity > p.humidity[1]) limiting = "High humidity increases disease pressure and canopy wetness risk.";
 
   const disease = humidity > 88 && temp >= 18 && temp <= 30 ? "High" : humidity > 75 ? "Moderate" : "Low";
-  return {
-    success: true,
-    crop: profile.label,
-    season: profile.season,
-    forecast_type: "crop_specific_environmental_suitability",
-    yield_index: score,
-    confidence: 65,
-    confidence_note: "Indicative suitability score, not a measured yield prediction. Confidence is limited because soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.",
-    productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions",
-    limiting_factor: limiting,
-    fungal_blight_risk: disease,
-    inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall },
-    preferred_ranges: { temperature_c: profile.temp, relative_humidity_pct: profile.humidity, seasonal_rainfall_mm: profile.rain },
-    agronomic_recommendations: [
-      temp > profile.temp[1] ? "Use heat-management practices such as timely irrigation and shade where agronomically appropriate." : temp < profile.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.",
-      rainfall < profile.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > profile.rain[1] ? "Check field drainage and avoid irrigation until the root zone has adequately drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.",
-      disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."
-    ]
-  };
+  return { success: true, crop: p.label, season: p.season, forecast_type: "crop_specific_environmental_suitability", yield_index: score, confidence: 65, confidence_note: "Indicative suitability score, not a measured yield prediction. Soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: limiting, fungal_blight_risk: disease, inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, preferred_ranges: { temperature_c: p.temp, relative_humidity_pct: p.humidity, seasonal_rainfall_mm: p.rain }, agronomic_recommendations: [temp > p.temp[1] ? "Use heat-management practices such as timely irrigation where appropriate." : temp < p.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.", rainfall < p.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > p.rain[1] ? "Check field drainage and avoid irrigation until the root zone has adequately drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.", disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."] };
 }
 
-function predictYieldRoute(req, res) {
-  try {
-    return res.json(calculateForecast(req.body));
-  } catch (error) {
-    console.error("Yield forecast error:", error);
-    return res.status(400).json({ success: false, error: "Invalid forecast inputs." });
-  }
+function predictYield(req, res) { try { return res.json(forecast(req.body, req.session?.user)); } catch (e) { console.error("Yield forecast error:", e); return res.status(400).json({ success: false, error: "Invalid forecast inputs." }); } }
+function recommendCrop(req, res) {
+  const temp = clamp(num(req.body?.temp, 25), -10, 55), rainfall = clamp(num(req.body?.rainfall, 100), 0, 3000);
+  const ranked = Object.entries(CROP_PROFILES).map(([key, p]) => ({ key, crop: p.label, score: Math.round(rangeScore(temp, p.temp, 12) * 0.45 + rangeScore(rainfall, p.rain, Math.max(250, p.rain[1] - p.rain[0])) * 0.55) })).sort((a, b) => b.score - a.score);
+  return res.json({ success: true, recommendation: ranked[0].crop, score: ranked[0].score, alternatives: ranked.slice(0, 3), inputs_used: { temperature_c: temp, seasonal_rainfall_mm: rainfall }, note: "Climate-based recommendation only; soil, market, water availability and crop rotation should also be considered." });
 }
+function aiStats(_req, res) { return res.json({ success: true, accuracy: null, validation_status: "not_validated", model_type: "rule_based_environmental_suitability", message: "No validated historical yield dataset is connected, so an accuracy percentage is not claimed." }); }
+function signedIn(req, res) { if (!req.session?.user?.uid && !req.session?.user?.email) return res.redirect("/signin.html"); return res.sendFile(path.join(process.cwd(), "templates", "signedin.html")); }
 
-function recommendCropRoute(req, res) {
-  const body = req.body || {};
-  const temp = clamp(cleanNumber(body.temp, 25), -10, 55);
-  const rainfall = clamp(cleanNumber(body.rainfall, 100), 0, 3000);
-  const ranked = Object.entries(CROP_PROFILES).map(([key, p]) => ({
-    key,
-    crop: p.label,
-    score: Math.round(rangeScore(temp, p.temp, 12) * 0.45 + rangeScore(rainfall, p.rain, Math.max(250, p.rain[1] - p.rain[0])) * 0.55)
-  })).sort((a, b) => b.score - a.score);
-  const best = ranked[0];
-  return res.json({ success: true, recommendation: best.crop, score: best.score, alternatives: ranked.slice(0, 3), inputs_used: { temperature_c: temp, seasonal_rainfall_mm: rainfall }, note: "Recommendation is climate-based only; soil, market, water availability and crop rotation should also be considered." });
-}
-
-function aiStatsRoute(_req, res) {
-  return res.json({ success: true, accuracy: null, validation_status: "not_validated", model_type: "rule_based_environmental_suitability", message: "No validated historical yield dataset is connected, so an accuracy percentage is not claimed." });
-}
-
-function protectedDashboardRoute(req, res) {
-  if (!req.session?.user?.uid && !req.session?.user?.email) {
-    return res.redirect("/signin.html");
-  }
-  return res.sendFile(path.join(process.cwd(), "templates", "signedin.html"));
-}
-
-express.application.post = function patchedPost(route, ...handlers) {
-  if (route === "/predict_yield") return originalPost.call(this, route, predictYieldRoute);
-  if (route === "/recommend_crop") return originalPost.call(this, route, recommendCropRoute);
+express.application.post = function(route, ...handlers) {
+  if (route === "/predict_yield") return originalPost.call(this, route, predictYield);
+  if (route === "/recommend_crop") return originalPost.call(this, route, recommendCrop);
   return originalPost.call(this, route, ...handlers);
 };
-
-express.application.get = function patchedGet(route, ...handlers) {
-  if (route === "/ai_stats") return originalGet.call(this, route, aiStatsRoute);
-  if (route === "/signedin") return originalGet.call(this, route, protectedDashboardRoute);
+express.application.get = function(route, ...handlers) {
+  if (route === "/ai_stats") return originalGet.call(this, route, aiStats);
+  if (route === "/signedin") return originalGet.call(this, route, signedIn);
   return originalGet.call(this, route, ...handlers);
 };
