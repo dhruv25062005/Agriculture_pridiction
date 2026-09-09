@@ -99,23 +99,48 @@ async function getFirebaseAdminAuth() {
   return firebaseAdminAuthPromise;
 }
 
-// /set_session now accepts only a Firebase ID token. The server derives uid,
-// email and profile identity from the verified token instead of trusting the browser.
+function readRequestBody(req, maxBytes = 1024 * 1024) {
+  return new Promise((resolve, reject) => {
+    if (req.body && typeof req.body === "object") return resolve(req.body);
+    let size = 0;
+    const chunks = [];
+    req.on("data", chunk => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        reject(new Error("Request body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      if (!chunks.length) return resolve({});
+      try { resolve(JSON.parse(Buffer.concat(chunks).toString("utf8"))); }
+      catch (_) { reject(new Error("Invalid JSON body")); }
+    });
+    req.on("error", reject);
+  });
+}
+
+// /set_session runs before express.json() in this project, so this middleware
+// parses that small JSON body itself and leaves the verified body on req.body.
 export const firebaseSessionGuard = async (req, res, next) => {
   if (req.method !== "POST" || req.path !== "/set_session") return next();
-  const idToken = req.body?.idToken;
-  if (!idToken || typeof idToken !== "string" || idToken.length < 100) {
-    return res.status(401).json({ success: false, error: "Missing Firebase ID token. Please sign in again." });
-  }
 
   try {
+    const incoming = await readRequestBody(req);
+    const idToken = incoming?.idToken;
+    if (!idToken || typeof idToken !== "string" || idToken.length < 100) {
+      return res.status(401).json({ success: false, error: "Missing Firebase ID token. Please sign in again." });
+    }
+
     const decodedToken = await (await getFirebaseAdminAuth()).verifyIdToken(idToken, true);
     req.body = {
       uid: decodedToken.uid,
       email: decodedToken.email || "",
       name: decodedToken.name || decodedToken.email?.split("@")[0] || "Smart Farmer",
       photo: decodedToken.picture || null,
-      provider: req.body.provider === "google" ? "google" : "password",
+      provider: incoming.provider === "google" ? "google" : "password",
       emailVerified: Boolean(decodedToken.email_verified)
     };
     return next();
@@ -125,7 +150,6 @@ export const firebaseSessionGuard = async (req, res, next) => {
   }
 };
 
-// The browser Firebase config is intentionally public. Admin credentials are never returned.
 export const firebaseConfigMiddleware = (req, res, next) => {
   if (req.method !== "GET" || req.path !== "/firebase_config") return next();
   const config = {
@@ -197,8 +221,6 @@ export const securityMiddleware = app => {
   app.use(firebaseSessionGuard);
 };
 
-// Render provides RENDER=true and NODE_ENV=production automatically.
-// Local development remains HTTP-friendly, while production uses Secure cookies.
 export const sessionSecurityOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true",
