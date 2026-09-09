@@ -2,11 +2,12 @@ import path from "node:path";
 import crypto from "node:crypto";
 import express from "express";
 
+// Never use a hard-coded session secret. Render production gets a random
+// process secret if the environment variable is missing; configure
+// SESSION_SECRET in Render to keep sessions valid across restarts.
 if (!process.env.SESSION_SECRET) {
-  if (process.env.NODE_ENV === "production" || process.env.RENDER === "true") {
-    throw new Error("SESSION_SECRET must be configured in production.");
-  }
   process.env.SESSION_SECRET = crypto.randomBytes(32).toString("hex");
+  console.warn("⚠️ SESSION_SECRET is not configured; generated a temporary process secret. Set SESSION_SECRET in Render for persistent sessions across restarts.");
 }
 
 const originalPost = express.application.post;
@@ -68,7 +69,7 @@ function forecast(body = {}, sessionUser = {}) {
   else if (humidity > p.humidity[1]) limiting = "High humidity increases disease pressure and canopy wetness risk.";
 
   const disease = humidity > 88 && temp >= 18 && temp <= 30 ? "High" : humidity > 75 ? "Moderate" : "Low";
-  return { success: true, crop: p.label, season: p.season, forecast_type: "crop_specific_environmental_suitability", yield_index: score, confidence: 65, confidence_note: "Indicative suitability score, not a measured yield prediction. Soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: limiting, fungal_blight_risk: disease, inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, preferred_ranges: { temperature_c: p.temp, relative_humidity_pct: p.humidity, seasonal_rainfall_mm: p.rain }, agronomic_recommendations: [temp > p.temp[1] ? "Use heat-management practices such as timely irrigation where appropriate." : temp < p.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.", rainfall < p.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > p.rain[1] ? "Check field drainage and avoid irrigation until the root zone has adequately drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.", disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."] };
+  return { success: true, crop: p.label, season: p.season, forecast_type: "crop_specific_environmental_suitability", yield_index: score, confidence: 65, confidence_note: "Indicative suitability score, not a measured yield prediction. Soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: limiting, fungal_blight_risk: disease, inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, preferred_ranges: { temperature_c: p.temp, relative_humidity_pct: p.humidity, seasonal_rainfall_mm: p.rain }, agronomic_recommendations: [temp > p.temp[1] ? "Use heat-management practices such as timely irrigation where appropriate." : temp < p.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.", rainfall < p.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > p.rain[1] ? "Check field drainage and avoid irrigation until the root zone has drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.", disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."] };
 }
 
 function predictYield(req, res) { try { return res.json(forecast(req.body, req.session?.user)); } catch (e) { console.error("Yield forecast error:", e); return res.status(400).json({ success: false, error: "Invalid forecast inputs." }); } }
