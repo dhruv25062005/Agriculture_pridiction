@@ -1,4 +1,4 @@
-/* firebase-config.js */
+/* Firebase browser configuration */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import {
@@ -50,21 +50,9 @@ export function handleFirestoreError(error, operationType, path) {
   return errInfo;
 }
 
-// Fallback empty placeholder config (overridden dynamically by /firebase_config)
-const defaultPlaceholderConfig = {
-  projectId: "",
-  appId: "",
-  apiKey: "",
-  authDomain: "",
-  firestoreDatabaseId: "ai-studio-agriculturepridi-19ab2f13-4ebd-42d7-aaf0-74a8af5164fb",
-  storageBucket: "",
-  messagingSenderId: ""
-};
-
 export async function testConnection() {
   if (!db) return;
   try {
-    // Probe Firestore backend with a short timeout safeguard
     const probePromise = getDocFromServer(doc(db, "test", "connection"));
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error("Probe timeout")), 4000)
@@ -72,31 +60,28 @@ export async function testConnection() {
     await Promise.race([probePromise, timeoutPromise]);
     console.log("✅ Firestore connection validated");
   } catch (error) {
-    if (error instanceof Error && error.message.includes("the client is offline")) {
-      console.warn("Firestore client offline notice: operating in offline cache mode.");
-    } else {
-      console.log("ℹ️ Firestore active (offline persistence enabled)");
-    }
+    console.log("ℹ️ Firestore connection probe did not return a readable test document.");
   }
 }
 
 async function initFirebase() {
-  let cfg = null;
   try {
-    const response = await fetch("/firebase_config");
-    if (response.ok) {
-      cfg = await response.json();
+    const response = await fetch("/firebase_config", { credentials: "same-origin" });
+    if (!response.ok) {
+      throw new Error(`Firebase configuration endpoint returned HTTP ${response.status}`);
     }
-  } catch (e) {
-    console.warn("Using local configuration fallback:", e.message);
-  }
 
-  const finalConfig = (cfg && cfg.apiKey && !cfg.apiKey.includes("your")) ? cfg : defaultPlaceholderConfig;
+    const cfg = await response.json();
+    const required = ["apiKey", "authDomain", "projectId", "appId"];
+    const missing = required.filter(key => !cfg?.[key]);
+    if (missing.length) {
+      throw new Error(`Firebase configuration is incomplete: ${missing.join(", ")}`);
+    }
 
-  try {
-    app = initializeApp(finalConfig);
+    app = initializeApp(cfg);
     auth = getAuth(app);
-    const dbId = finalConfig.firestoreDatabaseId || "ai-studio-agriculturepridi-19ab2f13-4ebd-42d7-aaf0-74a8af5164fb";
+
+    const dbId = cfg.firestoreDatabaseId || "(default)";
     try {
       db = initializeFirestore(app, {
         experimentalForceLongPolling: true
@@ -104,12 +89,16 @@ async function initFirebase() {
     } catch (fsInitErr) {
       db = getFirestore(app, dbId);
     }
-    console.log("✅ Firebase & Cloud Firestore Initialized Successfully");
+
+    console.log("✅ Firebase Authentication & Cloud Firestore initialized");
     testConnection().catch(() => {});
     return { app, auth, db };
   } catch (err) {
-    console.warn("Firebase initialization note:", err.message);
-    return { app: null, auth: null, db: null };
+    app = null;
+    auth = null;
+    db = null;
+    console.error("❌ Firebase initialization failed:", err.message);
+    return { app: null, auth: null, db: null, error: err };
   }
 }
 
@@ -139,5 +128,3 @@ export {
   onSnapshot,
   deleteDoc
 };
-
-
