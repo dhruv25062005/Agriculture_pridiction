@@ -35,30 +35,45 @@ function clearLoginMessage() {
   }
 }
 
-// Clear message when user types
 document.getElementById("signin-email")?.addEventListener("input", clearLoginMessage);
 document.getElementById("signin-password")?.addEventListener("input", clearLoginMessage);
 
 export async function syncUserProfile(user, additionalData = {}) {
   const currentDB = db || getFirebaseDB();
   if (!currentDB || !user) return;
-  try {
-    const userRef = doc(currentDB, "users", user.uid);
-    await setDoc(userRef, {
-      userId: user.uid,
-      email: user.email || "farmer@agriculture.local",
-      displayName: user.displayName || additionalData.displayName || "Smart Farmer",
-      preferredLanguage: "en",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }, { merge: true });
-    console.log("✅ User profile synced to Firestore:", user.uid);
-  } catch (err) {
-    console.warn("User profile Firestore sync notice:", err.message || err);
-  }
+  const now = new Date().toISOString();
+  const userRef = doc(currentDB, "users", user.uid);
+  await setDoc(userRef, {
+    userId: user.uid,
+    email: user.email || "",
+    displayName: user.displayName || additionalData.displayName || "Smart Farmer",
+    preferredLanguage: "en",
+    createdAt: additionalData.createdAt || now,
+    updatedAt: now
+  }, { merge: true });
 }
 
-/* ---------------- EMAIL + PASSWORD LOGIN ---------------- */
+// Exchange a Firebase ID token for the server's secure HttpOnly session cookie.
+async function establishServerSession(user, provider) {
+  const idToken = await user.getIdToken(true);
+  const response = await fetch("/set_session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify({ idToken, provider })
+  });
+
+  if (!response.ok) {
+    let message = "Unable to establish a secure server session.";
+    try {
+      const data = await response.json();
+      message = data.error || message;
+    } catch (_) {}
+    throw new Error(message);
+  }
+
+  return response.json();
+}
 
 if (signinForm) {
   signinForm.addEventListener("submit", async (e) => {
@@ -67,7 +82,6 @@ if (signinForm) {
 
     const submitBtn = signinForm.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn ? submitBtn.textContent : "Sign In";
-
     const email = document.getElementById("signin-email")?.value?.trim();
     const password = document.getElementById("signin-password")?.value;
 
@@ -81,50 +95,17 @@ if (signinForm) {
       submitBtn.textContent = "Signing In...";
     }
 
-    // Await firebase readiness
-    await firebaseReady;
-    const currentAuth = auth || getFirebaseAuth();
-
-    if (!currentAuth) {
-      console.warn("Operating with demo session");
-      try {
-        await fetch("/set_session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid: "demo-" + Date.now(),
-            email: email,
-            name: email.split("@")[0] || "Farmer",
-            provider: "password"
-          })
-        });
-        window.location.href = "/signedin";
-      } catch (err) {
-        window.location.href = "/signedin";
-      }
-      return;
-    }
-
     try {
+      await firebaseReady;
+      const currentAuth = auth || getFirebaseAuth();
+      if (!currentAuth) throw new Error("Firebase Authentication is not configured. Please check the Firebase environment variables and /firebase_config endpoint.");
+
       const userCredential = await signInWithEmailAndPassword(currentAuth, email, password);
-      console.log("✅ Login success (email):", userCredential.user.email);
+      await syncUserProfile(userCredential.user);
+      await establishServerSession(userCredential.user, "password");
 
       showLoginMessage("success", "✅ Welcome back! Entering your agricultural dashboard...");
-      await syncUserProfile(userCredential.user);
-
-      await fetch("/set_session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          name: userCredential.user.displayName || email.split("@")[0] || "Farmer",
-          provider: "password"
-        })
-      });
-
       window.location.href = "/signedin";
-
     } catch (error) {
       console.warn("Login attempt result:", error.code || error.message);
       if (submitBtn) {
@@ -133,64 +114,16 @@ if (signinForm) {
       }
 
       const errCode = error.code || "";
-      const errMsg = error.message || "";
-
       if (errCode === "auth/invalid-credential" || errCode === "auth/user-not-found") {
-        const actionHtml = `
-          <button type="button" class="auth-action-btn" id="btnQuickCreate">
-            ✨ Create account with this email
-          </button>
-          <button type="button" class="auth-action-btn" style="background:rgba(0,230,118,0.25); border-color:#00e676; margin-left:6px;" onclick="window.continueAsGuest && window.continueAsGuest()">
-            🌱 Continue as Guest Farmer
-          </button>
-        `;
-        showLoginMessage("error", "⚠️ No existing account matched these credentials, or password is incorrect.", actionHtml);
-
-        document.getElementById("btnQuickCreate")?.addEventListener("click", async () => {
-          showLoginMessage("info", "🌱 Registering account and logging in...");
-          try {
-            const newCred = await createUserWithEmailAndPassword(currentAuth, email, password);
-            await syncUserProfile(newCred.user);
-            await fetch("/set_session", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                uid: newCred.user.uid,
-                email: newCred.user.email,
-                name: email.split("@")[0] || "Farmer",
-                provider: "password"
-              })
-            });
-            window.location.href = "/signedin";
-          } catch (createErr) {
-            console.warn("Auto-create result:", createErr);
-            showLoginMessage("error", `⚠️ ${createErr.message || "Registration failed. Try guest access."}`);
-          }
-        });
-
+        showLoginMessage("error", "⚠️ Invalid email or password.");
       } else if (errCode === "auth/wrong-password") {
-        showLoginMessage("error", "⚠️ Incorrect password. Please try again or click 'Forgot password?' below.");
+        showLoginMessage("error", "⚠️ Incorrect password. Please try again or use Forgot password.");
       } else if (errCode === "auth/too-many-requests") {
-        showLoginMessage("error", "⚠️ Access temporarily throttled due to multiple attempts. Please try again in a few moments, or continue as Guest.");
-      } else if (errMsg.includes("Failed to fetch") || errMsg.includes("network")) {
-        showLoginMessage("info", "🌾 Network delay detected. Logging in with offline farmer session...");
-        try {
-          await fetch("/set_session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              uid: "offline-" + Date.now(),
-              email: email,
-              name: email.split("@")[0] || "Farmer",
-              provider: "offline"
-            })
-          });
-          window.location.href = "/signedin";
-        } catch (e) {
-          window.location.href = "/signedin";
-        }
+        showLoginMessage("error", "⚠️ Too many attempts. Please wait a few minutes and try again.");
+      } else if (errCode === "auth/invalid-api-key" || errCode === "auth/api-key-not-valid") {
+        showLoginMessage("error", "⚠️ Firebase configuration is invalid. Check FIREBASE_API_KEY and the Firebase project settings.");
       } else {
-        showLoginMessage("error", `⚠️ ${errMsg.replace("Firebase:", "").trim()}`);
+        showLoginMessage("error", `⚠️ ${String(error.message || "Authentication failed").replace("Firebase:", "").trim()}`);
       }
     }
   });
@@ -200,70 +133,31 @@ const handleGoogleSignIn = async () => {
   console.log("🚀 Google Sign-In initiated");
   clearLoginMessage();
 
-  await firebaseReady;
-  const currentAuth = auth || getFirebaseAuth();
-
-  if (!currentAuth) {
-    showLoginMessage("info", "🌱 Signing in with Google Farmer profile...");
-    await fetch("/set_session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uid: "google-demo-" + Date.now(),
-        email: "farmer.google@smartagriculture.local",
-        name: "Google Farmer",
-        provider: "google"
-      })
-    });
-    window.location.href = "/signedin";
-    return;
-  }
-
-  const provider = new GoogleAuthProvider();
-
   try {
+    await firebaseReady;
+    const currentAuth = auth || getFirebaseAuth();
+    if (!currentAuth) throw new Error("Firebase Authentication is not configured. Please check the Firebase environment variables and /firebase_config endpoint.");
+
+    const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(currentAuth, provider);
     const user = result.user;
 
-    console.log("✅ Login success (Google)");
     await syncUserProfile(user);
-
-    await fetch("/set_session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uid: user.uid,
-        email: user.email,
-        name: user.displayName || "Google Farmer",
-        photo: user.photoURL,
-        provider: "google"
-      })
-    });
-
+    await establishServerSession(user, "google");
     window.location.href = "/signedin";
-
   } catch (error) {
-    console.warn("Google popup unavailable in sandbox/iframe:", error.message || error.code);
-    // Seamless fallback so the user is never blocked in iframes
-    showLoginMessage("info", "🌱 Continuing with Google Farmer session in secure frame...");
-    try {
-      await fetch("/set_session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          uid: "google-user-" + Date.now(),
-          email: "farmer.google@smartagriculture.local",
-          name: "Google Smart Farmer",
-          provider: "google"
-        })
-      });
-      window.location.href = "/signedin";
-    } catch (sessionErr) {
-      window.location.href = "/signedin";
+    console.warn("Google sign-in failed:", error.code || error.message);
+    const errCode = error.code || "";
+    if (errCode === "auth/popup-closed-by-user") {
+      showLoginMessage("info", "Google sign-in was cancelled.");
+    } else if (errCode === "auth/popup-blocked") {
+      showLoginMessage("error", "⚠️ Your browser blocked the Google sign-in popup. Allow popups for this site and try again.");
+    } else if (errCode === "auth/unauthorized-domain") {
+      showLoginMessage("error", "⚠️ This site's domain is not authorized in Firebase Authentication settings.");
+    } else {
+      showLoginMessage("error", `⚠️ ${String(error.message || "Google sign-in failed").replace("Firebase:", "").trim()}`);
     }
   }
 };
 
 googleBtns.forEach(btn => btn.addEventListener("click", handleGoogleSignIn));
-
-
