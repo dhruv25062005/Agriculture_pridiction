@@ -175,11 +175,27 @@ export const corsConfig = () => {
   const allowedOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(",").map(o => o.trim()).filter(Boolean)
     : [];
+
+  // Render services use *.onrender.com, not *.render.com.
+  // Keep the hosted-origin allowlist narrow while allowing the current
+  // Render deployment and other known development/hosting environments.
+  const renderExternalUrl = process.env.RENDER_EXTERNAL_URL?.trim().replace(/\/$/, "");
+
   return cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      const isAllowedHostedOrigin = origin.includes("localhost") || origin.includes("127.0.0.1") || origin.endsWith(".run.app") || origin.endsWith(".render.com") || origin.endsWith(".ai.studio");
+      if (renderExternalUrl && origin === renderExternalUrl) return callback(null, true);
+
+      const isAllowedHostedOrigin =
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("https://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.startsWith("https://127.0.0.1:") ||
+        origin.endsWith(".run.app") ||
+        origin.endsWith(".onrender.com") ||
+        origin.endsWith(".ai.studio");
+
       if (isAllowedHostedOrigin) return callback(null, true);
       return callback(new Error("CORS origin not allowed"));
     },
