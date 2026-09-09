@@ -20,6 +20,20 @@ const signinForm = document.getElementById("signin-form");
 const loginFeedback = document.getElementById("login-feedback");
 const googleBtns = document.querySelectorAll(".google-btn, #google-signin-btn, #google-signup-btn");
 
+// Authentication is mandatory. Disable any legacy guest-login UI/function.
+function disableGuestAccess() {
+  document.querySelectorAll(".guest-btn").forEach((btn) => {
+    btn.disabled = true;
+    btn.removeAttribute("onclick");
+    btn.style.display = "none";
+  });
+  window.continueAsGuest = function () {
+    showLoginMessage("error", "Please sign in with Google or email/password. Guest access is disabled.");
+  };
+}
+
+disableGuestAccess();
+
 function showLoginMessage(type, message, actionHtml = "") {
   if (!loginFeedback) return;
   loginFeedback.className = `auth-feedback ${type}`;
@@ -40,7 +54,7 @@ document.getElementById("signin-password")?.addEventListener("input", clearLogin
 
 export async function syncUserProfile(user, additionalData = {}) {
   const currentDB = db || getFirebaseDB();
-  if (!currentDB || !user) return;
+  if (!currentDB || !user) throw new Error("Firebase Firestore is not initialized.");
 
   const userRef = doc(currentDB, "users", user.uid);
   let existing = null;
@@ -58,15 +72,16 @@ export async function syncUserProfile(user, additionalData = {}) {
     updatedAt: new Date().toISOString()
   };
 
-  // Firestore rules require createdAt to remain unchanged on updates.
   if (!existing?.exists()) profile.createdAt = new Date().toISOString();
-
   await setDoc(userRef, profile, { merge: true });
 }
 
-// Securely exchange a Firebase ID token for the server session.
+// Exchange a freshly issued Firebase ID token for the signed server session.
 export async function establishServerSession(user, provider) {
+  if (!user) throw new Error("No authenticated Firebase user was returned.");
   const idToken = await user.getIdToken(true);
+  if (!idToken) throw new Error("Firebase did not provide an ID token.");
+
   const response = await fetch("/set_session", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -74,19 +89,14 @@ export async function establishServerSession(user, provider) {
     body: JSON.stringify({ idToken, provider })
   });
 
-  if (!response.ok) {
-    let message = "Unable to establish a secure server session.";
-    try {
-      const data = await response.json();
-      message = data.error || message;
-    } catch (_) {}
-    throw new Error(message);
+  let data = {};
+  try { data = await response.json(); } catch (_) {}
+  if (!response.ok || data.success !== true || data.user?.firebaseVerified !== true) {
+    throw new Error(data.error || "Server rejected the Firebase authentication session.");
   }
-  return response.json();
+  return data;
 }
 
-// Compatibility bridge for the existing signup.js. It injects a real Firebase
-// ID token into legacy /set_session calls; no client-supplied UID is trusted.
 const originalFetch = window.fetch.bind(window);
 window.fetch = async (input, init = {}) => {
   try {
@@ -129,14 +139,13 @@ if (signinForm) {
     try {
       await firebaseReady;
       const currentAuth = auth || getFirebaseAuth();
-      if (!currentAuth) throw new Error("Firebase Authentication is not configured. Check the Firebase environment variables.");
+      if (!currentAuth) throw new Error("Firebase Authentication is not configured.");
 
       const userCredential = await signInWithEmailAndPassword(currentAuth, email, password);
       await syncUserProfile(userCredential.user);
       await establishServerSession(userCredential.user, "password");
 
-      showLoginMessage("success", "✅ Welcome back! Entering your agricultural dashboard...");
-      window.location.href = "/signedin";
+      window.location.replace("/signedin");
     } catch (error) {
       console.warn("Login failed:", error.code || error.message);
       if (submitBtn) {
@@ -150,7 +159,7 @@ if (signinForm) {
       } else if (errCode === "auth/too-many-requests") {
         showLoginMessage("error", "⚠️ Too many attempts. Please wait a few minutes and try again.");
       } else if (["auth/invalid-api-key", "auth/api-key-not-valid"].includes(errCode)) {
-        showLoginMessage("error", "⚠️ Firebase configuration is invalid. Check FIREBASE_API_KEY and the Firebase project settings.");
+        showLoginMessage("error", "⚠️ Firebase configuration is invalid. Check the Firebase project settings.");
       } else {
         showLoginMessage("error", `⚠️ ${String(error.message || "Authentication failed").replace("Firebase:", "").trim()}`);
       }
@@ -162,31 +171,43 @@ const handleGoogleSignIn = async () => {
   console.log("🚀 Google Sign-In initiated");
   clearLoginMessage();
 
+  const googleButton = document.querySelector("#google-signin-btn") || document.querySelector(".google-btn");
+  if (googleButton) googleButton.disabled = true;
+
   try {
     await firebaseReady;
     const currentAuth = auth || getFirebaseAuth();
-    if (!currentAuth) throw new Error("Firebase Authentication is not configured. Check the Firebase environment variables.");
+    if (!currentAuth) throw new Error("Firebase Authentication is not configured.");
 
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     const result = await signInWithPopup(currentAuth, provider);
     const user = result.user;
 
     await syncUserProfile(user);
     await establishServerSession(user, "google");
-    window.location.href = "/signedin";
+    window.location.replace("/signedin");
   } catch (error) {
     console.warn("Google sign-in failed:", error.code || error.message);
     const errCode = error.code || "";
     if (errCode === "auth/popup-closed-by-user") {
       showLoginMessage("info", "Google sign-in was cancelled.");
     } else if (errCode === "auth/popup-blocked") {
-      showLoginMessage("error", "⚠️ Your browser blocked the Google sign-in popup. Allow popups for this site and try again.");
+      showLoginMessage("error", "⚠️ Your browser blocked the Google popup. Allow popups for this site and try again.");
     } else if (errCode === "auth/unauthorized-domain") {
-      showLoginMessage("error", "⚠️ This site's domain is not authorized in Firebase Authentication settings.");
+      showLoginMessage("error", "⚠️ This domain is not authorized in Firebase Authentication. Add your exact Render domain under Authentication → Settings → Authorized domains.");
+    } else if (errCode === "auth/operation-not-allowed") {
+      showLoginMessage("error", "⚠️ Google Sign-In is disabled in Firebase Authentication. Enable the Google provider in Firebase Console.");
+    } else if (errCode === "auth/account-exists-with-different-credential") {
+      showLoginMessage("error", "⚠️ This email already has an account with a different sign-in method. Sign in using that method first.");
     } else {
       showLoginMessage("error", `⚠️ ${String(error.message || "Google sign-in failed").replace("Firebase:", "").trim()}`);
     }
+  } finally {
+    if (googleButton) googleButton.disabled = false;
   }
 };
 
-googleBtns.forEach(btn => btn.addEventListener("click", handleGoogleSignIn));
+googleBtns.forEach((btn) => {
+  btn.addEventListener("click", handleGoogleSignIn);
+});
