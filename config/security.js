@@ -123,7 +123,7 @@ function readRequestBody(req, maxBytes = 1024 * 1024) {
 }
 
 // /set_session runs before express.json() in this project, so this middleware
-// parses that small JSON body itself and leaves the verified body on req.body.
+// parses that small JSON body itself and leaves only verified identity data on req.body.
 export const firebaseSessionGuard = async (req, res, next) => {
   if (req.method !== "POST" || req.path !== "/set_session") return next();
 
@@ -135,13 +135,16 @@ export const firebaseSessionGuard = async (req, res, next) => {
     }
 
     const decodedToken = await (await getFirebaseAdminAuth()).verifyIdToken(idToken, true);
+    const requestedProvider = incoming.provider === "google" ? "google" : "password";
+
     req.body = {
       uid: decodedToken.uid,
       email: decodedToken.email || "",
       name: decodedToken.name || decodedToken.email?.split("@")[0] || "Smart Farmer",
       photo: decodedToken.picture || null,
-      provider: incoming.provider === "google" ? "google" : "password",
-      emailVerified: Boolean(decodedToken.email_verified)
+      provider: requestedProvider,
+      emailVerified: Boolean(decodedToken.email_verified),
+      firebaseVerified: true
     };
     return next();
   } catch (error) {
