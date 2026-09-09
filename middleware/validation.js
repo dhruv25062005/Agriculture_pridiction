@@ -187,6 +187,18 @@ export const validateProfileUpdate = [
     .trim()
     .isLength({ min: 2, max: 10 })
     .withMessage("Language code must be 2-10 characters"),
+  body("primaryCrop")
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ min: 1, max: 80 })
+    .withMessage("Primary crop must be 1-80 characters"),
+  body("farmSize")
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ min: 1, max: 60 })
+    .withMessage("Farm size must be 1-60 characters"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

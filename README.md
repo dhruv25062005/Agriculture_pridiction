@@ -153,9 +153,16 @@ The server starts at `http://localhost:3000`
 .
 ├── server.js                      Main Express backend
 ├── package.json                   Dependencies & scripts
-├── requirements.txt               Python equivalents (legacy)
-├── render.yaml                    Render.com deployment config
 ├── firestore.rules                Firebase security rules
+├── firebase-blueprint.json        Firebase collections & indexes schema
+│
+├── config/
+│   └── security.js                CORS, Helmet, Rate Limiting & Auth options
+├── middleware/
+│   ├── validation.js              Express validator schemas & file sanitation
+│   └── errorHandler.js            Centralized async error handling
+├── utils/
+│   └── logger.js                  Structured JSON logger
 │
 ├── templates/
 │   ├── template.html              Auth landing page
@@ -163,16 +170,12 @@ The server starts at `http://localhost:3000`
 │
 ├── static/
 │   ├── manifest.json              PWA manifest
-│   ├── sw.js                      Service worker (offline)
-│   ├── js/                        Frontend JavaScript modules
+│   ├── sw.js                      Service worker (offline cache)
+│   ├── js/                        Frontend JavaScript & Firebase modules
 │   ├── icons/                     PWA app icons
-│   ├── smart_agri_hero.*          Hero banner images
-│   └── smart_crop_scan.*          Feature images
+│   └── smart_agri_hero.*          Hero banner visuals
 │
-├── model/
-│   └── class_names.json           Disease class labels
-│
-└── README.md                      This file
+└── README.md                      Project documentation
 ```
 
 ## Key Implementation Features

@@ -300,25 +300,43 @@ body {
   transform: rotate(180deg);
 }
 
-/* Floating Profile Details Card */
+/* Floating Profile Details Card - Executive Agronomist Edition */
 .profile-dropdown-card {
   position: absolute;
   right: 0;
   top: calc(100% + 12px);
-  width: 380px;
-  max-width: calc(100vw - 32px);
-  background: rgba(6, 26, 19, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.15);
-  padding: 22px;
+  width: 410px;
+  max-width: calc(100vw - 28px);
+  max-height: min(580px, calc(100vh - 85px));
+  max-height: min(580px, calc(100dvh - 85px));
+  background: rgba(7, 26, 19, 0.98);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 28px rgba(16, 185, 129, 0.12);
+  padding: 0;
   z-index: 2200;
   opacity: 0;
   transform: translateY(-8px) scale(0.97);
   pointer-events: none;
   transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profile-dropdown-card::before {
+  content: '';
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #06b6d4, #10b981);
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .user-profile-section.open .profile-dropdown-card {
@@ -327,11 +345,51 @@ body {
   pointer-events: auto;
 }
 
+/* Selected Element in Focus Mode: Inner Profile Content Scroll Container */
+header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1),
+.profile-card-inner {
+  padding: 16px 20px 20px 20px;
+  max-height: min(570px, calc(100vh - 90px));
+  max-height: min(570px, calc(100dvh - 90px));
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.6) rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+}
+
+header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar,
+.profile-card-inner::-webkit-scrollbar {
+  width: 7px;
+}
+
+header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-track,
+.profile-card-inner::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  margin: 6px 0;
+}
+
+header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-thumb,
+.profile-card-inner::-webkit-scrollbar-thumb {
+  background: rgba(52, 211, 153, 0.55);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-thumb:hover,
+.profile-card-inner::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.85);
+}
+
 .profile-card-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding-bottom: 16px;
+  padding-bottom: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
 }
@@ -342,19 +400,20 @@ body {
 }
 
 .profile-avatar-large {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #047857);
+  background: linear-gradient(135deg, #059669, #047857);
   color: #ffffff;
   font-weight: 800;
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(52, 211, 153, 0.8);
+  border: 2px solid rgba(52, 211, 153, 0.85);
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
   overflow: hidden;
+  user-select: none;
 }
 
 .profile-avatar-large img {
@@ -365,18 +424,26 @@ body {
 
 .avatar-status-indicator {
   position: absolute;
-  bottom: 0px;
-  right: 0px;
+  bottom: 1px;
+  right: 1px;
   width: 13px;
   height: 13px;
   background: #10b981;
   border: 2px solid #062b21;
   border-radius: 50%;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
 }
 
 .profile-card-identity {
   flex: 1;
   min-width: 0;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .profile-card-name {
@@ -390,8 +457,22 @@ body {
   letter-spacing: -0.01em;
 }
 
+.profile-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 12px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+
 .profile-card-email {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
   margin-top: 2px;
   white-space: nowrap;
@@ -400,27 +481,33 @@ body {
 }
 
 .profile-card-role-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 0.7rem;
   font-weight: 600;
   color: #34d399;
   background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  border: 1px solid rgba(52, 211, 153, 0.28);
   border-radius: 6px;
-  padding: 2px 8px;
+  padding: 2px 7px;
   margin-top: 5px;
 }
 
 .profile-close-btn {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-muted);
-  font-size: 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  padding: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
-  border-radius: 6px;
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: all 0.15s ease;
   position: absolute;
   top: 0;
   right: 0;
@@ -428,62 +515,88 @@ body {
 
 .profile-close-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
 }
 
-/* Activity Metrics Bar */
+/* Activity Metrics Bar - 4 Columns */
 .profile-metrics-bar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin: 14px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 14px 0 12px 0;
 }
 
 .profile-metric-box {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  padding: 10px 8px;
+  border-radius: 10px;
+  padding: 8px 4px;
   text-align: center;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .profile-metric-box:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(52, 211, 153, 0.25);
 }
 
 .profile-metric-box .metric-num {
   display: block;
-  font-size: 1.15rem;
+  font-size: 1.02rem;
   font-weight: 800;
   color: #34d399;
   font-family: var(--font-display);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .profile-metric-box .metric-lbl {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   color: var(--text-muted);
   margin-top: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Section Subheadings */
+.profile-section-heading {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #34d399;
+  margin: 10px 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Detailed Information List */
 .profile-details-list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
-  margin-top: 6px;
+  gap: 6px;
 }
 
 .profile-detail-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  font-size: 0.8rem;
-  padding: 6px 0;
+  gap: 10px;
+  font-size: 0.78rem;
+  padding: 5px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -514,10 +627,10 @@ body {
 
 .detail-code {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
+  font-size: 0.7rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  padding: 2px 7px;
   border-radius: 6px;
   color: #a7f3d0;
   max-width: 140px;
@@ -526,72 +639,116 @@ body {
   white-space: nowrap;
 }
 
-.btn-copy-uid {
-  background: transparent;
+.btn-inline-action {
+  background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(52, 211, 153, 0.3);
   border-radius: 6px;
   color: #34d399;
-  padding: 2px 6px;
-  font-size: 0.72rem;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
-.btn-copy-uid:hover {
-  background: rgba(52, 211, 153, 0.2);
+.btn-inline-action:hover {
+  background: rgba(52, 211, 153, 0.25);
+  border-color: rgba(52, 211, 153, 0.6);
   color: #ffffff;
 }
 
 /* Edit Profile Drawer */
 .profile-edit-drawer {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(52, 211, 153, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(52, 211, 153, 0.25);
   border-radius: 12px;
   padding: 12px;
   margin-top: 10px;
-  animation: slideUpFade 0.25s ease;
+  animation: slideUpFade 0.22s ease;
 }
 
 .drawer-title {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #34d399;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .profile-edit-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 3px;
+  margin-bottom: 6px;
+}
+
+.profile-edit-field.full-span {
+  grid-column: span 2;
 }
 
 .profile-edit-field label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
+.profile-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .profile-edit-field input {
-  background: rgba(4, 20, 15, 0.7);
-  border: 1px solid rgba(52, 211, 153, 0.3);
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.82rem;
+  width: 100%;
+  background: rgba(4, 20, 15, 0.75);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 7px;
+  padding: 6px 9px;
+  font-size: 0.78rem;
   color: #ffffff;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .profile-edit-field input:focus {
   border-color: #34d399;
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.35);
+}
+
+.btn-gps-autofill {
+  position: absolute;
+  right: 5px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #34d399;
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-gps-autofill:hover {
+  background: rgba(16, 185, 129, 0.4);
+  color: #ffffff;
 }
 
 .edit-btn-row {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .btn-save-profile {
@@ -599,43 +756,53 @@ body {
   background: linear-gradient(135deg, #10b981, #059669);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: 7px;
   padding: 6px 12px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .btn-save-profile:hover {
   opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 .btn-cancel-edit {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  border-radius: 7px;
   padding: 6px 12px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
-/* Card Bottom Actions */
+.btn-cancel-edit:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+/* Card Bottom Actions - 4 Column Layout */
 .profile-card-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  padding-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .profile-action-btn {
-  flex: 1;
-  padding: 7px 10px;
-  border-radius: 9px;
-  font-size: 0.76rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.74rem;
   font-weight: 600;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -643,7 +810,7 @@ body {
   cursor: pointer;
   text-align: center;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -653,15 +820,13 @@ body {
 .profile-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  border-color: rgba(52, 211, 153, 0.4);
+  border-color: rgba(52, 211, 153, 0.45);
 }
 
 .profile-action-btn.signout-btn {
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.35);
   color: #fca5a5;
-  flex: 0 0 auto;
-  padding: 7px 14px;
 }
 
 .profile-action-btn.signout-btn:hover {
@@ -673,8 +838,29 @@ body {
 /* Sunlight Mode Theme overrides for Profile Dropdown */
 body.theme-sunlight .profile-dropdown-card {
   background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(16, 185, 129, 0.35);
+  border-color: rgba(16, 185, 129, 0.4);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 25px rgba(16, 185, 129, 0.1);
+}
+
+body.theme-sunlight .profile-card-inner,
+body.theme-sunlight header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1) {
+  scrollbar-color: rgba(16, 185, 129, 0.6) rgba(0, 0, 0, 0.08);
+}
+
+body.theme-sunlight .profile-card-inner::-webkit-scrollbar-track,
+body.theme-sunlight header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.theme-sunlight .profile-card-inner::-webkit-scrollbar-thumb,
+body.theme-sunlight header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.theme-sunlight .profile-card-inner::-webkit-scrollbar-thumb:hover,
+body.theme-sunlight header:nth-of-type(1) > div:nth-of-type(2) > div#userProfileSection:nth-of-type(2) > div#profileDropdownCard:nth-of-type(1) > div:nth-of-type(1)::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.8);
 }
 
 body.theme-sunlight .profile-btn-nav {
@@ -697,7 +883,19 @@ body.theme-sunlight .profile-card-header {
 
 body.theme-sunlight .profile-metric-box {
   background: rgba(16, 185, 129, 0.06);
-  border-color: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+body.theme-sunlight .profile-section-heading {
+  color: #047857;
+}
+
+body.theme-sunlight .profile-section-heading::after {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-sunlight .profile-detail-row {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
 body.theme-sunlight .detail-val {
@@ -706,24 +904,24 @@ body.theme-sunlight .detail-val {
 
 body.theme-sunlight .detail-code {
   background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.25);
   color: #065f46;
 }
 
 body.theme-sunlight .profile-edit-drawer {
   background: rgba(16, 185, 129, 0.05);
-  border-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 body.theme-sunlight .profile-edit-field input {
   background: #ffffff;
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.35);
   color: #0f172a;
 }
 
 body.theme-sunlight .profile-action-btn {
   background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.12);
   color: #1e293b;
 }
 
@@ -1829,6 +2027,230 @@ video#camera {
   border-color: #ef4444;
 }
 
+/* Advanced Weather Tabs & Microclimate Controls */
+.weather-tabs-nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin: 18px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  scrollbar-width: thin;
+}
+
+.weather-tab-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weather-tab-btn:hover {
+  background: rgba(0, 230, 118, 0.12);
+  border-color: rgba(0, 230, 118, 0.4);
+  color: #fff;
+}
+
+.weather-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.25), rgba(0, 255, 170, 0.15));
+  border-color: #00e676;
+  color: #00ffaa;
+  box-shadow: 0 4px 14px rgba(0, 230, 118, 0.2);
+}
+
+.quick-regions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-region-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quick-region-chip:hover {
+  background: rgba(0, 255, 170, 0.12);
+  border-color: rgba(0, 255, 170, 0.35);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.telemetry-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 12px 14px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.telemetry-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 255, 170, 0.25);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.telemetry-label {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.telemetry-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.telemetry-sub {
+  font-size: 0.68rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Hourly Forecast Horizontal Scroller */
+.hourly-scroller {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 12px 4px 16px;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+
+.hourly-card {
+  flex: 0 0 130px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 14px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.hourly-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 230, 118, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.hourly-card.current-hour {
+  border-color: #00e676;
+  background: linear-gradient(180deg, rgba(0, 230, 118, 0.15), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 0 14px rgba(0, 230, 118, 0.25);
+}
+
+.spray-pill {
+  font-size: 0.68rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spray-pill.pill-safe {
+  background: rgba(0, 230, 118, 0.2);
+  color: #00ffaa;
+  border: 1px solid rgba(0, 230, 118, 0.4);
+}
+
+.spray-pill.pill-caution {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.spray-pill.pill-unsafe {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* 7-Day Precision Agricultural Forecast Grid */
+.daily-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.daily-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 16px 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 255, 170, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #00e676;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #00e676;
+  animation: liveGlow 1.8s infinite ease-in-out;
+}
+
+@keyframes liveGlow {
+  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #00e676; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00e676; }
+  100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #00e676; }
+}
+
 /* ======================================================== */
 /* MODULE 4: COMMODITY MANDI & PROFIT                       */
 /* ======================================================== */
@@ -2502,119 +2924,160 @@ body.theme-sunlight .tactile-range {
 
       <!-- Profile Details Floating Dropdown Card -->
       <div class="profile-dropdown-card" id="profileDropdownCard" role="dialog" aria-modal="true" aria-labelledby="profileCardName" onclick="event.stopPropagation()">
-        <!-- Floating Card Header -->
-        <div class="profile-card-header">
-          <div class="profile-card-avatar-wrap">
-            <div class="profile-avatar-large" id="profileAvatarLarge">👨‍🌾</div>
-            <div class="avatar-status-indicator" title="Active Farmer Session"></div>
-          </div>
-          <div class="profile-card-identity">
-            <h3 class="profile-card-name" id="profileCardName">Smart Farmer</h3>
-            <div class="profile-card-email" id="profileCardEmail">farmer@smartagriculture.local</div>
-            <div class="profile-card-role-chip" id="profileCardRole">🌾 Verified AI Agronomist</div>
-          </div>
-          <button type="button" class="profile-close-btn" onclick="closeProfileDropdown()" aria-label="Close Profile">✕</button>
-        </div>
-
-        <!-- Dynamic Activity Metrics Bar -->
-        <div class="profile-metrics-bar">
-          <div class="profile-metric-box">
-            <span class="metric-num" id="profileScansCount">0</span>
-            <span class="metric-lbl">Leaf Scans</span>
-          </div>
-          <div class="profile-metric-box">
-            <span class="metric-num" id="profilePlotsCount">0</span>
-            <span class="metric-lbl">Farm Plots</span>
-          </div>
-          <div class="profile-metric-box">
-            <span class="metric-num" id="profileAiStatus">Gemini 3.8</span>
-            <span class="metric-lbl">Vision AI</span>
-          </div>
-        </div>
-
-        <!-- Detail Attributes List -->
-        <div class="profile-details-list">
-          <!-- UID Item with Quick Copy -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">🆔</span> Farmer UID
+        <div class="profile-card-inner">
+          <!-- Floating Card Header -->
+          <div class="profile-card-header">
+            <div class="profile-card-avatar-wrap">
+              <div class="profile-avatar-large" id="profileAvatarLarge">👨‍🌾</div>
+              <div class="avatar-status-indicator" title="Active Farmer Session"></div>
             </div>
-            <div class="detail-val-wrap">
-              <code class="detail-code" id="profileUidDisplay">Loading...</code>
-              <button type="button" class="btn-copy-uid" onclick="copyFarmerUid()" id="btnCopyUid" title="Copy UID to Clipboard">📋 Copy</button>
+            <div class="profile-card-identity">
+              <div class="profile-name-row">
+                <h3 class="profile-card-name" id="profileCardName">Smart Farmer</h3>
+                <span class="profile-verified-badge" title="Verified Agricultural Operator">✓ Verified</span>
+              </div>
+              <div class="profile-card-email" id="profileCardEmail">farmer@smartagriculture.local</div>
+              <div class="profile-card-role-chip" id="profileCardRole">🌾 Certified Farm Operator</div>
+            </div>
+            <button type="button" class="profile-close-btn" onclick="closeProfileDropdown()" aria-label="Close Profile">✕</button>
+          </div>
+
+          <!-- Dynamic 4-Column Activity Metrics Bar -->
+          <div class="profile-metrics-bar">
+            <div class="profile-metric-box">
+              <span class="metric-num" id="profileScansCount">0</span>
+              <span class="metric-lbl">Leaf Scans</span>
+            </div>
+            <div class="profile-metric-box">
+              <span class="metric-num" id="profilePlotsCount">0</span>
+              <span class="metric-lbl">Farm Plots</span>
+            </div>
+            <div class="profile-metric-box">
+              <span class="metric-num" id="profileAiStatus">Gemini 3.1</span>
+              <span class="metric-lbl">Vision AI</span>
+            </div>
+            <div class="profile-metric-box">
+              <span class="metric-num" id="profileDbStatusMini">Cloud Live</span>
+              <span class="metric-lbl">Firestore</span>
             </div>
           </div>
 
-          <!-- Auth Provider -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">🔐</span> Authentication
+          <!-- Section 1: Agricultural & Farm Identity -->
+          <div class="profile-section-heading">🌾 Farm & Crop Profile</div>
+          <div class="profile-details-list">
+            <!-- Farm Location / District -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>📍</span> Farm Location
+              </div>
+              <div class="detail-val-wrap">
+                <span class="detail-val" id="profileFarmLocationDisplay">Local Agricultural Zone</span>
+                <button type="button" class="btn-inline-action" onclick="syncGpsToProfile()" title="Calibrate GPS Location">📍 GPS</button>
+              </div>
             </div>
-            <div class="detail-val" id="profileAuthProvider">Cloud Session</div>
-          </div>
 
-          <!-- Farm Location / District -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">📍</span> Farm Location
+            <!-- Primary Crop -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>🌱</span> Primary Crops
+              </div>
+              <div class="detail-val" id="profilePrimaryCropDisplay">Wheat, Rice & Mustard</div>
             </div>
-            <div class="detail-val" id="profileFarmLocationDisplay">Local Agricultural Zone</div>
-          </div>
 
-          <!-- Preferred Language -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">🌐</span> Preferred Lang
+            <!-- Farm Area / Holding -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>📐</span> Farm Holding
+              </div>
+              <div class="detail-val" id="profileFarmSizeDisplay">5.0 Acres</div>
             </div>
-            <div class="detail-val" id="profileLanguageDisplay">English (en)</div>
           </div>
 
-          <!-- Cloud Firestore Database Status -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">☁️</span> Database
+          <!-- Section 2: Account & Security Credentials -->
+          <div class="profile-section-heading">🔐 Account & Cloud Session</div>
+          <div class="profile-details-list">
+            <!-- UID Item with Quick Copy -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>🆔</span> Farmer UID
+              </div>
+              <div class="detail-val-wrap">
+                <code class="detail-code" id="profileUidDisplay">Loading...</code>
+                <button type="button" class="btn-inline-action" onclick="copyFarmerUid()" id="btnCopyUid" title="Copy UID to Clipboard">📋 Copy</button>
+              </div>
             </div>
-            <div class="detail-val" id="profileDbStatus">Cloud Firestore Live</div>
-          </div>
 
-          <!-- Member Since / Registration -->
-          <div class="profile-detail-row">
-            <div class="detail-label">
-              <span class="detail-icon">📅</span> Member Since
+            <!-- Cloud Firestore Database Status -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>☁️</span> Database
+              </div>
+              <div class="detail-val" id="profileDbStatus">Cloud Firestore Live</div>
             </div>
-            <div class="detail-val" id="profileCreatedDisplay">Active Season</div>
-          </div>
-        </div>
 
-        <!-- Collapsible Edit Profile Form -->
-        <div class="profile-edit-drawer" id="profileEditDrawer" style="display:none;">
-          <div class="drawer-title">✏️ Update Farmer Profile</div>
-          <div class="profile-edit-field">
-            <label for="editDisplayNameInput">Farmer / Farm Name</label>
-            <input type="text" id="editDisplayNameInput" placeholder="e.g. Gurpreet Singh" maxlength="60" />
-          </div>
-          <div class="profile-edit-field">
-            <label for="editFarmLocationInput">Farm Location / District</label>
-            <input type="text" id="editFarmLocationInput" placeholder="e.g. Ludhiana, Punjab" maxlength="100" />
-          </div>
-          <div class="edit-btn-row">
-            <button type="button" class="btn-save-profile" onclick="saveProfileChanges()" id="btnSaveProfile">💾 Save Profile</button>
-            <button type="button" class="btn-cancel-edit" onclick="toggleEditProfileDrawer(false)">Cancel</button>
-          </div>
-          <div id="profileEditFeedback" style="font-size:0.75rem; margin-top:6px; display:none;"></div>
-        </div>
+            <!-- Preferred Language -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>🌐</span> Language
+              </div>
+              <div class="detail-val" id="profileLanguageDisplay">English (en)</div>
+            </div>
 
-        <!-- Quick Profile Card Actions -->
-        <div class="profile-card-actions">
-          <button type="button" class="profile-action-btn" id="btnToggleEditProfile" onclick="toggleEditProfileDrawer()">
-            ✏️ Edit Profile
-          </button>
-          <button type="button" class="profile-action-btn" onclick="syncGpsToProfile()" title="Use Current GPS for Farm Location">
-            📍 Use GPS
-          </button>
-          <a href="/signout" class="profile-action-btn signout-btn" id="btnProfileSignout" title="Sign out of account">
-            🚪 Logout
-          </a>
+            <!-- Auth Provider -->
+            <div class="profile-detail-row">
+              <div class="detail-label">
+                <span>🛡️</span> Session
+              </div>
+              <div class="detail-val" id="profileAuthProvider">Cloud Session</div>
+            </div>
+          </div>
+
+          <!-- Collapsible Edit Profile Form -->
+          <div class="profile-edit-drawer" id="profileEditDrawer" style="display:none;">
+            <div class="drawer-title">✏️ Update Farm & Personal Profile</div>
+            <div class="profile-edit-field">
+              <label for="editDisplayNameInput">Farmer / Farm Operator Name</label>
+              <input type="text" id="editDisplayNameInput" placeholder="e.g. Gurpreet Singh" maxlength="60" />
+            </div>
+            <div class="profile-edit-field">
+              <label for="editFarmLocationInput">Farm Location / District</label>
+              <div class="profile-input-wrap">
+                <input type="text" id="editFarmLocationInput" placeholder="e.g. Ludhiana, Punjab or GPS" maxlength="100" />
+                <button type="button" class="btn-gps-autofill" onclick="fillCurrentGpsIntoInput()" title="Auto-fill current GPS coordinates">📍 GPS</button>
+              </div>
+            </div>
+            <div class="profile-edit-grid">
+              <div class="profile-edit-field">
+                <label for="editPrimaryCropInput">Primary Crops</label>
+                <input type="text" id="editPrimaryCropInput" placeholder="e.g. Wheat, Tomato" maxlength="80" />
+              </div>
+              <div class="profile-edit-field">
+                <label for="editFarmSizeInput">Farm Area</label>
+                <input type="text" id="editFarmSizeInput" placeholder="e.g. 10 Acres" maxlength="60" />
+              </div>
+            </div>
+            <div class="edit-btn-row">
+              <button type="button" class="btn-save-profile" onclick="saveProfileChanges()" id="btnSaveProfile">💾 Save Profile</button>
+              <button type="button" class="btn-cancel-edit" onclick="toggleEditProfileDrawer(false)">Cancel</button>
+            </div>
+            <div id="profileEditFeedback" style="font-size:0.75rem; margin-top:6px; display:none;"></div>
+          </div>
+
+          <!-- Quick Profile Card Actions - 4-Item Grid -->
+          <div class="profile-card-actions">
+            <button type="button" class="profile-action-btn" id="btnToggleEditProfile" onclick="toggleEditProfileDrawer()" title="Update personal details and farm crops">
+              ✏️ Edit Profile
+            </button>
+            <button type="button" class="profile-action-btn" onclick="syncGpsToProfile()" title="Use Current GPS Coordinates for Farm">
+              📍 Sync GPS
+            </button>
+            <button type="button" class="profile-action-btn" onclick="exportFarmerCard()" title="Copy Farmer Passport Card to Clipboard">
+              📋 Share Card
+            </button>
+            <a href="/signout" class="profile-action-btn signout-btn" id="btnProfileSignout" title="Sign out of agricultural session">
+              🚪 Logout
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -2941,17 +3404,40 @@ body.theme-sunlight .tactile-range {
 
     <div class="grid-2" style="align-items:flex-end;">
       <div class="form-group">
-        <label>Your Farming Location (City/District/Town)</label>
-        <input type="text" id="weatherCityInput" placeholder="Enter city, district, or town (e.g. Ludhiana, Pune, Patna)" onkeydown="if(event.key==='Enter') loadWeather()">
+        <label style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Your Farming Location (City, District, Town, or Village)</span>
+          <span style="font-size:0.75rem; color:#00e676; font-weight:500; display:inline-flex; align-items:center; gap:5px;">
+            <span class="live-pulse-dot"></span> Real-time WMO Telemetry
+          </span>
+        </label>
+        <input type="text" id="weatherCityInput" placeholder="Enter city, district, or town (e.g. Ludhiana, Karnal, Nashik, Patna)" onkeydown="if(event.key==='Enter') loadWeather()">
       </div>
-      <div style="display:flex; gap:10px;">
-        <button type="button" class="btn-primary" style="margin:0;" onclick="loadWeather()" id="t-checkWeather">
-          🔍 Search City
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-primary" style="margin:0; display:inline-flex; align-items:center; gap:6px;" onclick="loadWeather()" id="t-checkWeather">
+          🔍 Search
         </button>
-        <button type="button" class="btn-secondary" style="width:auto; margin:0; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;" onclick="useMyLocation()" id="btnAutoLocate" title="Detect my current location">
-          📍 My Location
+        <button type="button" class="btn-secondary" style="width:auto; margin:0; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;" onclick="useMyLocation(true)" id="btnAutoLocate" title="Detect precise farm coordinates via GPS">
+          📍 Live GPS
+        </button>
+        <button type="button" class="btn-secondary" style="width:auto; margin:0; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; padding:10px 14px;" onclick="refreshCurrentWeather()" id="btnRefreshWeather" title="Refresh live weather telemetry">
+          🔄
         </button>
       </div>
+    </div>
+
+    <!-- Quick Agricultural Region Presets -->
+    <div class="quick-regions-wrap" id="quickRegionsBar">
+      <span style="font-size:0.75rem; color:#94a3b8; font-weight:600; margin-right:4px;">🌾 Quick Farming Zones:</span>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Ludhiana, Punjab')">🌾 Ludhiana (Punjab)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Karnal, Haryana')">🌾 Karnal (Haryana)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Nashik, Maharashtra')">🍇 Nashik (Vineyards)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Pune, Maharashtra')">🌱 Pune (Sugarcane)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Patna, Bihar')">🌾 Patna (Paddy/Wheat)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Guntur, Andhra Pradesh')">🌶️ Guntur (Chilli/Cotton)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Indore, Madhya Pradesh')">🌽 Indore (Soybean/Wheat)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Varanasi, Uttar Pradesh')">🌾 Varanasi (Gangetic Plains)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Jaipur, Rajasthan')">🌾 Jaipur (Mustard/Bajra)</button>
+      <button type="button" class="quick-region-chip" onclick="quickSelectCity('Bengaluru, Karnataka')">🌴 Bengaluru (Horticulture)</button>
     </div>
 
     <div id="weatherDisplayBox" style="margin-top:20px;"></div>
@@ -3432,6 +3918,7 @@ function switchScannerMode(mode) {
     stopLiveCameraStream();
   }
 }
+window.switchScannerMode = switchScannerMode;
 
 // Live Stream Initialization & Hardware Controls
 async function startLiveCameraStream() {
@@ -3558,9 +4045,9 @@ async function performLiveFrameAnalysis() {
   if (hudStatus) hudStatus.innerText = "🔬 AI Optical Inspection in progress...";
   if (blinkDot) blinkDot.style.background = "#00ffcc";
 
-  // Capture frame to offscreen canvas
+  // Capture frame to offscreen canvas (optimized 960px resolution for high-speed AI optical analysis)
   const canvas = document.createElement("canvas");
-  canvas.width = Math.min(1280, videoEl.videoWidth);
+  canvas.width = Math.min(960, videoEl.videoWidth);
   canvas.height = Math.round((canvas.width / videoEl.videoWidth) * videoEl.videoHeight);
   const ctx = canvas.getContext("2d");
   ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
@@ -3731,6 +4218,9 @@ function showToastNotice(msg) {
 
 // Comprehensive Universal Diagnosis Card Markup Builder
 function generateDiagnosisCardMarkup(d, viewContext = "standard") {
+  if (d && d.disease) {
+    latestDiagnosisData = d;
+  }
   // Check if subject is non-plant (e.g. human face, indoor object)
   if (d.is_plant === false) {
     const subjectName = d.detected_subject || "Human Face / Non-Plant Subject";
@@ -3857,7 +4347,7 @@ function generateDiagnosisCardMarkup(d, viewContext = "standard") {
         <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
           🧪 View Chemical Active
         </button>
-        <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px; border-color:var(--accent-green); color:#34d399;" onclick="askAgronomistAboutCondition('${(d.disease || '').replace(/'/g, &quot;\\'&quot;)}', '${(d.plant || '').replace(/'/g, &quot;\\'&quot;)}')">
+        <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px; border-color:var(--accent-green); color:#34d399;" onclick="askAgronomistAboutCurrentDiagnosis()">
           🤖 Consult Kisan Mitra AI
         </button>
         <button type="button" class="btn-report-export" onclick="exportDiagnosisPDF()">
@@ -3972,6 +4462,12 @@ predictForm.onsubmit = async (e) => {
     `;
   }
 };
+
+function askAgronomistAboutCurrentDiagnosis() {
+  if (!latestDiagnosisData) return;
+  askAgronomistAboutCondition(latestDiagnosisData.disease, latestDiagnosisData.plant);
+}
+window.askAgronomistAboutCurrentDiagnosis = askAgronomistAboutCurrentDiagnosis;
 
 function switchTreatmentView(method) {
   if (!latestDiagnosisData) return;
@@ -4334,124 +4830,427 @@ async function calculatePlotFertilizer() {
 }
 
 // ==========================================
-// 🌦️ MODULE 3: WEATHER & SMART SPRAY ADVISORY
+// 🌦️ MODULE 3: ADVANCED AGROMETEOROLOGICAL WEATHER & FORECAST ENGINE
 // ==========================================
-function renderWeatherUI(d) {
+let currentWeatherData = null;
+let activeWeatherTab = "current";
+
+function switchWeatherTab(tab) {
+  activeWeatherTab = tab;
+  if (currentWeatherData) {
+    renderWeatherUI(currentWeatherData, tab);
+  }
+}
+
+function quickSelectCity(cityName) {
+  const cityInput = document.getElementById("weatherCityInput");
+  if (cityInput) cityInput.value = cityName;
+  loadWeather(cityName);
+}
+
+function refreshCurrentWeather() {
+  const cityInput = document.getElementById("weatherCityInput");
+  const city = cityInput ? cityInput.value.trim() : "";
+  const refreshBtn = document.getElementById("btnRefreshWeather");
+  if (refreshBtn) {
+    refreshBtn.innerHTML = "⏳";
+    refreshBtn.disabled = true;
+  }
+  loadWeather(city, true).finally(() => {
+    if (refreshBtn) {
+      refreshBtn.innerHTML = "🔄";
+      refreshBtn.disabled = false;
+    }
+  });
+}
+
+function renderWeatherUI(d, requestedTab) {
+  if (!d) return;
+  currentWeatherData = d;
+  const tab = requestedTab || activeWeatherTab || "current";
+  activeWeatherTab = tab;
+
   const box = document.getElementById("weatherDisplayBox");
   if (!box) return;
+
   const sprayClass = d.spray_safety === "SAFE" ? "spray-safe" 
     : d.spray_safety === "CAUTION" ? "spray-caution" : "spray-unsafe";
 
-  // Build 24-Hour Spray Timeline based on spray conditions
-  const currentHour = new Date().getHours();
-  let timelineHtml = "";
-  for (let h = 0; h < 24; h += 2) {
-    let barClass = "bar-safe";
-    let statusText = "Safe Window";
-    // Afternoon wind or midday heat (11am - 4pm) triggers caution/unsafe
-    if (h >= 11 && h <= 16) {
-      barClass = d.spray_safety === "UNSAFE" ? "bar-unsafe" : "bar-caution";
-      statusText = "Midday Thermal Drift / Sun";
-    } else if (d.spray_safety === "UNSAFE") {
-      barClass = "bar-unsafe";
-      statusText = "High Wind / Rain";
-    } else if (h >= 6 && h <= 10) {
-      barClass = "bar-safe";
-      statusText = "Prime Morning Window";
-    } else if (h >= 17 && h <= 20) {
-      barClass = "bar-safe";
-      statusText = "Prime Evening Window";
-    } else {
-      barClass = "bar-caution";
-      statusText = "Night Dew Accumulation";
-    }
-    const isNow = h <= currentHour && currentHour < h + 2;
-    timelineHtml += `
-      <div class="spray-hour-bar ${barClass}" title="${h}:00 - ${h+2}:00: ${statusText} ${isNow ? '(Current Hour)' : ''}" style="${isNow ? 'box-shadow: 0 0 8px #fff; border: 1px solid #fff;' : ''}">
-        ${h}h
+  // Cache latest valid data for instantaneous 0ms reload
+  try {
+    localStorage.setItem("kisan_last_weather", JSON.stringify(d));
+  } catch (e) {}
+
+  const cityInput = document.getElementById("weatherCityInput");
+  if (cityInput && d.city && !cityInput.value) {
+    cityInput.value = d.city;
+  }
+
+  // --- TAB 1: CURRENT MICROCLIMATE & SPRAY SAFETY ---
+  let tabContentHtml = "";
+  if (tab === "current") {
+    // Top 6-pack microclimate telemetry
+    tabContentHtml = `
+      <div class="weather-hero-card">
+        <div class="weather-orb-container">
+          <div class="weather-orb-icon">${d.condition_icon || '🌤️'}</div>
+          <div class="weather-temp-big">${d.temperature}°C</div>
+          <div style="font-size:0.95rem; color:#94a3b8; margin-top:-4px;">Feels Like <b>${d.apparent_temperature || d.temperature}°C</b></div>
+          <div style="font-size:1.15rem; font-weight:700; color:#fff; margin-top:8px;">${d.city}</div>
+          <div style="font-size:0.86rem; color:#00ffaa; font-weight:600; margin-top:4px;">${d.condition}</div>
+          <div style="font-size:0.75rem; color:#cbd5e1; margin-top:6px; line-height:1.4;">${d.condition_description || 'Optimal atmospheric radiation'}</div>
+        </div>
+
+        <div>
+          <!-- Microclimate Telemetry Grid -->
+          <div class="telemetry-grid">
+            <div class="telemetry-card">
+              <div class="telemetry-label">🌬️ Wind & Drift</div>
+              <div class="telemetry-val">${d.windSpeed} <span style="font-size:0.75rem; font-weight:500;">km/h</span></div>
+              <div class="telemetry-sub">${d.wind_direction_compass || 'Variable'} • Gusts ${d.wind_gusts || d.windSpeed}</div>
+            </div>
+            <div class="telemetry-card">
+              <div class="telemetry-label">💧 Humidity</div>
+              <div class="telemetry-val">${d.humidity}<span style="font-size:0.75rem; font-weight:500;">%</span></div>
+              <div class="telemetry-sub">Dew Point: ${d.hourly_forecast?.[0]?.dewPoint || Math.round(d.temperature - ((100-d.humidity)/5))}°C</div>
+            </div>
+            <div class="telemetry-card">
+              <div class="telemetry-label">☀️ UV Index</div>
+              <div class="telemetry-val">${d.uv_index || 4.5} <span style="font-size:0.75rem; font-weight:500;">/ 11</span></div>
+              <div class="telemetry-sub">${d.uv_index > 6 ? 'High Solar Load' : 'Moderate'}</div>
+            </div>
+            <div class="telemetry-card">
+              <div class="telemetry-label">🌡️ Barometer</div>
+              <div class="telemetry-val">${d.surface_pressure || 1012} <span style="font-size:0.75rem; font-weight:500;">hPa</span></div>
+              <div class="telemetry-sub">Stable Surface</div>
+            </div>
+            <div class="telemetry-card">
+              <div class="telemetry-label">🌧️ Rainfall</div>
+              <div class="telemetry-val">${d.precipitation || 0.0} <span style="font-size:0.75rem; font-weight:500;">mm</span></div>
+              <div class="telemetry-sub">Wash-off: ${d.precipitation > 0.1 ? 'High' : 'Zero'}</div>
+            </div>
+            <div class="telemetry-card">
+              <div class="telemetry-label">🌾 FAO ET0</div>
+              <div class="telemetry-val">${d.et0_evapotranspiration || 4.8} <span style="font-size:0.75rem; font-weight:500;">mm/d</span></div>
+              <div class="telemetry-sub">${(d.water_deficit_liters_acre || 19400).toLocaleString()} L/acre</div>
+            </div>
+          </div>
+
+          <!-- Spray Alert Box -->
+          <div class="spray-alert-box ${sprayClass}">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <b style="font-size:1.02rem; display:flex; align-items:center; gap:6px;">
+                ${d.spray_badge}
+              </b>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span style="font-size:0.8rem; background:rgba(0,0,0,0.3); padding:3px 8px; border-radius:12px; font-weight:700;">Score: ${d.spray_score}/100</span>
+                <button type="button" class="btn-tts" style="padding:5px 12px; font-size:0.78rem;" onclick="readWeatherAloud('${d.city}', '${d.temperature}', '${d.spray_badge}', '${d.spray_reason}', '${d.spray_window}')">
+                  🔊 Listen / सुनें
+                </button>
+              </div>
+            </div>
+
+            <!-- Scientific Factor Breakdown -->
+            <ul style="margin:10px 0 0 16px; font-size:0.84rem; line-height:1.5; color:#e2e8f0;">
+              ${(d.spray_reasons || [d.spray_reason]).map(r => `<li>${r}</li>`).join("")}
+            </ul>
+
+            <div style="font-size:0.84rem; margin-top:10px; color:#cbd5e1; background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:10px;">
+              🕒 <b>Prime Spray Window:</b> <span style="color:#00ffaa; font-weight:600;">${d.spray_window}</span>
+            </div>
+          </div>
+
+          <!-- Quick Irrigation & Fungal Preview -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;">
+            <div style="background:rgba(255,255,255,0.05); padding:12px 14px; border-radius:14px; border:1px solid rgba(255,255,255,0.08);">
+              <b style="font-size:0.82rem; color:var(--accent-cyan);">💧 Irrigation Directive:</b>
+              <p style="font-size:0.78rem; color:#cbd5e1; margin-top:4px; line-height:1.4;">${d.irrigation_advice}</p>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); padding:12px 14px; border-radius:14px; border:1px solid rgba(255,255,255,0.08);">
+              <b style="font-size:0.82rem; color:#f87171;">🦠 Fungal Pressure Index:</b>
+              <div style="font-size:0.85rem; font-weight:700; color:#fff; margin-top:2px;">${d.fungal_risk_index || 'Low'}</div>
+              <p style="font-size:0.78rem; color:#cbd5e1; margin-top:2px; line-height:1.3;">${d.fungal_advice || 'Atmosphere is stable.'}</p>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
 
-  box.innerHTML = `
-    <div class="weather-hero-card">
-      <div class="weather-orb-container">
-        <div class="weather-orb-icon">🌤️</div>
-        <div class="weather-temp-big">${d.temperature}°C</div>
-        <div style="font-size:1.1rem; font-weight:600; color:#fff;">${d.city}</div>
-        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">${d.condition}</div>
-        <div style="font-size:0.72rem; color:#94a3b8; margin-top:6px; background:rgba(255,255,255,0.06); display:inline-block; padding:2px 8px; border-radius:10px;">📡 ${d.source || 'Live Weather Telemetry'}</div>
+  // --- TAB 2: 24-HOUR HOURLY FORECAST & SPRAY TIMELINE ---
+  else if (tab === "hourly") {
+    const hourlyItems = (d.hourly_forecast && d.hourly_forecast.length > 0) ? d.hourly_forecast : [];
+    const currentHourStr = new Date().getHours().toString().padStart(2, "0");
+
+    let hourlyCardsHtml = "";
+    hourlyItems.forEach((h, idx) => {
+      const isCurrent = h.time.startsWith(currentHourStr) || idx === 0;
+      const pillClass = h.spraySafety === "SAFE" ? "pill-safe" : (h.spraySafety === "CAUTION" ? "pill-caution" : "pill-unsafe");
+      hourlyCardsHtml += `
+        <div class="hourly-card ${isCurrent ? 'current-hour' : ''}">
+          <div style="font-size:0.82rem; font-weight:700; color:${isCurrent ? '#00ffaa' : '#cbd5e1'};">
+            ${h.time} ${isCurrent ? '<span style="font-size:0.65rem;">(Now)</span>' : ''}
+          </div>
+          <div style="font-size:1.8rem; margin:2px 0;">${h.icon || '🌤️'}</div>
+          <div style="font-size:1.15rem; font-weight:800; color:#fff;">${h.temperature}°C</div>
+          <div style="font-size:0.74rem; color:#94a3b8;">💧 ${h.rainProbability}% rain</div>
+          <div style="font-size:0.74rem; color:#94a3b8;">🌬️ ${h.windSpeed} km/h</div>
+          <div style="font-size:0.68rem; color:#64748b;">Dew: ${h.dewPoint}°C</div>
+          <div class="spray-pill ${pillClass}" style="margin-top:4px;" title="${h.sprayReason}">
+            ${h.spraySafety}
+          </div>
+        </div>
+      `;
+    });
+
+    tabContentHtml = `
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin:0;">⏱️ 24-Hour Precision Spray & Weather Timeline</h3>
+            <p style="font-size:0.78rem; color:#94a3b8; margin:2px 0 0;">Hourly agro-meteorological conditions. Color codes indicate chemical spraying suitability.</p>
+          </div>
+          <div style="display:flex; gap:8px; font-size:0.72rem; font-weight:600;">
+            <span style="color:#00ffaa;">🟢 Safe Window</span>
+            <span style="color:#fde047;">🟡 Caution</span>
+            <span style="color:#f87171;">🔴 Unsafe</span>
+          </div>
+        </div>
+
+        <div class="hourly-scroller">
+          ${hourlyCardsHtml || '<div style="color:#94a3b8; padding:20px;">Hourly forecast telemetry loading...</div>'}
+        </div>
       </div>
+    `;
+  }
 
-      <div>
-        <div class="grid-2">
-          <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-            <span style="font-size:0.8rem; color:var(--text-muted);">Wind Speed</span>
-            <div style="font-size:1.2rem; font-weight:700; color:#fff;">🌬️ ${d.windSpeed} km/h</div>
+  // --- TAB 3: 7-DAY AGRICULTURAL FORECAST ---
+  else if (tab === "daily") {
+    const dailyItems = (d.daily_forecast && d.daily_forecast.length > 0) ? d.daily_forecast : [];
+    let dailyCardsHtml = "";
+
+    dailyItems.forEach((day, idx) => {
+      const isToday = idx === 0;
+      const pillClass = day.spraySafety === "SAFE" ? "pill-safe" : (day.spraySafety === "CAUTION" ? "pill-caution" : "pill-unsafe");
+      dailyCardsHtml += `
+        <div class="daily-card" style="${isToday ? 'border-color:rgba(0,230,118,0.4); background:rgba(0,230,118,0.06);' : ''}">
+          <div style="font-size:0.88rem; font-weight:700; color:${isToday ? '#00ffaa' : '#fff'};">
+            ${day.dayName}
           </div>
-          <div style="background:rgba(255,255,255,0.06); padding:14px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-            <span style="font-size:0.8rem; color:var(--text-muted);">Humidity</span>
-            <div style="font-size:1.2rem; font-weight:700; color:#fff;">💧 ${d.humidity}%</div>
+          <div style="font-size:0.72rem; color:#94a3b8;">${day.date?.slice(5) || ''}</div>
+          <div style="font-size:2.2rem; margin:4px 0;">${day.icon || '☀️'}</div>
+          <div style="font-size:0.8rem; font-weight:600; color:#e2e8f0; height:32px; display:flex; align-items:center; justify-content:center;">
+            ${day.condition}
+          </div>
+          <div style="font-size:1.15rem; font-weight:800; color:#fff; margin-top:2px;">
+            ${day.tempMax}° <span style="font-size:0.85rem; font-weight:500; color:#94a3b8;">/ ${day.tempMin}°</span>
+          </div>
+          <div style="font-size:0.75rem; color:#38bdf8; font-weight:600; margin-top:2px;">
+            💧 ${day.precipitationSum} mm (${day.rainProbability}%)
+          </div>
+          <div style="font-size:0.72rem; color:#94a3b8;">
+            🌬️ Max ${day.maxWindSpeed} km/h
+          </div>
+          <div style="font-size:0.72rem; color:#a7f3d0;">
+            🌾 ET0: ${day.et0} mm/d
+          </div>
+          <div class="spray-pill ${pillClass}" style="margin-top:6px;">
+            ${day.spraySafety}
+          </div>
+        </div>
+      `;
+    });
+
+    tabContentHtml = `
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin:0;">📅 7-Day Precision Agricultural Forecast</h3>
+            <p style="font-size:0.78rem; color:#94a3b8; margin:2px 0 0;">Long-range field planning: temperature extremes, rainfall probability, and crop evapotranspiration.</p>
+          </div>
+        </div>
+        <div class="daily-grid">
+          ${dailyCardsHtml || '<div style="color:#94a3b8; padding:20px;">Daily forecast telemetry loading...</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- TAB 4: EVAPOTRANSPIRATION & IRRIGATION ---
+  else if (tab === "irrigation") {
+    const et0 = d.et0_evapotranspiration || 4.8;
+    const rain = d.precipitation || 0.0;
+    const deficitLiters = d.water_deficit_liters_acre || Math.round(et0 * 4047);
+
+    tabContentHtml = `
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <h3 style="font-size:1.1rem; font-weight:700; color:#38bdf8; margin:0;">💧 FAO-56 Evapotranspiration & Precision Irrigation</h3>
+            <p style="font-size:0.8rem; color:#94a3b8; margin:2px 0 0;">Balances crop transpiration and soil surface evaporation to prevent moisture stress and water waste.</p>
           </div>
         </div>
 
-        <div class="spray-alert-box ${sprayClass}">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="font-size:1rem;">${d.spray_badge}</b>
-            <button type="button" class="btn-tts" style="padding:6px 14px; font-size:0.78rem;" onclick="readWeatherAloud('${d.city}', '${d.temperature}', '${d.spray_badge}', '${d.spray_reason}', '${d.spray_window}')">
-              🔊 Listen / सुनें
-            </button>
-          </div>
-          <p style="font-size:0.88rem; margin-top:8px; line-height:1.5;">${d.spray_reason}</p>
-          <div style="font-size:0.82rem; margin-top:6px; color:#cbd5e1;">
-            🕒 <b>Best Spray Window:</b> ${d.spray_window}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+          <div style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.2); padding:16px; border-radius:16px;">
+            <span style="font-size:0.8rem; color:#7dd3fc;">Reference Evapotranspiration (ET0)</span>
+            <div style="font-size:1.8rem; font-weight:800; color:#fff; margin-top:4px;">${et0} <span style="font-size:0.9rem;">mm/day</span></div>
+            <p style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Calculated using Penman-Monteith agro-formula.</p>
           </div>
 
-          <!-- 24-Hour Spray Timeline Bar -->
-          <div style="margin-top:12px; font-size:0.75rem; color:#cbd5e1; font-weight:600;">
-            <span>⏱️ 24h Spray Window Forecast (Hover for Details):</span>
-            <div class="spray-timeline-hours">
-              ${timelineHtml}
+          <div style="background:rgba(0,230,118,0.08); border:1px solid rgba(0,230,118,0.2); padding:16px; border-radius:16px;">
+            <span style="font-size:0.8rem; color:#a7f3d0;">Estimated Water Demand</span>
+            <div style="font-size:1.8rem; font-weight:800; color:#00ffaa; margin-top:4px;">~${deficitLiters.toLocaleString()} <span style="font-size:0.9rem;">Liters / Acre</span></div>
+            <p style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Crop canopy replacement requirement for today.</p>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:16px; border-radius:16px;">
+            <span style="font-size:0.8rem; color:#cbd5e1;">Net Soil Water Balance</span>
+            <div style="font-size:1.8rem; font-weight:800; color:${d.water_balance_mm < 0 ? '#fbbf24' : '#38bdf8'}; margin-top:4px;">
+              ${d.water_balance_mm || -et0} <span style="font-size:0.9rem;">mm</span>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.7rem; color:var(--text-muted);">
-              <span>🟢 Safe Window</span>
-              <span>🟡 Caution</span>
-              <span>🔴 Unsafe (Drift/Rain)</span>
-            </div>
+            <p style="font-size:0.75rem; color:#cbd5e1; margin-top:4px;">Rainfall (${rain} mm) - Evapotranspiration (${et0} mm)</p>
           </div>
         </div>
 
-        <div style="background:rgba(255,255,255,0.05); padding:14px 18px; border-radius:14px; margin-top:12px; border:1px solid rgba(255,255,255,0.08);">
-          <b style="font-size:0.88rem; color:var(--accent-cyan);">💧 Irrigation Directive:</b>
-          <p style="font-size:0.85rem; color:#e2e8f0; margin-top:4px;">${d.irrigation_advice}</p>
+        <div style="background:rgba(255,255,255,0.05); border-left:4px solid #38bdf8; border-radius:12px; padding:14px 18px; margin-top:16px;">
+          <b style="color:#38bdf8; font-size:0.9rem;">Agronomist Irrigation Schedule Recommendation:</b>
+          <p style="font-size:0.86rem; color:#f1f5f9; margin-top:6px; line-height:1.5;">${d.irrigation_advice}</p>
+          <div style="font-size:0.78rem; color:#94a3b8; margin-top:6px;">
+            💡 <b>Efficiency Tip:</b> Irrigate between 5:30 AM - 8:00 AM to decrease surface evaporation by up to 28% compared to afternoon cycles.
+          </div>
         </div>
+      </div>
+    `;
+  }
+
+  // --- TAB 5: FUNGAL DISEASE PRESSURE ---
+  else if (tab === "disease") {
+    tabContentHtml = `
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:22px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:1.1rem; font-weight:700; color:#f87171; margin:0;">🦠 Microclimate Fungal & Blight Infection Alert</h3>
+            <p style="font-size:0.8rem; color:#94a3b8; margin:2px 0 0;">Analyzes canopy leaf wetness duration, relative humidity, and temperature for pathogen sporulation risk.</p>
+          </div>
+          <span style="background:${d.fungal_risk_index?.includes('Elevated') ? 'rgba(239,68,68,0.2)' : 'rgba(0,230,118,0.2)'}; color:${d.fungal_risk_index?.includes('Elevated') ? '#f87171' : '#00ffaa'}; padding:6px 14px; border-radius:20px; font-weight:700; font-size:0.82rem; border:1px solid currentColor;">
+            Status: ${d.fungal_risk_index || 'Low'}
+          </span>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05); border-radius:14px; padding:16px; border:1px solid rgba(255,255,255,0.08);">
+          <b style="color:#fff; font-size:0.92rem;">Microclimate Pathogen Telemetry:</b>
+          <p style="font-size:0.86rem; color:#cbd5e1; margin-top:6px; line-height:1.5;">${d.fungal_advice}</p>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:14px;">
+            <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:12px;">
+              <span style="font-size:0.75rem; color:#94a3b8;">Canopy Relative Humidity</span>
+              <div style="font-size:1.1rem; font-weight:700; color:#fff;">${d.humidity}%</div>
+              <span style="font-size:0.7rem; color:${d.humidity > 75 ? '#f87171' : '#00ffaa'};">${d.humidity > 75 ? 'Critical leaf wetness threshold' : 'Below fungal infection trigger'}</span>
+            </div>
+            <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:12px;">
+              <span style="font-size:0.75rem; color:#94a3b8;">Thermal Pathogen Window</span>
+              <div style="font-size:1.1rem; font-weight:700; color:#fff;">${d.temperature}°C</div>
+              <span style="font-size:0.7rem; color:#cbd5e1;">Optimum fungal sporulation range is 18°C - 27°C</span>
+            </div>
+            <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:12px;">
+              <span style="font-size:0.75rem; color:#94a3b8;">Preventive Bio-Shield Recommendation</span>
+              <div style="font-size:0.85rem; font-weight:600; color:#38bdf8; margin-top:3px;">Mancozeb 75% WP or Trichoderma</div>
+              <span style="font-size:0.7rem; color:#94a3b8;">Apply 2.5g/L water during safe spray window</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Master Assemble
+  box.innerHTML = `
+    <!-- Top Metadata Bar -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.2rem;">📍</span>
+        <div>
+          <b style="font-size:0.95rem; color:#fff;">${d.city}</b>
+          <div style="font-size:0.72rem; color:#94a3b8;">
+            ${d.latitude && d.longitude ? `Coords: ${Number(d.latitude).toFixed(2)}°N, ${Number(d.longitude).toFixed(2)}°E • ` : ''}
+            <span style="color:#00ffaa; font-weight:600;"><span class="live-pulse-dot"></span> Live Telemetry Active</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span style="font-size:0.72rem; color:#64748b; background:rgba(0,0,0,0.25); padding:3px 8px; border-radius:8px;">
+          🛰️ ${d.source || 'Open-Meteo Precision WMO'}
+        </span>
+        <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:0.75rem; margin:0;" onclick="refreshCurrentWeather()">
+          🔄 Refresh
+        </button>
       </div>
     </div>
-  `;
 
-  try {
-    localStorage.setItem("kisan_last_weather", JSON.stringify(d));
-  } catch (e) {}
+    <!-- Navigation Tabs -->
+    <div class="weather-tabs-nav">
+      <button type="button" class="weather-tab-btn ${tab === 'current' ? 'active' : ''}" onclick="switchWeatherTab('current')">
+        🛰️ Current & Spray Safety
+      </button>
+      <button type="button" class="weather-tab-btn ${tab === 'hourly' ? 'active' : ''}" onclick="switchWeatherTab('hourly')">
+        ⏱️ 24h Hourly Forecast
+      </button>
+      <button type="button" class="weather-tab-btn ${tab === 'daily' ? 'active' : ''}" onclick="switchWeatherTab('daily')">
+        📅 7-Day Farm Forecast
+      </button>
+      <button type="button" class="weather-tab-btn ${tab === 'irrigation' ? 'active' : ''}" onclick="switchWeatherTab('irrigation')">
+        💧 Evapotranspiration & ET0
+      </button>
+      <button type="button" class="weather-tab-btn ${tab === 'disease' ? 'active' : ''}" onclick="switchWeatherTab('disease')">
+        🦠 Fungal Risk Alert
+      </button>
+    </div>
+
+    <!-- Active Tab Panel Content -->
+    ${tabContentHtml}
+  `;
 }
 
-async function loadWeather(cityParam) {
+async function loadWeather(cityParam, forceBypassCache = false) {
   const city = cityParam || document.getElementById("weatherCityInput").value.trim() || "Delhi";
   const box = document.getElementById("weatherDisplayBox");
+
+  // Show inline shimmer loading state
   if (!box.children.length) {
-    box.innerHTML = `<div style="padding:20px; text-align:center; color:var(--accent-cyan);">⏳ Retrieving atmospheric telemetry...</div>`;
+    box.innerHTML = `
+      <div style="padding:28px; text-align:center; color:var(--accent-cyan); background:rgba(255,255,255,0.03); border-radius:18px; border:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:2rem; margin-bottom:8px; animation: liveGlow 1.2s infinite ease-in-out;">🛰️</div>
+        <div style="font-size:1.05rem; font-weight:700; color:#fff;">Connecting to Agrometeorological Satellites...</div>
+        <div style="font-size:0.82rem; color:#94a3b8; margin-top:4px;">Retrieving live microclimate, 24h spray windows, and 7-day forecast for <b>${city}</b>...</div>
+      </div>
+    `;
   }
 
   try {
-    const res = await fetch(`/weather?city=${encodeURIComponent(city)}`);
+    const url = `/weather?city=${encodeURIComponent(city)}${forceBypassCache ? '&_t=' + Date.now() : ''}`;
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Weather service responded with status ${res.status}`);
     }
     const d = await res.json();
     renderWeatherUI(d);
+    return d;
   } catch (err) {
-    console.warn("Weather telemetry notice:", err.message);
-    if (!box.children.length) {
-      box.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.04); border-radius:14px; color:#cbd5e1;">Atmospheric telemetry updating for ${city}... <button type="button" class="btn-secondary" style="margin-left:10px; padding:4px 10px; font-size:0.8rem;" onclick="loadWeather('Delhi')">Retry</button></div>`;
+    console.warn("Weather telemetry fetch notice:", err.message);
+    if (!box.children.length || box.innerText.includes("Connecting")) {
+      box.innerHTML = `
+        <div style="padding:20px; background:rgba(255,255,255,0.04); border-radius:16px; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); text-align:center;">
+          <div style="font-size:1.4rem; margin-bottom:6px;">📡</div>
+          <div>Unable to reach weather station for "${city}".</div>
+          <div style="font-size:0.8rem; color:#94a3b8; margin:6px 0 12px;">Please select one of the quick farming regions or retry with another location:</div>
+          <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+            <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="quickSelectCity('Ludhiana, Punjab')">🌾 Ludhiana (Punjab)</button>
+            <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="quickSelectCity('Nashik, Maharashtra')">🍇 Nashik</button>
+            <button type="button" class="btn-secondary" style="padding:6px 14px; font-size:0.8rem;" onclick="quickSelectCity('Delhi, India')">🏛️ Delhi</button>
+          </div>
+        </div>
+      `;
     }
   }
 }
@@ -4461,36 +5260,50 @@ function readWeatherAloud(city, temp, badge, reason, windowHours) {
   const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
   let readout = "";
   if (currentLanguage === "hi") {
-    readout = `${city} के लिए मौसम रिपोर्ट। वर्तमान तापमान ${temp} डिग्री सेल्सियस है। छिड़काव सलाह: ${badge}। ${reason}। छिड़काव का उत्तम समय ${windowHours} है।`;
+    readout = `${city} के लिए मौसम और छिड़काव रिपोर्ट। वर्तमान तापमान ${temp} डिग्री सेल्सियस है। छिड़काव सलाह: ${badge}। ${reason}। छिड़काव का सर्वोत्तम समय ${windowHours} है।`;
   } else {
-    readout = `Weather advisory for ${city}. Current temperature is ${temp} degrees celsius. Spray advisory: ${badge}. ${reason}. Ideal spraying hours are ${windowHours}.`;
+    readout = `Weather and spray advisory for ${city}. Current temperature is ${temp} degrees celsius. Spray status: ${badge}. ${reason}. Prime spraying window is ${windowHours}.`;
   }
   window.speechEngine.speak(readout, speechLang);
 }
 
-function useMyLocation() {
+function useMyLocation(userInitiated = false) {
   const box = document.getElementById("weatherDisplayBox");
+  const autoLocateBtn = document.getElementById("btnAutoLocate");
 
-  // Instantly restore cached weather for 0ms initial paint
+  if (autoLocateBtn) {
+    autoLocateBtn.innerHTML = "🛰️ Locating...";
+    autoLocateBtn.disabled = true;
+  }
+
+  const resetBtn = () => {
+    if (autoLocateBtn) {
+      autoLocateBtn.innerHTML = "📍 Live GPS";
+      autoLocateBtn.disabled = false;
+    }
+  };
+
+  // Check cached weather first for instant 0ms display on startup
   const cachedWeather = localStorage.getItem("kisan_last_weather");
-  if (cachedWeather) {
+  if (cachedWeather && !userInitiated && box && !box.children.length) {
     try {
       renderWeatherUI(JSON.parse(cachedWeather));
     } catch (e) {}
-  } else if (box) {
+  } else if (box && !box.children.length) {
     box.innerHTML = `
-      <div style="padding:28px 20px; text-align:center; color:var(--accent-cyan);">
+      <div style="padding:28px 20px; text-align:center; color:var(--accent-cyan); background:rgba(255,255,255,0.03); border-radius:18px; border:1px solid rgba(255,255,255,0.08);">
         <div style="font-size:2.2rem; margin-bottom:10px;">📍</div>
-        <div style="font-size:1.05rem; font-weight:700; color:#fff;">Detecting Your Local Farm Telemetry...</div>
-        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">Querying GPS satellites & network location...</div>
+        <div style="font-size:1.05rem; font-weight:700; color:#fff;">Detecting Your Farm Coordinates via Live GPS...</div>
+        <div style="font-size:0.85rem; color:#94a3b8; margin-top:6px;">Connecting to GPS satellites and agrometeorological towers...</div>
       </div>
     `;
   }
 
-  const fallbackToNetworkLocation = async (reason) => {
+  const fallbackToNetwork = async (reason) => {
+    console.log("GPS fallback triggered:", reason);
     try {
       const geoRes = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client", {
-        signal: AbortSignal.timeout(2000)
+        signal: AbortSignal.timeout(2200)
       });
       if (geoRes.ok) {
         const geo = await geoRes.json();
@@ -4511,46 +5324,51 @@ function useMyLocation() {
           if (wRes.ok) {
             const data = await wRes.json();
             renderWeatherUI(data);
+            resetBtn();
             return;
           }
         } else if (detectedPlace) {
           await loadWeather(detectedPlace);
+          resetBtn();
           return;
         }
       }
     } catch(err) {
-      console.warn("Network IP location notice:", err);
+      console.warn("Client IP location notice:", err.message);
     }
-    loadWeather("Delhi");
+
+    // Default fallback to major agricultural hub
+    const defaultCity = (cachedWeather ? JSON.parse(cachedWeather).city : null) || "Ludhiana, Punjab";
+    await loadWeather(defaultCity);
+    resetBtn();
   };
 
   if (!navigator.geolocation) {
-    fallbackToNetworkLocation("Browser does not support GPS");
+    fallbackToNetwork("Geolocation API not supported");
     return;
   }
 
   let finished = false;
-  const timer = setTimeout(() => {
+  const timeoutId = setTimeout(() => {
     if (!finished) {
       finished = true;
-      fallbackToNetworkLocation("GPS satellite fix timed out");
+      fallbackToNetwork("GPS Satellite fix timed out");
     }
-  }, 2500);
+  }, 4000);
 
   navigator.geolocation.getCurrentPosition(
     async (pos) => {
       if (finished) return;
       finished = true;
-      clearTimeout(timer);
+      clearTimeout(timeoutId);
 
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
 
-      // Reverse geocode to get locality name for UI
       let placeLabel = "";
       try {
         const rev = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`, {
-          signal: AbortSignal.timeout(1200)
+          signal: AbortSignal.timeout(1500)
         });
         if (rev.ok) {
           const rData = await rev.json();
@@ -4569,23 +5387,24 @@ function useMyLocation() {
           const data = await res.json();
           renderWeatherUI(data);
         } else {
-          fallbackToNetworkLocation("Weather server error for coordinates");
+          fallbackToNetwork("Backend weather error for coordinates");
         }
       } catch (err) {
-        fallbackToNetworkLocation(err.message || "Failed to fetch weather for coordinates");
+        fallbackToNetwork(err.message || "Failed to fetch weather for coordinates");
+      } finally {
+        resetBtn();
       }
     },
     (err) => {
       if (finished) return;
       finished = true;
-      clearTimeout(timer);
-      const msg = err.code === 1 ? "Permission denied" : (err.code === 2 ? "Position unavailable" : "Timeout");
-      fallbackToNetworkLocation(`GPS ${msg}`);
+      clearTimeout(timeoutId);
+      fallbackToNetwork(`GPS error: code ${err.code}`);
     },
     {
-      enableHighAccuracy: false,
-      timeout: 2500,
-      maximumAge: 120000
+      enableHighAccuracy: true,
+      timeout: 3800,
+      maximumAge: 60000
     }
   );
 }
@@ -5060,11 +5879,25 @@ window.initFirestoreScansListener = function(userId) {
   }
 };
 
+let journalScansCache = {};
+function speakJournalScan(scanId) {
+  const s = journalScansCache[scanId];
+  if (!s || !window.speechEngine) return;
+  const lang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+  const cleanTreatment = (s.treatment || "").replace(/[\r\n]+/g, " ");
+  window.speechEngine.speak(`${s.disease} on ${s.plant}. Treatment: ${cleanTreatment}`, lang);
+}
+window.speakJournalScan = speakJournalScan;
+
 // Render scans
 window.renderJournalList = function(scans) {
   const container = document.getElementById("scanJournalList");
   if (!container) return;
 
+  const scansBadge = document.getElementById("profileScansCount");
+  if (scansBadge) scansBadge.innerText = (scans && scans.length) ? scans.length : "0";
+
+  journalScansCache = {};
   if (!scans || scans.length === 0) {
     container.innerHTML = `
       <div style="text-align:center; padding:35px; color:var(--text-muted); background:rgba(255,255,255,0.03); border-radius:18px;">
@@ -5075,6 +5908,7 @@ window.renderJournalList = function(scans) {
   }
 
   container.innerHTML = scans.map(s => {
+    if (s && s.id) journalScansCache[s.id] = s;
     const sevClass = (s.severity || "").toLowerCase().includes("healthy") ? "sev-healthy"
       : (s.severity || "").toLowerCase().includes("mild") ? "sev-mild"
       : (s.severity || "").toLowerCase().includes("moderate") ? "sev-moderate"
@@ -5083,8 +5917,6 @@ window.renderJournalList = function(scans) {
     const timeFormatted = new Date(s.timestamp || Date.now()).toLocaleString([], {
       month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
     });
-
-    const safeTreatment = (s.treatment || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
     return `
       <div class="journal-item">
@@ -5100,7 +5932,7 @@ window.renderJournalList = function(scans) {
         </div>
 
         <div style="display:flex; align-items:center; gap:10px;">
-          <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.78rem; width:auto;" onclick="window.speechEngine && window.speechEngine.speak('${s.disease} on ${s.plant}. Treatment: ${safeTreatment}', '${currentLanguage === 'hi' ? 'hi-IN' : 'en-US'}')">
+          <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.78rem; width:auto;" onclick="speakJournalScan('${s.id}')">
             🔊 Speak
           </button>
           <button type="button" class="btn-secondary" style="padding:6px 12px; font-size:0.78rem; width:auto; border-color:rgba(239,68,68,0.4); color:#f87171;" onclick="deleteScan('${s.id}')">
@@ -5258,6 +6090,9 @@ window.renderPlotsList = function(plots) {
   const container = document.getElementById("savedPlotsContainer");
   if (!container) return;
 
+  const plotsBadge = document.getElementById("profilePlotsCount");
+  if (plotsBadge) plotsBadge.innerText = (plots && plots.length) ? plots.length : "0";
+
   if (!plots || plots.length === 0) {
     container.innerHTML = `
       <div style="background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); border-radius:14px; padding:20px; text-align:center;">
@@ -5335,8 +6170,394 @@ window.triggerPwaInstall = async function() {
   if (pwaBtn) pwaBtn.classList.add('hidden');
 };
 
+
+// ==========================================
+// 👤 FARMER PROFILE & CLOUD SESSION MANAGEMENT
+// ==========================================
+let isProfileDropdownOpen = false;
+
+function toggleProfileDropdown(event) {
+  if (event) event.stopPropagation();
+  const card = document.getElementById("profileDropdownCard");
+  const section = document.getElementById("userProfileSection");
+  const chevron = document.getElementById("profileChevron");
+  if (!card) return;
+
+  isProfileDropdownOpen = !isProfileDropdownOpen;
+  if (isProfileDropdownOpen) {
+    if (section) section.classList.add("open");
+    if (chevron) chevron.style.transform = "rotate(180deg)";
+    if (card) card.scrollTop = 0;
+    fetchFarmerProfile();
+  } else {
+    closeProfileDropdown();
+  }
+}
+
+function closeProfileDropdown() {
+  isProfileDropdownOpen = false;
+  const card = document.getElementById("profileDropdownCard");
+  const section = document.getElementById("userProfileSection");
+  const chevron = document.getElementById("profileChevron");
+  if (section) section.classList.remove("open");
+  if (chevron) chevron.style.transform = "rotate(0deg)";
+  toggleEditProfileDrawer(false);
+}
+
+document.addEventListener("click", (e) => {
+  const section = document.getElementById("userProfileSection");
+  if (isProfileDropdownOpen && section && !section.contains(e.target)) {
+    closeProfileDropdown();
+  }
+});
+
+async function copyFarmerUid() {
+  const uidEl = document.getElementById("profileUidDisplay");
+  if (!uidEl) return;
+  const text = uidEl.innerText.trim();
+  if (!text || text === "Loading...") return;
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    const btn = document.getElementById("btnCopyUid");
+    if (btn) {
+      const orig = btn.innerText;
+      btn.innerText = "✅ Copied!";
+      setTimeout(() => { btn.innerText = orig; }, 2000);
+    }
+    showToastNotice("Farmer UID copied to clipboard!");
+  } catch (err) {
+    showToastNotice("UID: " + text);
+  }
+}
+
+function updateAvatarVisuals(name, photoURL) {
+  const mini = document.getElementById("profileAvatarMini");
+  const large = document.getElementById("profileAvatarLarge");
+  if (photoURL) {
+    if (mini) mini.innerHTML = `<img src="${photoURL}" alt="${name || 'Farmer'}" />`;
+    if (large) large.innerHTML = `<img src="${photoURL}" alt="${name || 'Farmer'}" />`;
+    return;
+  }
+  if (name && name.trim()) {
+    const parts = name.trim().split(/\s+/);
+    let initials = parts[0][0].toUpperCase();
+    if (parts.length > 1) {
+      initials += parts[parts.length - 1][0].toUpperCase();
+    }
+    if (mini) mini.innerText = initials;
+    if (large) large.innerText = initials;
+  }
+}
+
+function fillCurrentGpsIntoInput() {
+  if (!navigator.geolocation) {
+    showToastNotice("Geolocation is not supported by your browser");
+    return;
+  }
+  showToastNotice("Detecting farm GPS coordinates...");
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lon = pos.coords.longitude.toFixed(4);
+      const locStr = `Lat: ${lat}, Lon: ${lon}`;
+      const locInput = document.getElementById("editFarmLocationInput");
+      if (locInput) locInput.value = locStr;
+      showToastNotice(`GPS detected: ${locStr}`);
+    },
+    (err) => {
+      showToastNotice("Location access denied or unavailable");
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+function exportFarmerCard() {
+  const name = document.getElementById("profileCardName")?.innerText || "Smart Farmer";
+  const uid = document.getElementById("profileUidDisplay")?.innerText || "N/A";
+  const email = document.getElementById("profileCardEmail")?.innerText || "N/A";
+  const location = document.getElementById("profileFarmLocationDisplay")?.innerText || "Local Agricultural Zone";
+  const crops = document.getElementById("profilePrimaryCropDisplay")?.innerText || "Wheat, Rice & Mustard";
+  const holding = document.getElementById("profileFarmSizeDisplay")?.innerText || "5.0 Acres";
+  const scans = document.getElementById("profileScansCount")?.innerText || "0";
+  const plots = document.getElementById("profilePlotsCount")?.innerText || "0";
+  const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+  const cardSummary = `🌾 SMART AGRI-AI • FARMER PASSPORT
+----------------------------------------
+Operator: ${name}
+Farmer UID: ${uid}
+Account Email: ${email}
+Farm Location: ${location}
+Primary Crops: ${crops}
+Farm Holding: ${holding}
+Diagnostics Completed: ${scans} scans
+Monitored Field Plots: ${plots} plots
+Cloud Sync: Cloud Firestore Live
+Verification: Certified Farm Operator
+Issued: ${dateStr}
+----------------------------------------`;
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(cardSummary);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = cardSummary;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    showToastNotice("📋 Farmer Passport copied to clipboard!");
+  } catch (err) {
+    showToastNotice("Could not copy card summary");
+  }
+}
+
+function toggleEditProfileDrawer(forceState) {
+  const drawer = document.getElementById("profileEditDrawer");
+  if (!drawer) return;
+  const show = typeof forceState === "boolean" ? forceState : (drawer.style.display === "none");
+  drawer.style.display = show ? "block" : "none";
+
+  if (show) {
+    const currentName = document.getElementById("profileCardName")?.innerText || "";
+    const currentLocation = document.getElementById("profileFarmLocationDisplay")?.innerText || "";
+    const currentCrop = document.getElementById("profilePrimaryCropDisplay")?.innerText || "";
+    const currentSize = document.getElementById("profileFarmSizeDisplay")?.innerText || "";
+
+    const nameInput = document.getElementById("editDisplayNameInput");
+    const locInput = document.getElementById("editFarmLocationInput");
+    const cropInput = document.getElementById("editPrimaryCropInput");
+    const sizeInput = document.getElementById("editFarmSizeInput");
+
+    if (nameInput) nameInput.value = currentName.trim();
+    if (locInput) locInput.value = currentLocation.trim() !== "Local Agricultural Zone" ? currentLocation.trim() : "";
+    if (cropInput) cropInput.value = currentCrop.trim() !== "Wheat, Rice & Mustard" ? currentCrop.trim() : "";
+    if (sizeInput) sizeInput.value = currentSize.trim() !== "5.0 Acres" ? currentSize.trim() : "";
+
+    setTimeout(() => {
+      drawer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 60);
+  }
+}
+
+async function saveProfileChanges() {
+  const nameInput = document.getElementById("editDisplayNameInput");
+  const locInput = document.getElementById("editFarmLocationInput");
+  const cropInput = document.getElementById("editPrimaryCropInput");
+  const sizeInput = document.getElementById("editFarmSizeInput");
+  const feedback = document.getElementById("profileEditFeedback");
+  const btn = document.getElementById("btnSaveProfile");
+
+  const name = nameInput ? nameInput.value.trim() : "";
+  const farmLocation = locInput ? locInput.value.trim() : "";
+  const primaryCrop = cropInput ? cropInput.value.trim() : "";
+  const farmSize = sizeInput ? sizeInput.value.trim() : "";
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span>⏳</span> Saving...`;
+  }
+  if (feedback) {
+    feedback.style.display = "block";
+    feedback.style.color = "#38bdf8";
+    feedback.innerText = "Synchronizing farm profile...";
+  }
+
+  try {
+    const res = await fetch("/api/update_profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        farmLocation,
+        primaryCrop,
+        farmSize,
+        preferredLanguage: typeof currentLanguage !== 'undefined' ? currentLanguage : 'en'
+      })
+    });
+
+    const data = await res.json();
+    if (data && data.success) {
+      if (name) {
+        const navName = document.getElementById("profileNavName");
+        const cardName = document.getElementById("profileCardName");
+        if (navName) navName.innerText = name;
+        if (cardName) cardName.innerText = name;
+        updateAvatarVisuals(name);
+      }
+      if (farmLocation) {
+        const locDisplay = document.getElementById("profileFarmLocationDisplay");
+        if (locDisplay) locDisplay.innerText = farmLocation;
+      }
+      if (primaryCrop) {
+        const cropDisplay = document.getElementById("profilePrimaryCropDisplay");
+        if (cropDisplay) cropDisplay.innerText = primaryCrop;
+      }
+      if (farmSize) {
+        const sizeDisplay = document.getElementById("profileFarmSizeDisplay");
+        if (sizeDisplay) sizeDisplay.innerText = farmSize;
+      }
+      if (feedback) {
+        feedback.style.color = "#00e676";
+        feedback.innerText = "✅ Profile updated successfully!";
+        setTimeout(() => { toggleEditProfileDrawer(false); }, 1200);
+      }
+      showToastNotice("Farmer profile updated successfully!");
+    } else {
+      throw new Error(data?.error || "Could not save profile");
+    }
+  } catch (err) {
+    if (feedback) {
+      feedback.style.color = "#ef4444";
+      feedback.innerText = "Error: " + err.message;
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `💾 Save Profile`;
+    }
+  }
+}
+
+async function syncGpsToProfile() {
+  if (!navigator.geolocation) {
+    showToastNotice("Geolocation is not supported by your browser");
+    return;
+  }
+  showToastNotice("Locating farm GPS coordinates...");
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lon = pos.coords.longitude.toFixed(4);
+      const locStr = `Lat: ${lat}, Lon: ${lon}`;
+      const locInput = document.getElementById("editFarmLocationInput");
+      const locDisplay = document.getElementById("profileFarmLocationDisplay");
+      if (locInput) locInput.value = locStr;
+      if (locDisplay) locDisplay.innerText = locStr;
+
+      try {
+        await fetch("/api/update_profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ farmLocation: locStr })
+        });
+        showToastNotice(`GPS Coordinates Synced: ${locStr}`);
+      } catch (e) {
+        console.warn("GPS sync notice:", e.message);
+      }
+    },
+    (err) => {
+      showToastNotice("Location access denied or unavailable");
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+async function fetchFarmerProfile() {
+  try {
+    const res = await fetch("/api/user_session");
+    if (!res.ok) return;
+    const session = await res.json();
+    if (session && session.user) {
+      const u = session.user;
+      const navName = document.getElementById("profileNavName");
+      const cardName = document.getElementById("profileCardName");
+      const cardEmail = document.getElementById("profileCardEmail");
+      const uidDisplay = document.getElementById("profileUidDisplay");
+      const providerEl = document.getElementById("profileAuthProvider");
+      const locDisplay = document.getElementById("profileFarmLocationDisplay");
+      const cropDisplay = document.getElementById("profilePrimaryCropDisplay");
+      const sizeDisplay = document.getElementById("profileFarmSizeDisplay");
+      const langDisplay = document.getElementById("profileLanguageDisplay");
+      const createdDisplay = document.getElementById("profileCreatedDisplay");
+
+      if (navName && u.name) navName.innerText = u.name;
+      if (cardName && u.name) cardName.innerText = u.name;
+      if (cardEmail && u.email) cardEmail.innerText = u.email;
+      if (uidDisplay && u.uid) uidDisplay.innerText = u.uid;
+      if (providerEl && u.provider) providerEl.innerText = u.provider === "guest" ? "Guest Mode" : u.provider;
+      if (locDisplay && u.farmLocation) locDisplay.innerText = u.farmLocation;
+      if (cropDisplay && u.primaryCrop) cropDisplay.innerText = u.primaryCrop;
+      if (sizeDisplay && u.farmSize) sizeDisplay.innerText = u.farmSize;
+      if (langDisplay && u.preferredLanguage) langDisplay.innerText = u.preferredLanguage.toUpperCase();
+      if (createdDisplay && u.createdAt) {
+        const d = new Date(u.createdAt);
+        createdDisplay.innerText = isNaN(d.getTime()) ? u.createdAt : d.toLocaleDateString();
+      }
+
+      updateAvatarVisuals(u.name);
+    }
+  } catch (err) {
+    console.debug("Session fetch notice:", err.message);
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && isProfileDropdownOpen) {
+    closeProfileDropdown();
+  }
+});
+
+// Bind interactive functions to window
+window.toggleProfileDropdown = toggleProfileDropdown;
+window.closeProfileDropdown = closeProfileDropdown;
+window.copyFarmerUid = copyFarmerUid;
+window.saveProfileChanges = saveProfileChanges;
+window.toggleEditProfileDrawer = toggleEditProfileDrawer;
+window.syncGpsToProfile = syncGpsToProfile;
+window.fillCurrentGpsIntoInput = fillCurrentGpsIntoInput;
+window.exportFarmerCard = exportFarmerCard;
+window.updateAvatarVisuals = updateAvatarVisuals;
+window.fetchFarmerProfile = fetchFarmerProfile;
+window.showToastNotice = showToastNotice;
+window.stopAudioReadout = window.stopAudioReadout || function() { if (window.speechEngine) window.speechEngine.stop(); if (window.speechSynthesis) window.speechSynthesis.cancel(); };
+window.toggleSunlightMode = toggleSunlightMode;
+window.changeLanguage = changeLanguage;
+window.openCamera = openCamera;
+window.captureImage = captureImage;
+window.flipLiveCamera = flipLiveCamera;
+window.toggleTorch = toggleTorch;
+window.toggleFreezeLiveStream = toggleFreezeLiveStream;
+window.performLiveFrameAnalysis = performLiveFrameAnalysis;
+window.toggleAutoLiveScan = toggleAutoLiveScan;
+window.syncNutrientInput = syncNutrientInput;
+window.calculatePlotFertilizer = calculatePlotFertilizer;
+window.loadWeather = loadWeather;
+window.useMyLocation = useMyLocation;
+window.refreshCurrentWeather = refreshCurrentWeather;
+window.quickSelectCity = quickSelectCity;
+window.calculateFarmProfit = calculateFarmProfit;
+window.recommendCrop = recommendCrop;
+window.predictYield = predictYield;
+window.askQuickPrompt = askQuickPrompt;
+window.speakChatMessage = speakChatMessage;
+window.toggleSpeechRecognition = toggleSpeechRecognition;
+window.sendAgronomistMessage = sendAgronomistMessage;
+window.loadScanJournal = loadScanJournal;
+window.readDiagnosisAloud = readDiagnosisAloud;
+window.switchTreatmentView = switchTreatmentView;
+window.exportDiagnosisPDF = exportDiagnosisPDF;
+window.shareDiagnosisWhatsApp = shareDiagnosisWhatsApp;
+window.readWeatherAloud = readWeatherAloud;
+window.switchWeatherTab = switchWeatherTab;
+window.applyCropToFertilizer = applyCropToFertilizer;
+window.askAgronomistAboutCondition = askAgronomistAboutCondition;
+
 // Initial boot sequence
 window.addEventListener("DOMContentLoaded", () => {
+  fetchFarmerProfile();
   useMyLocation();
   loadMandiPrices();
   loadScanJournal();

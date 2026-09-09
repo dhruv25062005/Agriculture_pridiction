@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 // Import security and utility modules
 import logger from "./utils/logger.js";
@@ -19,9 +19,7 @@ import {
 import { 
   errorHandler, 
   notFoundHandler, 
-  asyncHandler,
-  ValidationError,
-  UnauthorizedError
+  asyncHandler
 } from "./middleware/errorHandler.js";
 import {
   validateFileUpload,
@@ -93,19 +91,8 @@ function getGenAIClient() {
 }
 
 // ===============================
-// LOAD CLASS NAMES & KNOWLEDGE BASE
+// COMPREHENSIVE AGRONOMIC KNOWLEDGE BASE (Disease & Pest Database)
 // ===============================
-const classNamesPath = path.join(__dirname, "model", "class_names.json");
-let classNames = [];
-try {
-  if (fs.existsSync(classNamesPath)) {
-    classNames = JSON.parse(fs.readFileSync(classNamesPath, "utf-8"));
-  }
-} catch (e) {
-  logger.warn("Could not read class_names.json: " + e.message);
-}
-
-// Comprehensive Agronomic Knowledge Base (Disease & Pest Database)
 const KNOWLEDGE_BASE = {
   "Tomato___Late_blight": {
     plant: "Tomato (Solanum lycopersicum)",
@@ -628,6 +615,8 @@ app.get("/api/user_session", (req, res) => {
     email: "farmer@smartagriculture.local",
     name: "Smart Farmer",
     farmLocation: "Local Agricultural Zone",
+    primaryCrop: "Wheat & Vegetables",
+    farmSize: "5 Acres",
     provider: "guest",
     createdAt: new Date().toISOString()
   };
@@ -641,7 +630,7 @@ app.get("/api/user_session", (req, res) => {
 
 app.post("/api/update_profile", validateProfileUpdate, strictRateLimiter, (req, res) => {
   try {
-    const { name, farmLocation, preferredLanguage } = req.body || {};
+    const { name, farmLocation, preferredLanguage, primaryCrop, farmSize } = req.body || {};
 
     if (!req.session.user) {
       req.session.user = {
@@ -649,6 +638,8 @@ app.post("/api/update_profile", validateProfileUpdate, strictRateLimiter, (req, 
         email: "farmer@smartagriculture.local",
         name: "Smart Farmer",
         farmLocation: "Local Agricultural Zone",
+        primaryCrop: "Wheat & Vegetables",
+        farmSize: "5 Acres",
         provider: "guest"
       };
     }
@@ -656,11 +647,14 @@ app.post("/api/update_profile", validateProfileUpdate, strictRateLimiter, (req, 
     if (name) req.session.user.name = String(name).slice(0, 100);
     if (farmLocation) req.session.user.farmLocation = String(farmLocation).slice(0, 120);
     if (preferredLanguage) req.session.user.preferredLanguage = String(preferredLanguage).slice(0, 10);
+    if (primaryCrop) req.session.user.primaryCrop = String(primaryCrop).slice(0, 80);
+    if (farmSize) req.session.user.farmSize = String(farmSize).slice(0, 60);
     req.session.user.updatedAt = new Date().toISOString();
 
     logger.info("Profile updated", { userId: req.session.user.uid });
 
     res.json({
+      success: true,
       status: "success",
       user: req.session.user
     });
@@ -698,11 +692,106 @@ app.get(["/signout", "/logout"], (req, res) => {
 });
 
 // ===============================
-// 🤖 GEMINI MULTIMODAL ANALYSIS
+// 🤖 GEMINI MULTIMODAL ANALYSIS & STRUCTURED SCHEMA
 // ===============================
+const diagnosisResponseSchema = {
+  type: Type.OBJECT,
+  properties: {
+    is_plant: {
+      type: Type.BOOLEAN,
+      description: "True if image contains an agricultural plant, crop, leaf, stem, flower, fruit, seedling, or insect pest on vegetation. False if human, face, selfie, skin, animal, room, furniture, or non-plant."
+    },
+    detected_subject: {
+      type: Type.STRING,
+      description: "Exact subject detected (e.g., 'Crop Foliage', 'Tomato Leaf', 'Human Face / Person', 'Indoor Room', 'Animal')"
+    },
+    plant: {
+      type: Type.STRING,
+      description: "Specific crop species name (e.g., 'Tomato', 'Potato', 'Corn', 'Rice', 'Wheat', 'Cotton', 'Apple', 'Grape', 'Pepper') or 'None (Non-Plant Subject)'"
+    },
+    disease: {
+      type: Type.STRING,
+      description: "Accurate pathology or condition name (e.g., 'Late Blight', 'Early Blight', 'Powdery Mildew', 'Bacterial Leaf Spot', 'Fall Armyworm Infestation', 'Healthy Plant Specimen', 'Non-Plant / Human Face Detected')"
+    },
+    severity: {
+      type: Type.STRING,
+      description: "'Healthy', 'Mild', 'Moderate', 'Critical', or 'N/A'"
+    },
+    cause: {
+      type: Type.STRING,
+      description: "'Fungal', 'Bacterial', 'Viral', 'Insect Pest', 'Nutrient Deficiency', 'Healthy', or 'Non-Agricultural Subject'"
+    },
+    is_healthy: {
+      type: Type.BOOLEAN,
+      description: "True if plant is healthy without disease or pest"
+    },
+    is_insect_caused: {
+      type: Type.BOOLEAN,
+      description: "True if symptoms are caused by insect or arthropod pests"
+    },
+    culprit_type: {
+      type: Type.STRING,
+      description: "'Pathogen', 'Insect Pest', 'Nutrient Deficiency', 'Healthy', or 'Non-Plant'"
+    },
+    culprit: {
+      type: Type.STRING,
+      description: "Scientific or common name of causal organism or pest, or 'Healthy Crop'"
+    },
+    damage_mechanism: {
+      type: Type.STRING,
+      description: "Symptom description, tissue lesions, or insect feeding mechanism"
+    },
+    confidence: {
+      type: Type.NUMBER,
+      description: "Confidence percentage from 80.0 to 99.9"
+    },
+    summary: {
+      type: Type.STRING,
+      description: "2-3 sentences of clear diagnostic assessment"
+    },
+    organic_treatment: {
+      type: Type.STRING,
+      description: "Organic bio-control or herbal remedy with specific dosage"
+    },
+    chemical_treatment: {
+      type: Type.STRING,
+      description: "Chemical active ingredient with dosage"
+    },
+    recovery_protocol: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Day-by-day IPM recovery steps"
+    },
+    prevention_tips: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Preventative agronomic measures"
+    }
+  },
+  required: [
+    "is_plant",
+    "detected_subject",
+    "plant",
+    "disease",
+    "severity",
+    "cause",
+    "is_healthy",
+    "is_insect_caused",
+    "culprit_type",
+    "culprit",
+    "damage_mechanism",
+    "confidence",
+    "summary",
+    "organic_treatment",
+    "chemical_treatment",
+    "recovery_protocol",
+    "prevention_tips"
+  ]
+};
+
 async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
-  // Use currently active, high-speed multimodal models (gemini-3.1-flash-lite, gemini-3.6-flash, gemini-flash-latest)
-  const candidateModels = ["gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-flash-latest", "gemini-3.8-flash"];
+  // Prioritize high-availability, low-latency vision models, with seamless fallback for peak demand periods
+  const candidateModels = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.8-flash"];
 
   for (const model of candidateModels) {
     for (let attempt = 1; attempt <= 2; attempt++) {
@@ -721,7 +810,9 @@ async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
             ]
           },
           config: {
-            responseMimeType: "application/json"
+            responseMimeType: "application/json",
+            responseSchema: diagnosisResponseSchema,
+            systemInstruction: "You are an expert plant pathologist, agricultural vision scientist, and entomologist. Inspect crop foliage, stems, fruits, pathology lesions, and pests with precision."
           }
         });
 
@@ -745,13 +836,18 @@ async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
       } catch (err) {
         const msg = err.message || "";
         const isQuota = msg.includes("quota") || msg.includes("resource_exhausted") || msg.includes("429");
-        const isTransient = !isQuota && (msg.includes("503") || msg.includes("UNAVAILABLE"));
+        const isTemporaryHighDemand = msg.includes("503") || msg.includes("UNAVAILABLE") || msg.includes("high demand");
 
-        if (isTransient && attempt === 1) {
-          await new Promise(r => setTimeout(r, 650));
+        if (isTemporaryHighDemand) {
+          logger.info(`Model ${model} experiencing temporary load (503); immediately switching to fallback candidate`);
+          break; // Immediately move to next candidate without hammering the overloaded model
+        }
+
+        if (attempt === 1 && !isQuota) {
+          await new Promise(r => setTimeout(r, 400));
           continue;
         }
-        logger.warn(`Model ${model} attempt ${attempt} notice: ${msg.slice(0, 100)}`);
+        logger.info(`Model ${model} notice: ${msg.slice(0, 100)}`);
         break;
       }
     }
@@ -1156,7 +1252,7 @@ app.post("/predict_yield", (req, res) => {
 // ===============================
 // 🤖 AI AGRONOMIST CHAT ("Kisan Mitra")
 // ===============================
-app.post("/api/agronomist_chat", strictRateLimiter, asyncHandler(async (req, res) => {
+app.post(["/api/agronomist_chat", "/chat_with_agronomist"], strictRateLimiter, asyncHandler(async (req, res) => {
   const userMessage = (req.body.message || "").trim();
   const userLang = (req.body.lang || "en").toLowerCase();
   const currentCrop = (req.body.crop || "").trim();
@@ -1184,7 +1280,7 @@ RULES:
 4. Keep the answer concise (2-4 clear bullet points or 100-180 words), respectful, encouraging, and free from unnecessary developer jargon.
 5. Emphasize safety: wearing gloves, pre-harvest interval (PHI), and avoiding pesticide spraying during high wind or bloom periods when bees pollinate.`;
 
-    const candidateModels = ["gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-flash-latest"];
+    const candidateModels = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.8-flash"];
     for (const m of candidateModels) {
       try {
         const result = await ai.models.generateContent({
@@ -1197,7 +1293,12 @@ RULES:
           break;
         }
       } catch (genErr) {
-        logger.warn(`AI chat candidate ${m} failed: ${genErr.message}`);
+        const msg = genErr.message || "";
+        if (msg.includes("503") || msg.includes("UNAVAILABLE") || msg.includes("high demand")) {
+          logger.info(`AI chat candidate ${m} temporarily busy (503); falling over to next model`);
+        } else {
+          logger.info(`AI chat candidate ${m} notice: ${msg.slice(0, 100)}`);
+        }
       }
     }
   }
@@ -1320,7 +1421,7 @@ app.post("/plot_fertilizer", validateFertilizerInput, (req, res) => {
 // ===============================
 // 💰 MARKET PRICES & PROFIT
 // ===============================
-app.get("/market_prices", (req, res) => {
+app.get(["/market_prices", "/mandi_prices"], (req, res) => {
   res.setHeader("Cache-Control", "public, max-age=180");
   res.json({
     commodities: MARKET_COMMODITIES,
@@ -1359,156 +1460,426 @@ app.post("/calculate_profit", validateProfitCalculation, (req, res) => {
 });
 
 // ===============================
-// 🌦️ WEATHER API
+// 🌦️ ADVANCED AGROMETEOROLOGICAL WEATHER & FORECASTING ENGINE
 // ===============================
 const weatherCache = new Map();
-const WEATHER_CACHE_TTL = 10 * 60 * 1000;
+const WEATHER_CACHE_TTL = 8 * 60 * 1000; // 8 minutes precision cache
+
+function decodeWmoCode(code, isDay = 1) {
+  switch (code) {
+    case 0:
+      return { condition: "Clear Skies", icon: isDay ? "☀️" : "🌙", severity: "optimal", description: "Clear conditions with optimal solar radiation for photosynthesis." };
+    case 1:
+      return { condition: "Mainly Clear", icon: isDay ? "🌤️" : "🌤️", severity: "optimal", description: "Slight cloud cover; high solar energy and stable wind conditions." };
+    case 2:
+      return { condition: "Partly Cloudy", icon: "⛅", severity: "optimal", description: "Scattered clouds; moderate evaporative demand." };
+    case 3:
+      return { condition: "Overcast", icon: "☁️", severity: "caution", description: "Full cloud cover; diminished transpiration and light intensity." };
+    case 45:
+    case 48:
+      return { condition: "Fog & Foliar Dew", icon: "🌫️", severity: "caution", description: "Dense fog; prolonged leaf surface wetness increases fungal sporulation." };
+    case 51:
+    case 53:
+    case 55:
+      return { condition: "Light Drizzle", icon: "🌦️", severity: "unsafe", description: "Persistent drizzle washes off non-systemic chemicals and contact dusts." };
+    case 61:
+    case 63:
+    case 65:
+      return { condition: "Moderate / Heavy Rain", icon: "🌧️", severity: "unsafe", description: "Precipitation event; complete wash-off hazard. Hold all foliar applications." };
+    case 66:
+    case 67:
+      return { condition: "Freezing Rain", icon: "🌧️", severity: "unsafe", description: "Freezing precipitation; risk of crop frost damage and stomatal shock." };
+    case 71:
+    case 73:
+    case 75:
+    case 77:
+      return { condition: "Snow / Frost Alert", icon: "❄️", severity: "unsafe", description: "Sub-zero tissue crystallization risk. Protect sensitive seedlings." };
+    case 80:
+    case 81:
+    case 82:
+      return { condition: "Scattered Rain Showers", icon: "🌧️", severity: "unsafe", description: "Unpredictable showers; delay fungicide and insecticide applications." };
+    case 85:
+    case 86:
+      return { condition: "Snow Showers", icon: "🌨️", severity: "unsafe", description: "Cold weather snap with precipitation." };
+    case 95:
+      return { condition: "Thunderstorm Warning", icon: "⛈️", severity: "unsafe", description: "Severe lightning and squalls; cease all field machinery operations." };
+    case 96:
+    case 99:
+      return { condition: "Severe Thunderstorm & Hail Hazard", icon: "⛈️", severity: "unsafe", description: "Hail and gale force wind risk; potential vegetative lodging." };
+    default:
+      return { condition: "Stable Atmosphere", icon: "🌤️", severity: "optimal", description: "Atmospheric indicators within standard agronomic ranges." };
+  }
+}
+
+function getCompassDirection(deg) {
+  if (deg === null || deg === undefined || isNaN(deg)) return { dir: "Variable", compass: "🧭" };
+  const dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const ix = Math.round((deg % 360) / 22.5) % 16;
+  return { dir: dirs[ix], compass: "🧭 " + dirs[ix] };
+}
 
 app.get("/weather", asyncHandler(async (req, res) => {
-  const city = req.query.city || "Delhi";
+  const cityParam = (req.query.city || "").trim();
+  const placeParam = (req.query.place || "").trim();
   const latParam = req.query.lat ? parseFloat(req.query.lat) : null;
   const lonParam = req.query.lon ? parseFloat(req.query.lon) : null;
 
-  const cacheKey = (latParam && lonParam) 
-    ? `geo:${latParam.toFixed(2)},${lonParam.toFixed(2)}`
-    : `city:${city.toLowerCase()}`;
+  const hasCoords = latParam !== null && !isNaN(latParam) && lonParam !== null && !isNaN(lonParam);
+  const cacheKey = hasCoords 
+    ? `geo:${latParam.toFixed(3)},${lonParam.toFixed(3)}`
+    : `city:${(cityParam || placeParam || "delhi").toLowerCase()}`;
 
   const cached = weatherCache.get(cacheKey);
   if (cached && (Date.now() - cached.timestamp < WEATHER_CACHE_TTL)) {
     res.setHeader("X-Cache", "HIT");
+    res.setHeader("Cache-Control", "public, max-age=300");
     return res.json(cached.data);
   }
 
-  let weatherData = null;
-  let weatherSource = "Open-Meteo Precision Agro-Forecast";
+  let lat = null;
+  let lon = null;
+  let locationName = placeParam || cityParam || "Delhi, India";
+  let resolvedAddress = "";
 
-  try {
-    let lat = latParam;
-    let lon = lonParam;
-    let locationName = city;
-
-    if (!lat || !lon) {
-      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`);
-      const geoData = await geoRes.json();
-      if (geoData.results?.length) {
-        lat = geoData.results[0].latitude;
-        lon = geoData.results[0].longitude;
-        locationName = geoData.results[0].name;
+  // 1. Resolve coordinates & geocoding
+  if (hasCoords) {
+    lat = latParam;
+    lon = lonParam;
+    // If place was not provided, attempt fast reverse-geocoding
+    if (!placeParam && !cityParam) {
+      try {
+        const revRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`, {
+          signal: AbortSignal.timeout(1800)
+        });
+        if (revRes.ok) {
+          const revData = await revRes.json();
+          const place = revData.locality || revData.city || revData.principalSubdivision;
+          const state = revData.principalSubdivision;
+          const country = revData.countryName || "";
+          locationName = place ? `${place}${state && state !== place ? ', ' + state : ''}${country ? ', ' + country : ''}` : `Field (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
+          resolvedAddress = locationName;
+        }
+      } catch (e) {
+        locationName = `Field (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
       }
     }
-
-    if (lat && lon) {
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,wind_speed_10m&forecast_days=2`;
-      const weatherRes = await fetch(weatherUrl);
-      const result = await weatherRes.json();
-      const current = result.current;
-
-      const temp = current?.temperature_2m ?? 26.5;
-      const humidity = current?.relative_humidity_2m ?? 65;
-      const windSpeed = current?.wind_speed_10m ?? 8.5;
-      const rain = current?.precipitation ?? 0.0;
-      const code = current?.weather_code ?? 0;
-
-      let conditionText = "Clear Skies";
-      if (code >= 51 && code <= 67) conditionText = "Light Rain / Drizzle";
-      else if (code >= 71 && code <= 86) conditionText = "Heavy Rain / Storm";
-      else if (code >= 1 && code <= 3) conditionText = "Partly Cloudy";
-      else if (code === 45 || code === 48) conditionText = "Foggy / High Humidity";
-
-      // Calculate upcoming 8-hour spray windows
-      const hourlyList = [];
-      if (result.hourly?.time) {
-        const nowIndex = new Date().getHours();
-        for (let i = nowIndex; i < Math.min(nowIndex + 12, result.hourly.time.length); i++) {
-          const hTime = result.hourly.time[i]?.slice(11, 16) || `${i}:00`;
-          const hTemp = result.hourly.temperature_2m[i];
-          const hWind = result.hourly.wind_speed_10m[i];
-          const hRainProb = result.hourly.precipitation_probability ? result.hourly.precipitation_probability[i] : 0;
-          const hHum = result.hourly.relative_humidity_2m[i];
-          const hSafe = hWind < 15 && hRainProb < 35 && hTemp <= 32;
-
-          hourlyList.push({
-            time: hTime,
-            temperature: hTemp,
-            humidity: hHum,
-            windSpeed: hWind,
-            rain_probability: hRainProb,
-            status: hSafe ? "Safe" : (hWind >= 15 ? "Wind Drift" : "Rain Risk")
-          });
+  } else {
+    const query = cityParam || placeParam || "Delhi";
+    try {
+      // Primary geocoder: Open-Meteo Geocoding
+      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`;
+      const geoRes = await fetch(geoUrl, { signal: AbortSignal.timeout(3000) });
+      if (geoRes.ok) {
+        const geoData = await geoRes.json();
+        if (geoData.results && geoData.results.length > 0) {
+          const top = geoData.results[0];
+          lat = top.latitude;
+          lon = top.longitude;
+          const parts = [top.name];
+          if (top.admin1 && top.admin1 !== top.name) parts.push(top.admin1);
+          if (top.country) parts.push(top.country);
+          locationName = parts.join(", ");
+          resolvedAddress = locationName;
         }
       }
+    } catch (e) {
+      logger.warn("Open-Meteo geocode notice: " + e.message);
+    }
 
-      weatherData = {
-        city: locationName,
-        temperature: temp,
-        humidity,
-        windSpeed,
-        precipitation: rain,
-        condition: conditionText,
-        hourly_forecast: hourlyList
-      };
+    // Fallback geocoder if Open-Meteo had no match for small villages/mandals
+    if (lat === null || lon === null) {
+      try {
+        const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+        const nomRes = await fetch(nomUrl, {
+          headers: { "User-Agent": "SmartAgriPrecisionForecast/2.0" },
+          signal: AbortSignal.timeout(2500)
+        });
+        if (nomRes.ok) {
+          const nomData = await nomRes.json();
+          if (nomData && nomData.length > 0) {
+            lat = parseFloat(nomData[0].lat);
+            lon = parseFloat(nomData[0].lon);
+            locationName = nomData[0].display_name.split(",").slice(0, 3).join(", ");
+            resolvedAddress = locationName;
+          }
+        }
+      } catch (e) {
+        logger.warn("Nominatim fallback geocode notice: " + e.message);
+      }
+    }
+
+    // Ultimate default if nothing resolved: Delhi Agricultural Plains
+    if (lat === null || lon === null) {
+      lat = 28.6139;
+      lon = 77.2090;
+      if (!cityParam) locationName = "Delhi, India";
+    }
+  }
+
+  // 2. Fetch full agrometeorological telemetry from Open-Meteo
+  let telemetry = null;
+  let weatherSource = "Open-Meteo WMO Precision Agrometeorology";
+
+  try {
+    const weatherParams = new URLSearchParams({
+      latitude: lat.toString(),
+      longitude: lon.toString(),
+      current: "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index",
+      hourly: "temperature_2m,relative_humidity_2m,dew_point_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,uv_index",
+      daily: "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,wind_direction_10m_dominant,et0_fao_evapotranspiration,uv_index_max",
+      timezone: "auto",
+      forecast_days: "7"
+    });
+
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?${weatherParams.toString()}`;
+    const weatherRes = await fetch(weatherUrl, { signal: AbortSignal.timeout(4500) });
+    if (weatherRes.ok) {
+      telemetry = await weatherRes.json();
     }
   } catch (e) {
-    logger.warn("Weather fetch error: " + e.message);
+    logger.warn("Agrometeorology live fetch notice: " + e.message);
   }
 
-  if (!weatherData) {
-    weatherData = {
-      city,
-      temperature: 27.5,
-      humidity: 62,
-      windSpeed: 8.8,
-      precipitation: 0.0,
-      condition: "Clear Skies",
-      hourly_forecast: []
-    };
+  // 3. Process Live Data or Generate Agro-Climatic Model
+  const current = telemetry?.current || {};
+  const temp = typeof current.temperature_2m === "number" ? current.temperature_2m : 28.2;
+  const feelsLike = typeof current.apparent_temperature === "number" ? current.apparent_temperature : Math.round(temp + 2);
+  const humidity = typeof current.relative_humidity_2m === "number" ? current.relative_humidity_2m : 64;
+  const windSpeed = typeof current.wind_speed_10m === "number" ? current.wind_speed_10m : 7.8;
+  const windGusts = typeof current.wind_gusts_10m === "number" ? current.wind_gusts_10m : Math.round(windSpeed * 1.35 * 10) / 10;
+  const windDirDeg = typeof current.wind_direction_10m === "number" ? current.wind_direction_10m : 270;
+  const windCompass = getCompassDirection(windDirDeg);
+  const rain = typeof current.precipitation === "number" ? current.precipitation : 0.0;
+  const pressure = typeof current.surface_pressure === "number" ? Math.round(current.surface_pressure) : 1008;
+  const uvIndex = typeof current.uv_index === "number" ? current.uv_index : 4.5;
+  const weatherCode = typeof current.weather_code === "number" ? current.weather_code : 0;
+  const isDay = current.is_day !== undefined ? current.is_day : 1;
+
+  const decoded = decodeWmoCode(weatherCode, isDay);
+
+  // 4. Compute 24-Hour Precision Hourly Spray & Weather Timeline
+  const hourlyList = [];
+  const hourlyData = telemetry?.hourly;
+  if (hourlyData && hourlyData.time && hourlyData.time.length > 0) {
+    const nowIso = new Date().toISOString();
+    let startIdx = 0;
+    // Find index matching current local time
+    for (let i = 0; i < hourlyData.time.length; i++) {
+      if (hourlyData.time[i] >= nowIso.slice(0, 13)) {
+        startIdx = i;
+        break;
+      }
+    }
+    const endIdx = Math.min(startIdx + 24, hourlyData.time.length);
+    for (let i = startIdx; i < endIdx; i++) {
+      const timeStr = hourlyData.time[i] || "";
+      const hourPart = timeStr.slice(11, 16);
+      const hTemp = hourlyData.temperature_2m ? hourlyData.temperature_2m[i] : temp;
+      const hHum = hourlyData.relative_humidity_2m ? hourlyData.relative_humidity_2m[i] : humidity;
+      const hDew = hourlyData.dew_point_2m ? hourlyData.dew_point_2m[i] : Math.round(hTemp - ((100 - hHum) / 5));
+      const hWind = hourlyData.wind_speed_10m ? hourlyData.wind_speed_10m[i] : windSpeed;
+      const hRainProb = hourlyData.precipitation_probability ? hourlyData.precipitation_probability[i] : 0;
+      const hRainMm = hourlyData.precipitation ? hourlyData.precipitation[i] : 0;
+      const hCode = hourlyData.weather_code ? hourlyData.weather_code[i] : 0;
+      const hDecoded = decodeWmoCode(hCode, 1);
+
+      // Hourly Spray Window Evaluation
+      let hSafety = "SAFE";
+      let hReason = "Optimal spray window (safe wind & zero wash-off)";
+      if (hWind >= 15 || hRainProb >= 40 || hRainMm > 0.2 || hTemp > 34) {
+        hSafety = "UNSAFE";
+        if (hWind >= 15) hReason = `High wind drift (${hWind} km/h > 15 km/h limit)`;
+        else if (hRainProb >= 40 || hRainMm > 0.2) hReason = `Rain wash-off risk (${hRainProb}% rain chance)`;
+        else hReason = `Thermal volatilization / foliar burn risk (${hTemp}°C > 34°C)`;
+      } else if (hWind >= 11 || hRainProb >= 25 || hTemp > 31 || (hTemp - hDew) < 1.8) {
+        hSafety = "CAUTION";
+        if (hWind >= 11) hReason = `Moderate wind (${hWind} km/h); use coarse drift nozzles`;
+        else if (hTemp > 31) hReason = `High ambient heat (${hTemp}°C); spray in early morning or evening`;
+        else hReason = `Dew condensation near leaf surface (${hHum}% humidity)`;
+      }
+
+      hourlyList.push({
+        time: hourPart,
+        fullTime: timeStr,
+        temperature: Math.round(hTemp * 10) / 10,
+        humidity: Math.round(hHum),
+        dewPoint: Math.round(hDew * 10) / 10,
+        windSpeed: Math.round(hWind * 10) / 10,
+        rainProbability: hRainProb,
+        precipitation: Math.round(hRainMm * 10) / 10,
+        condition: hDecoded.condition,
+        icon: hDecoded.icon,
+        spraySafety: hSafety,
+        sprayReason: hReason
+      });
+    }
   }
 
-  // Agronomic Spray Risk Assessment Calculation
-  const isWindSafe = weatherData.windSpeed < 15;
-  const isTempSafe = weatherData.temperature <= 32;
-  const isRainSafe = (weatherData.precipitation || 0) < 0.2;
-  const isOverallSafe = isWindSafe && isTempSafe && isRainSafe;
+  // 5. Compute 7-Day Precision Agricultural Daily Forecast
+  const dailyList = [];
+  const dailyData = telemetry?.daily;
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  if (dailyData && dailyData.time && dailyData.time.length > 0) {
+    for (let d = 0; d < Math.min(7, dailyData.time.length); d++) {
+      const dateStr = dailyData.time[d];
+      const dateObj = new Date(dateStr + "T00:00:00");
+      const dayName = d === 0 ? "Today" : (d === 1 ? "Tomorrow" : dayNames[dateObj.getDay()]);
+      const maxTemp = dailyData.temperature_2m_max ? dailyData.temperature_2m_max[d] : temp + 4;
+      const minTemp = dailyData.temperature_2m_min ? dailyData.temperature_2m_min[d] : temp - 5;
+      const rainSum = dailyData.precipitation_sum ? dailyData.precipitation_sum[d] : 0;
+      const rainProb = dailyData.precipitation_probability_max ? dailyData.precipitation_probability_max[d] : 0;
+      const maxWind = dailyData.wind_speed_10m_max ? dailyData.wind_speed_10m_max[d] : windSpeed;
+      const dCode = dailyData.weather_code ? dailyData.weather_code[d] : 0;
+      const dDecoded = decodeWmoCode(dCode, 1);
+      const et0 = dailyData.et0_fao_evapotranspiration ? dailyData.et0_fao_evapotranspiration[d] : 4.8;
+      const uvMax = dailyData.uv_index_max ? dailyData.uv_index_max[d] : 6;
 
-  // 0-100 Scientific Spray Index
-  let score = 100;
-  if (!isWindSafe) score -= 45;
-  else if (weatherData.windSpeed > 10) score -= 15;
-  if (!isTempSafe) score -= 25;
-  if (!isRainSafe) score -= 50;
-  score = Math.max(10, Math.min(100, score));
+      let dailySpray = "SAFE";
+      if (rainSum > 1.5 || rainProb > 45 || maxWind >= 16) dailySpray = "UNSAFE";
+      else if (rainSum > 0.2 || rainProb > 25 || maxWind >= 12 || maxTemp > 33) dailySpray = "CAUTION";
 
+      dailyList.push({
+        date: dateStr,
+        dayName,
+        condition: dDecoded.condition,
+        icon: dDecoded.icon,
+        tempMax: Math.round(maxTemp * 10) / 10,
+        tempMin: Math.round(minTemp * 10) / 10,
+        precipitationSum: Math.round(rainSum * 10) / 10,
+        rainProbability: rainProb,
+        maxWindSpeed: Math.round(maxWind * 10) / 10,
+        et0: Math.round(et0 * 10) / 10,
+        uvMax: Math.round(uvMax),
+        spraySafety: dailySpray
+      });
+    }
+  }
+
+  // 6. Agronomic Evapotranspiration (ET0) & Irrigation Deficit Calculation
+  const todayEt0 = dailyList[0]?.et0 || 4.8;
+  const todayRain = dailyList[0]?.precipitationSum || rain;
+  const waterBalanceMm = Math.round((todayRain - todayEt0) * 10) / 10;
+  // 1 mm of water over 1 acre = 4,046.86 Liters
+  const waterDeficitLitersPerAcre = waterBalanceMm < 0 ? Math.round(Math.abs(waterBalanceMm) * 4047) : 0;
+
+  // 7. Comprehensive Chemical & Biological Spray Safety Assessment
+  const isWindSafe = windSpeed < 14;
+  const isTempSafe = temp <= 32 && temp >= 12;
+  const isRainSafe = rain < 0.2 && (dailyList[0]?.rainProbability || 0) < 40;
+  const isHumiditySafe = humidity >= 38 && humidity <= 82;
+
+  let sprayScore = 100;
   const reasons = [];
-  if (isWindSafe) reasons.push(`Wind speed ${weatherData.windSpeed} km/h is below drift limit (15 km/h)`);
-  else reasons.push(`High wind (${weatherData.windSpeed} km/h) causes severe chemical spray drift`);
 
-  if (isTempSafe) reasons.push(`Temperature ${weatherData.temperature}°C avoids chemical volatilization`);
-  else reasons.push(`High temperature (${weatherData.temperature}°C) causes rapid droplet evaporation`);
+  if (windSpeed >= 15) {
+    sprayScore -= 45;
+    reasons.push(`High wind speed (${windSpeed} km/h, gusts ${windGusts} km/h) causes severe chemical spray drift to non-target areas`);
+  } else if (windSpeed > 10) {
+    sprayScore -= 15;
+    reasons.push(`Breeze (${windSpeed} km/h); use coarse droplet nozzles and spray with ${windCompass.dir} wind`);
+  } else {
+    reasons.push(`Wind velocity ${windSpeed} km/h (${windCompass.dir}) is ideal; negligible spray drift`);
+  }
 
-  if (isRainSafe) reasons.push("Dry conditions allow systemic chemical absorption (2-4 hrs)");
-  else reasons.push("Precipitation will wash off applied pesticides and fungicides");
+  if (temp > 32) {
+    sprayScore -= 30;
+    reasons.push(`High ambient temperature (${temp}°C) causes chemical volatilization and foliar scorch`);
+  } else if (temp < 10) {
+    sprayScore -= 20;
+    reasons.push(`Cold temperature (${temp}°C) constricts plant leaf stomata, diminishing systemic pesticide intake`);
+  } else {
+    reasons.push(`Temperature ${temp}°C is within optimal physiological assimilation range (15°C - 30°C)`);
+  }
 
-  const fungalRisk = (weatherData.humidity > 75 && weatherData.temperature >= 18 && weatherData.temperature <= 28)
-    ? "Elevated (Fungal spore germination favored)"
-    : "Low to Moderate";
+  if (rain >= 0.2 || (dailyList[0]?.rainProbability || 0) >= 50) {
+    sprayScore -= 45;
+    reasons.push(`Rainfall detected or impending (${dailyList[0]?.rainProbability || 0}% chance); chemical will wash off before 2hr rainfast period`);
+  } else {
+    reasons.push("Dry leaf canopy provides adequate 3-hour rainfast adhesion window");
+  }
+
+  if (humidity < 35) {
+    sprayScore -= 15;
+    reasons.push(`Low relative humidity (${humidity}%) accelerates droplet evaporation before target contact`);
+  } else if (humidity > 85) {
+    reasons.push(`High ambient humidity (${humidity}%) delays chemical drying; enhances fungal spore vulnerability`);
+  }
+
+  sprayScore = Math.max(10, Math.min(100, sprayScore));
+  const isOverallSafe = sprayScore >= 75;
+  const isCaution = sprayScore >= 50 && sprayScore < 75;
+
+  let sprayBadge = "🟢 Safe for Pesticide & Foliar Fertigation";
+  let spraySafety = "SAFE";
+  let sprayStatus = "Optimal Spray Window";
+  if (!isOverallSafe) {
+    if (isCaution) {
+      sprayBadge = "🟡 Caution: Marginal Spray Conditions";
+      spraySafety = "CAUTION";
+      sprayStatus = "Spray with Caution (Use Coarse Droplets)";
+    } else {
+      sprayBadge = "🔴 Hold Spraying (Adverse Microclimate)";
+      spraySafety = "UNSAFE";
+      sprayStatus = "Cease Foliar Applications";
+    }
+  }
+
+  // 8. Fungal Blight & Pest Proliferation Telemetry
+  let fungalRiskLevel = "Low";
+  let fungalAdvice = "Microclimate is dry and stable. Standard preventive scouting recommended.";
+  if (humidity > 78 && temp >= 17 && temp <= 27) {
+    fungalRiskLevel = "Elevated (High Inoculum Pressure)";
+    fungalAdvice = "Warm humid canopy favors Late Blight (Phytophthora) and Downy Mildew. Apply preventive Mancozeb or Trichoderma bio-agent.";
+  } else if (humidity > 68 && temp >= 22) {
+    fungalRiskLevel = "Moderate";
+    fungalAdvice = "Monitor lower canopy leaves for powdery mildew and bacterial leaf spots.";
+  }
+
+  // 9. Evapotranspiration Irrigation Directive
+  let irrigationDirective = "";
+  if (todayRain > 5.0) {
+    irrigationDirective = `Precipitation of ${todayRain} mm recorded. Suspend drip and furrow irrigation cycles to avoid waterlogging and root hypoxia.`;
+  } else if (todayEt0 >= 5.0) {
+    irrigationDirective = `High daily evaporative loss (ET0: ${todayEt0} mm/day, ~${waterDeficitLitersPerAcre.toLocaleString()} L/acre). Schedule drip irrigation in early morning (45-60 mins) to balance transpiration deficit.`;
+  } else {
+    irrigationDirective = `Standard baseline evapotranspiration (ET0: ${todayEt0} mm/day, ~${waterDeficitLitersPerAcre.toLocaleString()} L/acre). Maintain normal vegetative irrigation schedule.`;
+  }
 
   const payload = {
-    ...weatherData,
+    city: locationName,
+    address: resolvedAddress || locationName,
+    latitude: lat,
+    longitude: lon,
+    temperature: temp,
+    apparent_temperature: feelsLike,
+    humidity,
+    windSpeed,
+    wind_gusts: windGusts,
+    wind_direction_deg: windDirDeg,
+    wind_direction_compass: windCompass.compass,
+    precipitation: rain,
+    surface_pressure: pressure,
+    uv_index: uvIndex,
+    condition: decoded.condition,
+    condition_icon: decoded.icon,
+    condition_description: decoded.description,
     source: weatherSource,
     spray_safe: isOverallSafe,
-    spray_score: score,
-    spray_status: isOverallSafe ? "Optimal Spray Window" : "Caution / Hold Spraying",
-    spray_badge: isOverallSafe ? "🟢 Safe for Pesticide & Fertilizer Spraying" : "🔴 Hold Spraying (Adverse Microclimate)",
-    spray_safety: isOverallSafe ? "SAFE" : "UNSAFE",
+    spray_score: sprayScore,
+    spray_status: sprayStatus,
+    spray_badge: sprayBadge,
+    spray_safety: spraySafety,
     spray_reason: reasons.join(". ") + ".",
-    spray_window: isOverallSafe ? "6:30 AM - 9:30 AM & 4:30 PM - 7:00 PM" : "Wait for wind < 14 km/h & dry weather",
+    spray_window: isOverallSafe ? "6:00 AM - 9:30 AM & 4:30 PM - 7:00 PM" : "Wait for wind < 14 km/h and dry conditions",
     spray_reasons: reasons,
-    irrigation_advice: weatherData.humidity < 50 
-      ? "Low ambient humidity detected. Increase drip irrigation volume by 15% to maintain soil root hydration."
-      : (weatherData.precipitation > 0.5 
-          ? "Precipitation recorded. Suspend drip cycles to avoid waterlogging and root hypoxia."
-          : "Standard baseline irrigation. Soil moisture is within optimal vegetative range."),
-    fungal_risk_index: fungalRisk
+    et0_evapotranspiration: todayEt0,
+    water_balance_mm: waterBalanceMm,
+    water_deficit_liters_acre: waterDeficitLitersPerAcre,
+    irrigation_advice: irrigationDirective,
+    fungal_risk_index: fungalRiskLevel,
+    fungal_advice: fungalAdvice,
+    hourly_forecast: hourlyList,
+    daily_forecast: dailyList
   };
 
   weatherCache.set(cacheKey, { timestamp: Date.now(), data: payload });

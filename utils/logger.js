@@ -1,18 +1,6 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const logsDir = path.join(__dirname, "../logs");
-
-// Create logs directory if it doesn't exist
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
 /**
- * Simple structured logger
- * Logs to console and file
+ * Simple structured console logger
+ * Standard stream logger for container & Cloud Run environments
  */
 class Logger {
   constructor(level = process.env.LOG_LEVEL || "info") {
@@ -45,28 +33,11 @@ class Logger {
   }
 
   /**
-   * Write log to file
-   */
-  writeToFile(level, formattedLog) {
-    const filename = path.join(logsDir, `${level}.log`);
-    const allFilename = path.join(logsDir, "combined.log");
-
-    try {
-      fs.appendFileSync(filename, formattedLog + "\n");
-      fs.appendFileSync(allFilename, formattedLog + "\n");
-    } catch (err) {
-      console.error("Failed to write log:", err.message);
-    }
-  }
-
-  /**
    * Log error level
    */
   error(message, meta = {}) {
     if (this.levels.error <= this.currentLevel) {
-      const formattedLog = this.formatLog("error", message, meta);
-      console.error(formattedLog);
-      this.writeToFile("error", formattedLog);
+      console.error(this.formatLog("error", message, meta));
     }
   }
 
@@ -75,9 +46,7 @@ class Logger {
    */
   warn(message, meta = {}) {
     if (this.levels.warn <= this.currentLevel) {
-      const formattedLog = this.formatLog("warn", message, meta);
-      console.warn(formattedLog);
-      this.writeToFile("warn", formattedLog);
+      console.warn(this.formatLog("warn", message, meta));
     }
   }
 
@@ -86,9 +55,7 @@ class Logger {
    */
   info(message, meta = {}) {
     if (this.levels.info <= this.currentLevel) {
-      const formattedLog = this.formatLog("info", message, meta);
-      console.log(formattedLog);
-      this.writeToFile("info", formattedLog);
+      console.log(this.formatLog("info", message, meta));
     }
   }
 
@@ -97,9 +64,7 @@ class Logger {
    */
   debug(message, meta = {}) {
     if (this.levels.debug <= this.currentLevel) {
-      const formattedLog = this.formatLog("debug", message, meta);
-      console.debug(formattedLog);
-      this.writeToFile("debug", formattedLog);
+      console.debug(this.formatLog("debug", message, meta));
     }
   }
 }
