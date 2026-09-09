@@ -3,6 +3,7 @@ import {
   db,
   doc,
   setDoc,
+  getDoc,
   firebaseReady,
   getFirebaseAuth,
   getFirebaseDB
@@ -57,16 +58,13 @@ export async function syncUserProfile(user, additionalData = {}) {
     updatedAt: new Date().toISOString()
   };
 
-  // Firestore rules require createdAt to stay unchanged on updates.
-  // Only write it when creating the profile for the first time.
-  if (!existing?.exists()) {
-    profile.createdAt = new Date().toISOString();
-  }
+  // Firestore rules require createdAt to remain unchanged on updates.
+  if (!existing?.exists()) profile.createdAt = new Date().toISOString();
 
   await setDoc(userRef, profile, { merge: true });
 }
 
-// Exchange a Firebase ID token for the server's secure HttpOnly session cookie.
+// Securely exchange a Firebase ID token for the server session.
 export async function establishServerSession(user, provider) {
   const idToken = await user.getIdToken(true);
   const response = await fetch("/set_session", {
@@ -84,9 +82,29 @@ export async function establishServerSession(user, provider) {
     } catch (_) {}
     throw new Error(message);
   }
-
   return response.json();
 }
+
+// Compatibility bridge for the existing signup.js. It injects a real Firebase
+// ID token into legacy /set_session calls; no client-supplied UID is trusted.
+const originalFetch = window.fetch.bind(window);
+window.fetch = async (input, init = {}) => {
+  try {
+    const requestUrl = typeof input === "string" ? input : input.url;
+    const pathname = new URL(requestUrl, window.location.href).pathname;
+    if (pathname === "/set_session" && auth?.currentUser && init?.body) {
+      let payload;
+      try { payload = JSON.parse(init.body); } catch (_) { payload = {}; }
+      if (!payload.idToken) {
+        payload.idToken = await auth.currentUser.getIdToken(true);
+        init = { ...init, body: JSON.stringify(payload) };
+      }
+    }
+  } catch (error) {
+    console.warn("Session token injection failed:", error.message);
+  }
+  return originalFetch(input, init);
+};
 
 if (signinForm) {
   signinForm.addEventListener("submit", async (e) => {
@@ -127,11 +145,11 @@ if (signinForm) {
       }
 
       const errCode = error.code || "";
-      if (errCode === "auth/invalid-credential" || errCode === "auth/user-not-found" || errCode === "auth/wrong-password") {
+      if (["auth/invalid-credential", "auth/user-not-found", "auth/wrong-password"].includes(errCode)) {
         showLoginMessage("error", "⚠️ Invalid email or password.");
       } else if (errCode === "auth/too-many-requests") {
         showLoginMessage("error", "⚠️ Too many attempts. Please wait a few minutes and try again.");
-      } else if (errCode === "auth/invalid-api-key" || errCode === "auth/api-key-not-valid") {
+      } else if (["auth/invalid-api-key", "auth/api-key-not-valid"].includes(errCode)) {
         showLoginMessage("error", "⚠️ Firebase configuration is invalid. Check FIREBASE_API_KEY and the Firebase project settings.");
       } else {
         showLoginMessage("error", `⚠️ ${String(error.message || "Authentication failed").replace("Firebase:", "").trim()}`);
