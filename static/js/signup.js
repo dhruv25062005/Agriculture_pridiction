@@ -3,7 +3,7 @@ import {
   firebaseReady,
   getFirebaseAuth
 } from "./firebase-config.js";
-import { syncUserProfile } from "./signin.js";
+import { syncUserProfile, establishServerSession } from "./signin.js";
 import { createUserWithEmailAndPassword } from
   "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
@@ -48,7 +48,6 @@ if (signupForm) {
       showSignupMessage("error", "⚠️ Please enter an email address and password.");
       return;
     }
-
     if (password.length < 6) {
       showSignupMessage("error", "⚠️ Password must be at least 6 characters long.");
       return;
@@ -59,52 +58,21 @@ if (signupForm) {
       submitBtn.textContent = "Creating Account...";
     }
 
-    await firebaseReady;
-    const currentAuth = auth || getFirebaseAuth();
-
-    if (!currentAuth) {
-      console.warn("Operating with local farmer session");
-      try {
-        await fetch("/set_session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid: "user-" + Date.now(),
-            email: email,
-            name: fullName,
-            provider: "local"
-          })
-        });
-        showSignupMessage("success", "✅ Account ready! Loading dashboard...");
-        window.location.href = "/signedin";
-      } catch (err) {
-        window.location.href = "/signedin";
-      }
-      return;
-    }
-
     try {
+      await firebaseReady;
+      const currentAuth = auth || getFirebaseAuth();
+      if (!currentAuth) throw new Error("Firebase Authentication is not configured. Check the Firebase environment variables.");
+
       const userCredential = await createUserWithEmailAndPassword(currentAuth, email, password);
-      console.log("✅ Signup successful:", userCredential.user.email);
+      const user = userCredential.user;
+
+      await syncUserProfile(user, { displayName: fullName });
+      await establishServerSession(user, "password");
 
       showSignupMessage("success", "✅ Account created successfully! Launching your smart farm...");
-      await syncUserProfile(userCredential.user, { displayName: fullName });
-
-      await fetch("/set_session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          uid: userCredential.user.uid,
-          email: userCredential.user.email,
-          name: fullName,
-          provider: "password"
-        })
-      });
-
       window.location.href = "/signedin";
-
     } catch (error) {
-      console.warn("Signup attempt notice:", error.code || error.message);
+      console.warn("Signup failed:", error.code || error.message);
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
@@ -112,39 +80,16 @@ if (signupForm) {
 
       const errCode = error.code || "";
       const errMsg = error.message || "";
-
       if (errCode === "auth/email-already-in-use") {
-        showSignupMessage("info", "🌱 An account with this email already exists. Redirecting to sign in...");
-        const signinEmail = document.getElementById("signin-email");
-        if (signinEmail) signinEmail.value = email;
-        setTimeout(() => {
-          if (typeof window.showLogin === "function") {
-            window.showLogin();
-          }
-        }, 1200);
+        showSignupMessage("info", "🌱 An account with this email already exists. Please sign in instead.");
       } else if (errCode === "auth/weak-password") {
-        showSignupMessage("error", "⚠️ Password is too weak. Please use at least 6 characters with mixed letters and numbers.");
+        showSignupMessage("error", "⚠️ Password is too weak. Please use at least 6 characters.");
       } else if (errCode === "auth/invalid-email") {
         showSignupMessage("error", "⚠️ Please enter a valid email address.");
-      } else if (errMsg.includes("Failed to fetch") || errMsg.includes("network")) {
-        showSignupMessage("info", "🌾 Network delay detected. Logging you in with offline farmer session...");
-        try {
-          await fetch("/set_session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              uid: "offline-" + Date.now(),
-              email: email,
-              name: fullName,
-              provider: "offline"
-            })
-          });
-          window.location.href = "/signedin";
-        } catch (e) {
-          window.location.href = "/signedin";
-        }
+      } else if (errCode === "auth/operation-not-allowed") {
+        showSignupMessage("error", "⚠️ Email/password authentication is disabled in Firebase. Enable it in Firebase Authentication.");
       } else {
-        showSignupMessage("error", `⚠️ ${errMsg.replace("Firebase:", "").trim()}`);
+        showSignupMessage("error", `⚠️ ${String(errMsg || "Account creation failed").replace("Firebase:", "").trim()}`);
       }
     }
   });
