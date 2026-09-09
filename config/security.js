@@ -155,6 +155,14 @@ export const firebaseSessionGuard = async (req, res, next) => {
 
 export const firebaseConfigMiddleware = (req, res, next) => {
   if (req.method !== "GET" || req.path !== "/firebase_config") return next();
+
+  // The current Firebase project uses a named Firestore database rather than
+  // the implicit "(default)" database. The value can be overridden on Render
+  // with FIREBASE_FIRESTORE_DATABASE_ID without changing application code.
+  const firestoreDatabaseId =
+    process.env.FIREBASE_FIRESTORE_DATABASE_ID?.trim() ||
+    "ai-studio-agriculturepridi-19ab2f13-4ebd-42d7-aaf0-74a8af5164fb";
+
   const config = {
     apiKey: process.env.FIREBASE_API_KEY || "",
     authDomain: process.env.FIREBASE_AUTH_DOMAIN || "",
@@ -163,7 +171,8 @@ export const firebaseConfigMiddleware = (req, res, next) => {
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "",
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "",
     appId: process.env.FIREBASE_APP_ID || "",
-    measurementId: process.env.FIREBASE_MEASUREMENT_ID || ""
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID || "",
+    firestoreDatabaseId
   };
   const missing = ["apiKey", "authDomain", "projectId", "appId"].filter(key => !config[key]);
   if (missing.length) return res.status(503).json({ error: "Firebase is not configured on the server.", missing });
