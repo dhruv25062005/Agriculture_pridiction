@@ -2,6 +2,7 @@ import express from "express";
 
 const COOKIE = "agri_session";
 const history = new Map();
+const observedApps = new WeakSet();
 
 function clearSession(res) {
   res.clearCookie(COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true", sameSite: "lax", path: "/" });
@@ -59,7 +60,10 @@ function observer(req, res, next) {
 
 const originalUse = express.application.use;
 express.application.use = function(route, ...handlers) {
-  if (typeof route === "function" && handlers.length === 0 && route !== observer) originalUse.call(this, observer);
+  if (typeof route === "function" && handlers.length === 0 && route !== observer && !observedApps.has(this)) {
+    observedApps.add(this);
+    originalUse.call(this, observer);
+  }
   return originalUse.call(this, route, ...handlers);
 };
 
