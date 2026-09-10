@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { getFirebaseAdminAuth } from "./config/security.js";
 
 const COOKIE = "agri_session";
 const history = new Map();
@@ -10,6 +11,27 @@ const DASHBOARD_BINDING_TAG = '<script src="/static/js/dashboard-bindings.js" de
 function clearSession(res) {
   res.clearCookie(COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true", sameSite: "lax", path: "/" });
   res.setHeader("Cache-Control", "no-store");
+}
+
+function readCookie(req, name) {
+  const header = String(req.headers.cookie || "");
+  for (const part of header.split(";")) {
+    const i = part.indexOf("=");
+    if (i < 0 || part.slice(0, i).trim() !== name) continue;
+    try { return decodeURIComponent(part.slice(i + 1).trim()); } catch { return part.slice(i + 1).trim(); }
+  }
+  return "";
+}
+
+async function verifyDashboardSession(req) {
+  const token = readCookie(req, COOKIE);
+  if (!token) return null;
+  try {
+    const decoded = await (await getFirebaseAdminAuth()).verifySessionCookie(token, true);
+    return decoded?.uid ? decoded : null;
+  } catch {
+    return null;
+  }
 }
 
 async function resolveLocation(req) {
@@ -40,7 +62,8 @@ async function weather(req, res) {
 }
 
 async function sendDashboard(req, res) {
-  if (!req.session?.user?.firebaseVerified || !req.session.user.uid) return res.redirect("/signin");
+  const session = await verifyDashboardSession(req);
+  if (!session) return res.redirect("/signin");
   try {
     const file = await fs.readFile(path.join(process.cwd(), "templates", "signedin.html"), "utf8");
     const html = file.includes("/static/js/dashboard-bindings.js") ? file : file.replace(/<\/body>/i, `${DASHBOARD_BINDING_TAG}\n</body>`);
@@ -80,10 +103,7 @@ express.application.use = function(route, ...handlers) {
 
 const originalGet = express.application.get;
 express.application.get = function(route, ...handlers) {
-  if (route === "/signedin") {
-    originalGet.call(this, "/__kisan_session_bootstrap", () => {});
-    return this.route(route).get(sendDashboard);
-  }
+  if (route === "/signedin") return this.route(route).get(sendDashboard);
   if (route === "/weather") return originalGet.call(this, route, weather);
   if (route === "/scan_history") return originalGet.call(this, route, (req, res) => {
     const uid = req.session?.user?.uid;
