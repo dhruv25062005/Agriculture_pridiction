@@ -4,7 +4,7 @@ import {
   getFirebaseAuth
 } from "./firebase-config.js";
 import { sendPasswordResetEmail } from
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 console.log("✅ forgot-password.js initialized");
 
@@ -45,18 +45,10 @@ if (forgotForm) {
       submitBtn.textContent = "Sending...";
     }
 
-    await firebaseReady;
-    const currentAuth = auth || getFirebaseAuth();
-
-    if (!currentAuth) {
-      showForgotMessage("info", `🌱 Password reset link sent to ${email}. Returning to sign in...`);
-      setTimeout(() => {
-        if (typeof window.showLogin === "function") window.showLogin();
-      }, 2000);
-      return;
-    }
-
     try {
+      await firebaseReady;
+      const currentAuth = auth || getFirebaseAuth();
+      if (!currentAuth) throw new Error("Firebase Authentication is not configured.");
       await sendPasswordResetEmail(currentAuth, email);
       showForgotMessage("success", "✅ Password reset link has been dispatched to your email inbox.");
       if (submitBtn) {
@@ -78,10 +70,7 @@ if (forgotForm) {
       } else if (error.code === "auth/invalid-email") {
         showForgotMessage("error", "⚠️ Please enter a valid email address.");
       } else if ((error.message || "").includes("Failed to fetch") || (error.message || "").includes("network")) {
-        showForgotMessage("info", `🌱 Reset request dispatched for ${email}. Returning to sign in...`);
-        setTimeout(() => {
-          if (typeof window.showLogin === "function") window.showLogin();
-        }, 2200);
+        showForgotMessage("error", "⚠️ Network error. Please check your connection and try again.");
       } else {
         showForgotMessage("error", `⚠️ ${error.message?.replace("Firebase:", "").trim() || "Could not send reset email."}`);
       }
