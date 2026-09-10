@@ -24,6 +24,59 @@
     } catch (_) {}
   }
 
+  /*
+   * Predict API bridge:
+   * The dashboard already knows how to render a structured non-plant response,
+   * but the legacy code treated every non-2xx response as a generic network
+   * error before it could read that JSON. Keep the real server status for all
+   * other endpoints, while normalizing only /predict 422/503 responses so the
+   * existing UI can display the actual reason returned by the server.
+   * A short client cooldown also prevents auto-scan from hammering Gemini when
+   * the provider is temporarily unavailable.
+   */
+  try {
+    if (!window.__KISAN_PREDICT_FETCH_BRIDGE__) {
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = async function (input, init) {
+        const rawUrl = typeof input === "string" ? input : (input?.url || "");
+        let pathname = "";
+        try { pathname = new URL(rawUrl, window.location.href).pathname; } catch (_) {}
+
+        if (pathname === "/predict" && !window.__KISAN_PREDICT_COOLDOWN_UNTIL__) {
+          const response = await nativeFetch(input, init);
+          if ((response.status === 422 || response.status === 503) && !response.bodyUsed) {
+            let payload = null;
+            try { payload = await response.clone().json(); } catch (_) {}
+            if (payload && typeof payload === "object") {
+              if (response.status === 503) {
+                window.__KISAN_PREDICT_COOLDOWN_UNTIL__ = Date.now() + 30000;
+              }
+              return new Response(JSON.stringify(payload), {
+                status: 200,
+                headers: { "Content-Type": "application/json" }
+              });
+            }
+          }
+          return response;
+        }
+
+        if (pathname === "/predict" && window.__KISAN_PREDICT_COOLDOWN_UNTIL__) {
+          const until = Number(window.__KISAN_PREDICT_COOLDOWN_UNTIL__) || 0;
+          if (Date.now() < until) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: "Plant diagnosis is temporarily unavailable. Please wait a few seconds and try again."
+            }), { status: 200, headers: { "Content-Type": "application/json" } });
+          }
+          delete window.__KISAN_PREDICT_COOLDOWN_UNTIL__;
+        }
+
+        return nativeFetch(input, init);
+      };
+      window.__KISAN_PREDICT_FETCH_BRIDGE__ = "2026-09-10-predict-bridge-1";
+    }
+  } catch (_) {}
+
   function byId(id) { return document.getElementById(id); }
 
   if (typeof window.toggleSunlightMode !== "function") {
@@ -79,5 +132,5 @@
     if (typeof window[name] !== "function") window[name] = unavailable(name);
   }
 
-  window.__KISAN_DASHBOARD_BINDINGS__ = "2026-09-10-rescue-2";
+  window.__KISAN_DASHBOARD_BINDINGS__ = "2026-09-10-rescue-3";
 })();
