@@ -1,5 +1,8 @@
 // KisanAI service worker: cache public static assets only.
-const CACHE_NAME = "kisan-ai-cache-v6";
+// IMPORTANT: navigation/authenticated requests are intentionally NOT intercepted.
+// This prevents a service-worker fetch rejection from turning normal server errors
+// into misleading "Failed to fetch" errors on /signedin and API endpoints.
+const CACHE_NAME = "kisan-ai-cache-v7";
 const PRECACHE_URLS = [
   "/static/manifest.json",
   "/static/smart_agri_hero.webp",
@@ -30,23 +33,26 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (event.request.method !== "GET" || !/^https?:$/.test(url.protocol)) return;
 
+  // Never intercept page navigation. The browser must receive the real
+  // /signin, /signedin, 4xx, 5xx, redirect, and server response directly.
+  if (event.request.mode === "navigate") return;
+
   const isAuthenticated =
-    url.pathname === "/signedin" ||
+    url.pathname === "/api/" ||
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/scan_history") ||
     url.pathname.startsWith("/predict") ||
     url.pathname.startsWith("/weather") ||
     url.pathname.startsWith("/market_prices") ||
     url.pathname.startsWith("/plot_fertilizer") ||
-    url.pathname.startsWith("/calculate_profit");
+    url.pathname.startsWith("/calculate_profit") ||
+    url.pathname === "/set_session" ||
+    url.pathname === "/signout" ||
+    url.pathname === "/logout";
 
-  // Never synthesize a 503 for an authenticated request. Doing so hides the
-  // real server/API response and makes Chrome report a misleading SW error.
-  // Always let the browser receive the actual network status/body.
-  if (event.request.mode === "navigate" || isAuthenticated) {
-    event.respondWith(fetch(event.request));
-    return;
-  }
+  // Never intercept authenticated/API traffic. This also means a temporary
+  // network failure is handled by the browser/app rather than by SW logic.
+  if (isAuthenticated) return;
 
   // Firebase configuration must never be served from a stale cache.
   if (url.pathname === "/static/js/firebase-config.js") {
@@ -59,13 +65,15 @@ self.addEventListener("fetch", event => {
       caches.match(event.request).then(cached => {
         if (cached) return cached;
         return fetch(event.request).then(response => {
-          if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone())).catch(() => {});
+          if (response.ok) {
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, response.clone()))
+              .catch(() => {});
+          }
           return response;
         });
       })
     );
     return;
   }
-
-  event.respondWith(fetch(event.request));
 });
