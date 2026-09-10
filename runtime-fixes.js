@@ -8,6 +8,7 @@ const history = new Map();
 const observedApps = new WeakSet();
 const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260910";
 const DASHBOARD_BINDING_TAG = `<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
+const DISABLED_SW = `// KisanAI service worker disabled for compatibility.\nconst KISANAI_SW_VERSION = "disabled-2026-09-10-v1";\nself.addEventListener("install", event => event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate", event => event.waitUntil(self.clients.claim()));\n`;
 
 function clearSession(res) {
   res.clearCookie(COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true", sameSite: "lax", path: "/" });
@@ -67,8 +68,6 @@ async function sendDashboard(req, res) {
   if (!session) return res.redirect("/signin");
   try {
     const file = await fs.readFile(path.join(process.cwd(), "templates", "signedin.html"), "utf8");
-    // Normalize every Firebase browser import to the same SDK version. The dashboard
-    // previously mixed 10.8.0 and 12.18.0, which can create auth/Firestore state issues.
     const normalized = file.replaceAll("https://www.gstatic.com/firebasejs/10.8.0/", "https://www.gstatic.com/firebasejs/12.18.0/");
     const withoutBindings = normalized.replace(/<script\s+src=["']\/static\/js\/dashboard-bindings\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
     const html = withoutBindings.replace(/<\/head>/i, `${DASHBOARD_BINDING_TAG}\n</head>`);
@@ -110,6 +109,13 @@ express.application.use = function(route, ...handlers) {
 
 const originalGet = express.application.get;
 express.application.get = function(route, ...handlers) {
+  if (route === "/sw.js") {
+    return originalGet.call(this, route, (_req, res) => {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
+      res.setHeader("Pragma", "no-cache");
+      res.type("application/javascript").send(DISABLED_SW);
+    });
+  }
   if (route === "/signedin") return this.route(route).get(sendDashboard);
   if (route === "/weather") return originalGet.call(this, route, weather);
   if (route === "/scan_history") return originalGet.call(this, route, (req, res) => {
