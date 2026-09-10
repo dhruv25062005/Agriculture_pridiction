@@ -1,8 +1,11 @@
 import express from "express";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 const COOKIE = "agri_session";
 const history = new Map();
 const observedApps = new WeakSet();
+const DASHBOARD_BINDING_TAG = '<script src="/static/js/dashboard-bindings.js" defer></script>';
 
 function clearSession(res) {
   res.clearCookie(COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true", sameSite: "lax", path: "/" });
@@ -42,6 +45,20 @@ async function weather(req, res) {
   }
 }
 
+async function sendDashboard(req, res) {
+  if (!req.session?.user?.firebaseVerified || !req.session.user.uid) return res.redirect("/signin");
+  try {
+    const file = await fs.readFile(path.join(process.cwd(), "templates", "signedin.html"), "utf8");
+    const html = file.includes("/static/js/dashboard-bindings.js") ? file : file.replace(/<\/body>/i, `${DASHBOARD_BINDING_TAG}\n</body>`);
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.type("html").send(html);
+  } catch (err) {
+    console.error("Dashboard render failed:", err.message);
+    res.status(500).send("Dashboard could not be loaded.");
+  }
+}
+
 function observer(req, res, next) {
   const originalJson = res.json.bind(res);
   res.json = payload => {
@@ -69,6 +86,7 @@ express.application.use = function(route, ...handlers) {
 
 const originalGet = express.application.get;
 express.application.get = function(route, ...handlers) {
+  if (route === "/signedin") return originalGet.call(this, route, sendDashboard);
   if (route === "/weather") return originalGet.call(this, route, weather);
   if (route === "/scan_history") return originalGet.call(this, route, (req, res) => {
     const uid = req.session?.user?.uid;
