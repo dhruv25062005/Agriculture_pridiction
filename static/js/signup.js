@@ -5,7 +5,7 @@ import {
 } from "./firebase-config.js";
 import { syncUserProfile, establishServerSession } from "./signin.js";
 import { createUserWithEmailAndPassword } from
-  "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 console.log("✅ signup.js initialized");
 
