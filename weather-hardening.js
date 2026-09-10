@@ -2,8 +2,6 @@ import "dotenv/config";
 import express from "express";
 
 // Strict validation layer for the existing /weather route.
-// It validates the location, verifies a live Open-Meteo forecast, and normalizes
-// the legacy agricultural response so every dashboard field has a stable name.
 const originalGet = express.application.get;
 const GEO_TIMEOUT = 5000;
 const WEATHER_TIMEOUT = 7000;
@@ -12,27 +10,12 @@ function validPlace(value) {
   const s = String(value ?? "").trim();
   return s.length >= 2 && s.length <= 100 && !/[\u0000-\u001f\u007f]/.test(s) && /[\p{L}\p{N}]/u.test(s);
 }
+function validCoords(lat, lon) { return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180; }
+function finite(value) { const n = Number(value); return Number.isFinite(n) ? n : null; }
+function firstFinite(...values) { for (const value of values) { const n = finite(value); if (n !== null) return n; } return null; }
 
-function validCoords(lat, lon) {
-  return Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-}
-
-function finite(value) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-function firstFinite(...values) {
-  for (const value of values) {
-    const n = finite(value);
-    if (n !== null) return n;
-  }
-  return null;
-}
-
-function normalizeWeatherPayload(payload) {
+function normalizeWeatherPayload(payload, liveVerified = false) {
   if (!payload || typeof payload !== "object" || payload.success === false) return payload;
-
   const out = { ...payload };
   const temp = firstFinite(out.temperature, out.temperature_2m);
   const humidity = firstFinite(out.humidity, out.relative_humidity_2m);
@@ -62,17 +45,13 @@ function normalizeWeatherPayload(payload) {
   let score = finite(out.spray_score);
   if (score === null) {
     score = 100;
-    if (wind !== null) {
-      if (wind >= 15) score -= 35;
-      else if (wind >= 11) score -= 15;
-    }
+    if (wind !== null) score -= wind >= 15 ? 35 : wind >= 11 ? 15 : 0;
     if (rain > 0.2) score -= rain >= 1.5 ? 35 : 20;
     if (humidity !== null && humidity < 35) score -= 15;
     if (temp !== null && temp > 34) score -= 20;
     score = Math.max(10, Math.min(100, score));
   }
   out.spray_score = Math.round(score);
-
   const safe = score >= 75;
   const caution = score >= 50 && score < 75;
   if (!out.spray_badge) out.spray_badge = safe ? "🟢 Safe for Pesticide & Foliar Fertigation" : caution ? "🟡 Caution: Marginal Spray Conditions" : "🔴 Hold Spraying (Adverse Microclimate)";
@@ -82,26 +61,22 @@ function normalizeWeatherPayload(payload) {
   if (!out.spray_reason) out.spray_reason = out.spray_reasons.join(". ") || (safe ? "Wind, rain and temperature are within the configured spray limits." : "Current weather conditions are not suitable for spraying.");
   if (!out.spray_window) out.spray_window = safe ? "6:00 AM - 9:30 AM & 4:30 PM - 7:00 PM" : "Wait for wind < 14 km/h and dry conditions";
 
-  const precipitation = rain;
   if (out.irrigation_advice == null) {
-    if (precipitation > 5) out.irrigation_advice = `Precipitation of ${precipitation} mm recorded. Suspend irrigation to avoid waterlogging.`;
+    if (rain > 5) out.irrigation_advice = `Precipitation of ${rain} mm recorded. Suspend irrigation to avoid waterlogging.`;
     else if (et0 !== null && et0 >= 5) out.irrigation_advice = `High daily ET0 (${et0.toFixed(1)} mm/day). Schedule irrigation in the early morning to reduce evaporative loss.`;
     else if (et0 !== null) out.irrigation_advice = `Standard ET0 (${et0.toFixed(1)} mm/day). Maintain the normal crop irrigation schedule.`;
     else out.irrigation_advice = "Irrigation advice is unavailable because ET0 data was not returned by the weather provider.";
   }
-
   if (!out.fungal_risk_index) {
     if (humidity !== null && temp !== null && humidity > 78 && temp >= 17 && temp <= 27) out.fungal_risk_index = "Elevated (High Inoculum Pressure)";
     else if (humidity !== null && temp !== null && humidity > 68 && temp >= 22) out.fungal_risk_index = "Moderate";
     else out.fungal_risk_index = "Low";
   }
-  if (!out.fungal_advice) {
-    out.fungal_advice = out.fungal_risk_index === "Low" ? "Microclimate is relatively stable. Continue regular crop scouting." : "Humidity and temperature favor disease development. Increase canopy scouting and avoid prolonged leaf wetness.";
-  }
-
+  if (!out.fungal_advice) out.fungal_advice = out.fungal_risk_index === "Low" ? "Microclimate is relatively stable. Continue regular crop scouting." : "Humidity and temperature favor disease development. Increase canopy scouting and avoid prolonged leaf wetness.";
   if (out.city == null) out.city = out.address || "Selected location";
-  if (out.source == null) out.source = "Open-Meteo";
-  if (out.live == null) out.live = true;
+  if (out.source == null && liveVerified) out.source = "Open-Meteo";
+  // Never label a legacy/fallback response as live merely because the response normalizer ran.
+  out.live = liveVerified || out.live === true;
   out.normalized_at = new Date().toISOString();
   return out;
 }
@@ -110,7 +85,7 @@ function installResponseNormalizer(req, res) {
   if (res.__weatherNormalizerInstalled) return;
   res.__weatherNormalizerInstalled = true;
   const originalJson = res.json.bind(res);
-  res.json = payload => originalJson(normalizeWeatherPayload(payload));
+  res.json = payload => originalJson(normalizeWeatherPayload(payload, Boolean(res.locals.weatherLiveVerified)));
 }
 
 async function resolvePlace(query) {
@@ -121,8 +96,7 @@ async function resolvePlace(query) {
   const results = Array.isArray(data.results) ? data.results : [];
   if (!results.length) return null;
   const top = results[0];
-  const lat = Number(top.latitude);
-  const lon = Number(top.longitude);
+  const lat = Number(top.latitude), lon = Number(top.longitude);
   if (!validCoords(lat, lon)) return null;
   const parts = [top.name, top.admin1, top.country].filter((v, i, a) => v && a.indexOf(v) === i);
   return { lat, lon, name: parts.join(", ") };
@@ -148,13 +122,12 @@ async function weatherGuard(req, res, next) {
     const hasLat = req.query.lat !== undefined;
     const hasLon = req.query.lon !== undefined;
     if (hasLat || hasLon) {
-      const lat = Number(req.query.lat);
-      const lon = Number(req.query.lon);
+      const lat = Number(req.query.lat), lon = Number(req.query.lon);
       if (!validCoords(lat, lon)) return res.status(400).json({ success: false, error: "Invalid coordinates. Latitude must be -90..90 and longitude -180..180." });
       await verifyLiveForecast(lat, lon);
+      res.locals.weatherLiveVerified = true;
       return next();
     }
-
     const city = String(req.query.city || req.query.place || "").trim();
     if (!validPlace(city)) return res.status(400).json({ success: false, error: "Enter a valid city, district, town or village name." });
     const resolved = await resolvePlace(city);
@@ -163,6 +136,7 @@ async function weatherGuard(req, res, next) {
     req.query.lon = String(resolved.lon);
     req.query.place = resolved.name;
     await verifyLiveForecast(resolved.lat, resolved.lon);
+    res.locals.weatherLiveVerified = true;
     return next();
   } catch (error) {
     console.error("Weather validation error:", error.message);
@@ -175,7 +149,6 @@ express.application.get = function patchedWeatherGet(route, ...handlers) {
   return originalGet.call(this, route, ...handlers);
 };
 
-// Prevent the dashboard's legacy loadWeather() helper from converting an empty search into a default city.
 const originalSendFile = express.response.sendFile;
 express.response.sendFile = function patchedSendFile(filePath, ...args) {
   if (!String(filePath).endsWith("/templates/signedin.html") && !String(filePath).endsWith("\\templates\\signedin.html")) return originalSendFile.call(this, filePath, ...args);
