@@ -6,7 +6,8 @@ import { getFirebaseAdminAuth } from "./config/security.js";
 const COOKIE = "agri_session";
 const history = new Map();
 const observedApps = new WeakSet();
-const DASHBOARD_BINDING_TAG = '<script src="/static/js/dashboard-bindings.js" defer></script>';
+const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260910";
+const DASHBOARD_BINDING_TAG = `<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
 
 function clearSession(res) {
   res.clearCookie(COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === "production" || process.env.RENDER === "true", sameSite: "lax", path: "/" });
@@ -66,9 +67,15 @@ async function sendDashboard(req, res) {
   if (!session) return res.redirect("/signin");
   try {
     const file = await fs.readFile(path.join(process.cwd(), "templates", "signedin.html"), "utf8");
-    const html = file.includes("/static/js/dashboard-bindings.js") ? file : file.replace(/<\/body>/i, `${DASHBOARD_BINDING_TAG}\n</body>`);
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    // Always replace any previous binding tag. This makes every deployment use
+    // the newest rescue script and prevents stale browser/CDN HTML from
+    // pointing at an old JavaScript asset.
+    const withoutBindings = file.replace(/<script\s+src=["']\/static\/js\/dashboard-bindings\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
+    const html = withoutBindings.replace(/<\/head>/i, `${DASHBOARD_BINDING_TAG}\n</head>`);
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    res.setHeader("Surrogate-Control", "no-store");
     res.type("html").send(html);
   } catch (err) {
     console.error("Dashboard render failed:", err.message);
