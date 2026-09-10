@@ -1,9 +1,6 @@
-// KisanAI Progressive Web App Service Worker
-const CACHE_NAME = "kisan-ai-cache-v2";
-
+// KisanAI service worker: cache public static assets only.
+const CACHE_NAME = "kisan-ai-cache-v3";
 const PRECACHE_URLS = [
-  "/signedin",
-  "/template",
   "/static/manifest.json",
   "/static/smart_agri_hero.webp",
   "/static/smart_agri_hero.jpg",
@@ -13,73 +10,20 @@ const PRECACHE_URLS = [
   "/static/icons/icon-192.png",
   "/static/icons/icon-512.png"
 ];
-
-// Install: pre-cache shell assets
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("🌾 KisanAI Service Worker: Pre-caching offline application shell");
-      return cache.addAll(PRECACHE_URLS).catch((err) => {
-        console.warn("PWA pre-cache notice (non-blocking):", err);
-      });
-    }).then(() => self.skipWaiting())
-  );
-});
-
-// Activate: cleanup stale caches
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            console.log("🧹 Clearing old service worker cache:", name);
-            return caches.delete(name);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-// Fetch: Stale-While-Revalidate for static assets, Network-First for APIs
-self.addEventListener("fetch", (event) => {
+self.addEventListener("install", event => event.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(PRECACHE_URLS).catch(()=>{})).then(()=>self.skipWaiting())));
+self.addEventListener("activate", event => event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
-
-  // Skip non-GET and chrome extensions
-  if (event.request.method !== "GET" || !url.protocol.startsWith("http")) {
+  if (event.request.method !== "GET" || !/^https?:$/.test(url.protocol)) return;
+  // Never cache authenticated pages, API responses, user data, uploads or history.
+  if (url.pathname === "/signedin" || url.pathname.startsWith("/api/") || url.pathname.startsWith("/scan_history") || url.pathname.startsWith("/predict") || url.pathname.startsWith("/weather") || url.pathname.startsWith("/market_prices") || url.pathname.startsWith("/plot_fertilizer") || url.pathname.startsWith("/calculate_profit")) {
+    event.respondWith(fetch(event.request));
     return;
   }
-
-  // API calls: Network-First with offline fallback
-  if (url.pathname.startsWith("/predict") || url.pathname.startsWith("/weather") || url.pathname.startsWith("/market_prices")) {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match(event.request);
-      })
-    );
+  if (url.pathname.startsWith("/static/")) {
+    event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => { if(response.ok)caches.open(CACHE_NAME).then(c=>c.put(event.request,response.clone())); return response; })));
     return;
   }
-
-  // App Shell & Static assets: Cache First with background network refresh
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        // Offline fallback for navigation requests
-        if (event.request.mode === "navigate") {
-          return caches.match("/signedin") || caches.match("/template");
-        }
-      });
-
-      return cachedResponse || fetchPromise;
-    })
-  );
+  // Do not cache arbitrary navigation responses; this avoids persisting signed-in HTML.
+  event.respondWith(fetch(event.request));
 });
