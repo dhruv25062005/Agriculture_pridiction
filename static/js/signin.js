@@ -53,26 +53,35 @@ document.getElementById("signin-password")?.addEventListener("input", clearLogin
 
 export async function syncUserProfile(user, additionalData = {}) {
   const currentDB = db || getFirebaseDB();
-  if (!currentDB || !user) throw new Error("Firebase Firestore is not initialized.");
-
-  const userRef = doc(currentDB, "users", user.uid);
-  let existing = null;
-  try {
-    existing = await getDoc(userRef);
-  } catch (error) {
-    console.warn("Could not read existing user profile:", error.message);
+  if (!currentDB || !user) {
+    console.warn("Firestore profile sync skipped: Firebase Firestore is not initialized.");
+    return false;
   }
 
-  const profile = {
-    userId: user.uid,
-    email: user.email || "",
-    displayName: user.displayName || additionalData.displayName || "Smart Farmer",
-    preferredLanguage: additionalData.preferredLanguage || "en",
-    updatedAt: new Date().toISOString()
-  };
+  try {
+    const userRef = doc(currentDB, "users", user.uid);
+    let existing = null;
+    try {
+      existing = await getDoc(userRef);
+    } catch (error) {
+      console.warn("Could not read existing user profile; continuing with sign-in:", error.message);
+    }
 
-  if (!existing?.exists()) profile.createdAt = new Date().toISOString();
-  await setDoc(userRef, profile, { merge: true });
+    const profile = {
+      userId: user.uid,
+      email: user.email || "",
+      displayName: user.displayName || additionalData.displayName || "Smart Farmer",
+      preferredLanguage: additionalData.preferredLanguage || "en",
+      updatedAt: new Date().toISOString()
+    };
+
+    if (!existing?.exists()) profile.createdAt = new Date().toISOString();
+    await setDoc(userRef, profile, { merge: true });
+    return true;
+  } catch (error) {
+    console.warn("Firestore profile sync unavailable; server authentication will continue:", error.message);
+    return false;
+  }
 }
 
 export async function establishServerSession(user, provider) {
