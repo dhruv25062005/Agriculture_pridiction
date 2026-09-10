@@ -67,10 +67,10 @@ async function sendDashboard(req, res) {
   if (!session) return res.redirect("/signin");
   try {
     const file = await fs.readFile(path.join(process.cwd(), "templates", "signedin.html"), "utf8");
-    // Always replace any previous binding tag. This makes every deployment use
-    // the newest rescue script and prevents stale browser/CDN HTML from
-    // pointing at an old JavaScript asset.
-    const withoutBindings = file.replace(/<script\s+src=["']\/static\/js\/dashboard-bindings\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
+    // Normalize every Firebase browser import to the same SDK version. The dashboard
+    // previously mixed 10.8.0 and 12.18.0, which can create auth/Firestore state issues.
+    const normalized = file.replaceAll("https://www.gstatic.com/firebasejs/10.8.0/", "https://www.gstatic.com/firebasejs/12.18.0/");
+    const withoutBindings = normalized.replace(/<script\s+src=["']\/static\/js\/dashboard-bindings\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
     const html = withoutBindings.replace(/<\/head>/i, `${DASHBOARD_BINDING_TAG}\n</head>`);
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
@@ -125,6 +125,18 @@ express.application.get = function(route, ...handlers) {
 const originalPost = express.application.post;
 express.application.post = function(route, ...handlers) {
   if (route === "/signout" || route === "/logout") return originalPost.call(this, route, (req, res) => { clearSession(res); history.delete(req.session?.user?.uid); res.json({ success: true }); });
-  if (route === "/scan_history/delete") return originalPost.call(this, route, (req, res) => { const uid=req.session?.user?.uid; if(!uid)return res.status(401).json({success:false,error:"Authentication required."}); history.delete(uid); res.json({success:true}); });
+  if (route === "/scan_history/delete") return originalPost.call(this, route, (req, res) => {
+    const uid = req.session?.user?.uid;
+    if (!uid) return res.status(401).json({ success: false, error: "Authentication required." });
+    const id = String(req.body?.id || "").trim();
+    const list = history.get(uid) || [];
+    if (!id) {
+      history.delete(uid);
+      return res.json({ success: true, deleted: "all" });
+    }
+    const next = list.filter(item => String(item?.id || "") !== id);
+    history.set(uid, next);
+    return res.json({ success: true, deleted: next.length !== list.length ? id : null });
+  });
   return originalPost.call(this, route, ...handlers);
 };

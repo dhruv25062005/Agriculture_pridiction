@@ -12,7 +12,7 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 console.log("✅ signin.js initialized");
 
@@ -20,7 +20,6 @@ const signinForm = document.getElementById("signin-form");
 const loginFeedback = document.getElementById("login-feedback");
 const googleBtns = document.querySelectorAll(".google-btn, #google-signin-btn, #google-signup-btn");
 
-// Authentication is mandatory. Disable any legacy guest-login UI/function.
 function disableGuestAccess() {
   document.querySelectorAll(".guest-btn").forEach((btn) => {
     btn.disabled = true;
@@ -76,7 +75,6 @@ export async function syncUserProfile(user, additionalData = {}) {
   await setDoc(userRef, profile, { merge: true });
 }
 
-// Exchange a freshly issued Firebase ID token for the signed server session.
 export async function establishServerSession(user, provider) {
   if (!user) throw new Error("No authenticated Firebase user was returned.");
   const idToken = await user.getIdToken(true);

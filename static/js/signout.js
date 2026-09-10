@@ -1,5 +1,5 @@
 import { auth } from "./firebase-config.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
 
 console.log("✅ signout.js loaded");
 
