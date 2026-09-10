@@ -1,5 +1,5 @@
 // KisanAI service worker: cache public static assets only.
-const CACHE_NAME = "kisan-ai-cache-v5";
+const CACHE_NAME = "kisan-ai-cache-v6";
 const PRECACHE_URLS = [
   "/static/manifest.json",
   "/static/smart_agri_hero.webp",
@@ -40,23 +40,17 @@ self.addEventListener("fetch", event => {
     url.pathname.startsWith("/plot_fertilizer") ||
     url.pathname.startsWith("/calculate_profit");
 
-  // Navigations must remain real network responses. A synthetic 503 here makes
-  // Chrome report a misleading HTTP failure when the network is temporarily down.
-  if (event.request.mode === "navigate") {
+  // Never synthesize a 503 for an authenticated request. Doing so hides the
+  // real server/API response and makes Chrome report a misleading SW error.
+  // Always let the browser receive the actual network status/body.
+  if (event.request.mode === "navigate" || isAuthenticated) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  if (isAuthenticated) {
-    event.respondWith(fetch(event.request).catch(error => {
-      console.warn("KisanAI authenticated request failed:", url.pathname, error?.message || error);
-      return new Response("Network unavailable", { status: 503, headers: { "Content-Type": "text/plain" } });
-    }));
-    return;
-  }
-
+  // Firebase configuration must never be served from a stale cache.
   if (url.pathname === "/static/js/firebase-config.js") {
-    event.respondWith(fetch(event.request, { cache: "no-store" }).catch(() => new Response("Firebase configuration unavailable", { status: 503, headers: { "Content-Type": "text/plain" } })));
+    event.respondWith(fetch(event.request, { cache: "no-store" }));
     return;
   }
 
@@ -68,7 +62,7 @@ self.addEventListener("fetch", event => {
           if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone())).catch(() => {});
           return response;
         });
-      }).catch(() => new Response("Asset unavailable", { status: 503 }))
+      })
     );
     return;
   }
