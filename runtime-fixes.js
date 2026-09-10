@@ -6,10 +6,10 @@ import { getFirebaseAdminAuth } from "./config/security.js";
 const COOKIE="agri_session";
 const history=new Map();
 const observedApps=new WeakSet();
-const DASHBOARD_BINDING_SRC="/static/js/dashboard-bindings.js?v=20260910-crop-yield-3";
+const DASHBOARD_BINDING_SRC="/static/js/dashboard-bindings.js?v=20260910-crop-yield-4";
 const DASHBOARD_BINDING_TAG=`<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
-const YIELD_UI_TAG=`<script src="/static/js/yield-ui-hardening.js?v=20260910-3" defer></script>`;
-const CROP_UI_TAG=`<script src="/static/js/crop-yield-ui-hardening.js?v=20260910-2" defer></script>`;
+const YIELD_UI_TAG=`<script src="/static/js/yield-ui-hardening.js?v=20260910-5" defer></script>`;
+const CROP_UI_TAG=`<script src="/static/js/crop-yield-ui-hardening.js?v=20260910-3" defer></script>`;
 const DISABLED_SW=`// KisanAI service worker disabled for compatibility.\nconst KISANAI_SW_VERSION="disabled-2026-09-10-v1";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));\n`;
 function clearSession(res){res.clearCookie(COOKIE,{httpOnly:true,secure:process.env.NODE_ENV==="production"||process.env.RENDER==="true",sameSite:"lax",path:"/"});res.setHeader("Cache-Control","no-store");}
 function readCookie(req,name){const header=String(req.headers.cookie||"");for(const part of header.split(";")){const i=part.indexOf("=");if(i<0||part.slice(0,i).trim()!==name)continue;try{return decodeURIComponent(part.slice(i+1).trim());}catch{return part.slice(i+1).trim();}}return "";}
