@@ -1,1 +1,13 @@
-/* crop UI */
+/* Clean climate recommendation UI: never displays unsupported yield placeholders. */
+(() => {
+  const V="2026-09-10-crop-ui-v2"; if(window.__KISAN_CROP_UI__===V)return; window.__KISAN_CROP_UI__=V;
+  const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;","`>":"&gt;","\"":"&quot;","'":"&#39;"}[m]||m));
+  async function recommendCrop(){
+    const out=document.getElementById("cropResult"),temp=Number(document.getElementById("cropTempInput")?.value),rain=Number(document.getElementById("cropRainInput")?.value),btn=document.getElementById("t-recBtn");
+    if(!out)return;if(!Number.isFinite(temp)||!Number.isFinite(rain)||rain<0){out.innerHTML="<div style='color:#fecaca'>Enter a valid temperature and rainfall.</div>";return;}
+    if(btn){btn.disabled=true;btn.textContent="Analyzing…";}out.innerHTML="<div style='opacity:.75'>Comparing crops against the climate profile…</div>";
+    try{const r=await fetch("/recommend_crop",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify({temp,rainfall:rain})}),d=await r.json().catch(()=>({}));if(!r.ok||d.success!==true)throw Error(d.error||"Crop recommendation failed.");const al=Array.isArray(d.alternatives)?d.alternatives:[],alt=al.map(x=>`<span style="display:inline-block;padding:4px 8px;margin:2px;border-radius:10px;background:rgba(255,255,255,.07)">${esc(x.crop)} · ${esc(x.score)}/100</span>`).join("");out.innerHTML=`<div style="padding:14px;border-radius:12px;border:1px solid rgba(52,211,153,.4);background:rgba(16,185,129,.08)"><div style="font-size:1.2rem;font-weight:700;color:var(--accent-green)">${esc(d.crop||d.recommendation)}</div><div style="margin-top:6px">Climate suitability: <b>${esc(d.score)}/100</b> · ${esc(d.suitability_label||"Climate screening")}</div><div style="margin-top:6px">🌡️ Temperature fit: <b>${esc(d.temperature_fit)}/100</b></div><div style="margin-top:4px">🌧️ Rainfall fit: <b>${esc(d.rainfall_fit)}/100</b></div><div style="margin-top:4px">🌱 Typical season: <b>${esc(d.season)}</b> · Water demand: <b>${esc(d.water_requirement)}</b></div>${alt?`<div style="margin-top:9px;font-size:.84rem;opacity:.85">Other suitable crops:</div><div>${alt}</div>`:""}<div style="margin-top:9px;font-size:.75rem;opacity:.68">Climate screening only. Use the Yield Estimator on the right for a historical-data yield estimate.</div></div>`;}
+    catch(e){out.innerHTML=`<div style='color:#fecaca'>${esc(e.message||"Unable to recommend a crop.")}</div>`;}finally{if(btn){btn.disabled=false;btn.textContent="Recommend Crop";}}
+  }
+  window.recommendCrop=recommendCrop;
+})();
