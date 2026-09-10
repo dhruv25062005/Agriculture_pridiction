@@ -41,9 +41,13 @@ export async function getFirebaseAdminAuth() {
         try { account = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON); } catch { throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON."); }
         if (account.private_key) account.private_key = account.private_key.replace(/\\n/g, "\n");
         credential = cert(account);
-      } else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+      } else if (process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PROJECT_ID) {
         credential = cert({ projectId: process.env.FIREBASE_PROJECT_ID, clientEmail: process.env.FIREBASE_CLIENT_EMAIL, privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n") });
-      } else credential = applicationDefault();
+      } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        credential = applicationDefault();
+      } else {
+        throw new Error("Firebase Admin credentials are not configured. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_CLIENT_EMAIL/FIREBASE_PRIVATE_KEY/FIREBASE_PROJECT_ID.");
+      }
       initializeApp({ credential, projectId: process.env.FIREBASE_PROJECT_ID || undefined });
     }
     return getAuth();
@@ -54,10 +58,10 @@ export async function getFirebaseAdminAuth() {
 function readRequestBody(req, maxBytes = 256 * 1024) {
   return new Promise((resolve,reject) => {
     if (req.body && typeof req.body === "object") return resolve(req.body);
-    let size=0; const chunks=[];
-    req.on("data", chunk => { size += chunk.length; if (size > maxBytes) { reject(new Error("Request body too large")); req.destroy(); return; } chunks.push(chunk); });
-    req.on("end", () => { try { resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString("utf8")) : {}); } catch { reject(new Error("Invalid JSON body")); } });
-    req.on("error", reject);
+    let size=0; const chunks=[]; let settled=false;
+    req.on("data", chunk => { if (settled) return; size += chunk.length; if (size > maxBytes) { settled=true; reject(new Error("Request body too large")); return; } chunks.push(chunk); });
+    req.on("end", () => { if (settled) return; try { settled=true; resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString("utf8")) : {}); } catch { settled=true; reject(new Error("Invalid JSON body")); } });
+    req.on("error", err => { if (!settled) { settled=true; reject(err); } });
   });
 }
 
@@ -81,7 +85,7 @@ export const firebaseConfigMiddleware = (req,res,next) => {
   if (req.method !== "GET" || req.path !== "/firebase_config") return next();
   const config = {
     apiKey: process.env.FIREBASE_API_KEY || "", authDomain: process.env.FIREBASE_AUTH_DOMAIN || "", databaseURL: process.env.FIREBASE_DATABASE_URL || "", projectId: process.env.FIREBASE_PROJECT_ID || "", storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "", messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "", appId: process.env.FIREBASE_APP_ID || "", measurementId: process.env.FIREBASE_MEASUREMENT_ID || "",
-    firestoreDatabaseId: process.env.FIREBASE_FIRESTORE_DATABASE_ID?.trim() || "ai-studio-agriculturepridi-19ab2f13-4ebd-42d7-aaf0-74a8af5164fb"
+    firestoreDatabaseId: process.env.FIREBASE_FIRESTORE_DATABASE_ID?.trim() || "(default)"
   };
   const missing=["apiKey","authDomain","projectId","appId"].filter(k=>!config[k]);
   if(missing.length) return res.status(503).json({error:"Firebase is not configured on the server.",missing});
@@ -89,7 +93,7 @@ export const firebaseConfigMiddleware = (req,res,next) => {
 };
 
 export const corsConfig = () => {
-  const explicit=(process.env.CORS_ORIGINS||"").split(",").map(x=>x.trim()).filter(Boolean);
+  const explicit=(process.env.CORS_ORIGINS||"").split(",").map(x=>x.trim().replace(/\/$/,"")).filter(Boolean);
   const own=(process.env.RENDER_EXTERNAL_URL||"").replace(/\/$/,"");
   return cors({ origin:(origin,cb)=>{ if(!origin||explicit.includes(origin)||(own&&origin===own)||origin.startsWith("http://localhost:")||origin.startsWith("http://127.0.0.1:")) return cb(null,true); cb(new Error("CORS origin not allowed")); }, credentials:true, methods:["GET","POST","PUT","DELETE","OPTIONS"], allowedHeaders:["Content-Type","Authorization","X-Requested-With"], maxAge:86400 });
 };
