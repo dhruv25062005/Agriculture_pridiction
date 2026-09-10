@@ -27,13 +27,7 @@ async function resolveLocation(req) {
 async function weather(req, res) {
   try {
     const loc = await resolveLocation(req);
-    const params = new URLSearchParams({
-      latitude: String(loc.lat), longitude: String(loc.lon), timezone: "auto",
-      current: "temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,surface_pressure,uv_index",
-      hourly: "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m,uv_index",
-      daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,uv_index_max",
-      forecast_days: "7"
-    });
+    const params = new URLSearchParams({ latitude: String(loc.lat), longitude: String(loc.lon), timezone: "auto", current: "temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,surface_pressure,uv_index", hourly: "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m,uv_index", daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,uv_index_max", forecast_days: "7" });
     const r = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
     if (!r.ok) throw Object.assign(new Error("Weather provider is unavailable."), { status: 503 });
     const data = await r.json();
@@ -86,7 +80,10 @@ express.application.use = function(route, ...handlers) {
 
 const originalGet = express.application.get;
 express.application.get = function(route, ...handlers) {
-  if (route === "/signedin") return originalGet.call(this, route, sendDashboard);
+  if (route === "/signedin") {
+    originalGet.call(this, "/__kisan_session_bootstrap", () => {});
+    return this.route(route).get(sendDashboard);
+  }
   if (route === "/weather") return originalGet.call(this, route, weather);
   if (route === "/scan_history") return originalGet.call(this, route, (req, res) => {
     const uid = req.session?.user?.uid;
