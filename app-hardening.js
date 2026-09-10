@@ -1,180 +1,34 @@
 import "dotenv/config";
-import path from "node:path";
-import crypto from "node:crypto";
 import express from "express";
+import multer from "multer";
+import crypto from "node:crypto";
+import path from "node:path";
+import { GoogleGenAI } from "@google/genai";
+import { getFirebaseAdminAuth } from "./config/security.js";
 
-// The main server uses req.session but does not install a session middleware.
-// Install a small signed, HTTP-only cookie session before the first route.
-// Firebase remains the source of truth: only /set_session can create a
-// dashboard session, and that route is protected by Firebase Admin token
-// verification in config/security.js.
-if (!process.env.SESSION_SECRET) {
-  if (process.env.NODE_ENV === "production" || process.env.RENDER === "true") {
-    throw new Error("SESSION_SECRET must be configured in production.");
-  }
-  process.env.SESSION_SECRET = crypto.randomBytes(32).toString("hex");
-  console.warn("⚠️ SESSION_SECRET is not configured; generated a temporary development secret.");
-}
-
-const SESSION_COOKIE = "agri_session";
-const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
-const SESSION_SECRET = process.env.SESSION_SECRET;
-
-function sign(value) {
-  return crypto.createHmac("sha256", SESSION_SECRET).update(value).digest("base64url");
-}
-
-function encodeSession(session) {
-  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  return `${payload}.${sign(payload)}`;
-}
-
-function decodeSession(value) {
-  try {
-    const [payload, signature] = String(value || "").split(".");
-    if (!payload || !signature) return null;
-    const expected = sign(payload);
-    const a = Buffer.from(signature);
-    const b = Buffer.from(expected);
-    if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    if (!data || !data.exp || Date.now() > Number(data.exp)) return null;
-    return data;
-  } catch (_) {
-    return null;
-  }
-}
-
-function parseCookieHeader(header = "") {
-  const out = {};
-  for (const part of header.split(";")) {
-    const index = part.indexOf("=");
-    if (index < 0) continue;
-    const key = part.slice(0, index).trim();
-    const value = part.slice(index + 1).trim();
-    try { out[key] = decodeURIComponent(value); } catch (_) { out[key] = value; }
-  }
-  return out;
-}
-
-function sessionMiddleware(req, res, next) {
-  const cookies = parseCookieHeader(req.headers.cookie || "");
-  const stored = decodeSession(cookies[SESSION_COOKIE]);
-  req.session = stored?.user ? { user: stored.user } : {};
-
-  const originalEnd = res.end;
-  res.end = function patchedEnd(...args) {
-    if (!res.headersSent) {
-      const sessionData = {
-        user: req.session?.user || null,
-        iat: Date.now(),
-        exp: Date.now() + SESSION_MAX_AGE
-      };
-      const value = encodeSession(sessionData);
-      const secure = process.env.NODE_ENV === "production" || process.env.RENDER === "true";
-      const cookie = `${SESSION_COOKIE}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${Math.floor(SESSION_MAX_AGE / 1000)}${secure ? "; Secure" : ""}`;
-      const existing = res.getHeader("Set-Cookie");
-      res.setHeader("Set-Cookie", existing ? [].concat(existing, cookie) : cookie);
-    }
-    return originalEnd.apply(this, args);
-  };
-  next();
-}
-
-const originalPost = express.application.post;
-const originalGet = express.application.get;
-const originalUse = express.application.use;
-let sessionInstalled = false;
-
-function isRouteRegistration(route) {
-  if (typeof route === "string") return route.startsWith("/");
-  if (Array.isArray(route)) return route.some(item => typeof item === "string" && item.startsWith("/"));
-  return false;
-}
-
-function ensureSessionMiddleware(app) {
-  if (!sessionInstalled) {
-    sessionInstalled = true;
-    originalUse.call(app, sessionMiddleware);
-  }
-}
-
-// Never allow an arbitrary client-supplied UID/password/session to become a
-// dashboard session. Firebase ID token verification happens in security.js.
-express.application.get = function(route, ...handlers) {
-  if (isRouteRegistration(route)) ensureSessionMiddleware(this);
-  if (route === "/ai_stats") return originalGet.call(this, route, aiStats);
-  if (route === "/signedin") return originalGet.call(this, route, signedIn);
-  return originalGet.call(this, route, ...handlers);
-};
-
-express.application.post = function(route, ...handlers) {
-  if (isRouteRegistration(route)) ensureSessionMiddleware(this);
-  if (route === "/predict_yield") return originalPost.call(this, route, predictYield);
-  if (route === "/recommend_crop") return originalPost.call(this, route, recommendCrop);
-  return originalPost.call(this, route, ...handlers);
-};
-
-const CROP_PROFILES = {
-  wheat: { label: "Wheat", temp: [15, 24], humidity: [45, 70], rain: [350, 550], season: "Rabi" },
-  rice: { label: "Rice", temp: [24, 30], humidity: [70, 90], rain: [900, 1400], season: "Kharif" },
-  maize: { label: "Maize", temp: [20, 30], humidity: [50, 75], rain: [500, 800], season: "Kharif/Rabi" },
-  tomato: { label: "Tomato", temp: [20, 28], humidity: [55, 75], rain: [400, 700], season: "Year-round with suitable climate" },
-  potato: { label: "Potato", temp: [15, 23], humidity: [60, 80], rain: [450, 700], season: "Rabi" },
-  cotton: { label: "Cotton", temp: [21, 32], humidity: [50, 70], rain: [500, 900], season: "Kharif" },
-  pepper: { label: "Chilli/Pepper", temp: [21, 30], humidity: [60, 80], rain: [600, 1000], season: "Kharif/Year-round" },
-  sugarcane: { label: "Sugarcane", temp: [20, 32], humidity: [60, 80], rain: [1000, 1500], season: "Year-round" },
-  soybean: { label: "Soybean", temp: [20, 30], humidity: [55, 75], rain: [450, 700], season: "Kharif" }
-};
-
-const num = (v, fallback) => Number.isFinite(Number(v)) ? Number(v) : fallback;
-const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-function cropKey(v) {
-  const raw = String(v ?? "").trim().toLowerCase();
-  if (!raw || raw === "agricultural crops" || raw === "crop") return null;
-  return Object.keys(CROP_PROFILES).find(k => raw.includes(k)) || null;
-}
-function rangeScore(v, range, tolerance) {
-  if (v >= range[0] && v <= range[1]) return 100;
-  const distance = v < range[0] ? range[0] - v : v - range[1];
-  return clamp(100 - (distance / tolerance) * 100, 0, 100);
-}
-function forecast(body = {}, sessionUser = {}) {
-  const temp = clamp(num(body.temp, 25), -10, 55);
-  const humidity = clamp(num(body.humidity, 65), 0, 100);
-  const rainfall = clamp(num(body.rainfall, 100), 0, 3000);
-  const key = cropKey(body.crop) || cropKey(sessionUser.crop) || cropKey(sessionUser.primaryCrop);
-  const p = key ? CROP_PROFILES[key] : null;
-  if (!p) {
-    const score = Math.round(rangeScore(temp, [18, 32], 15) * 0.4 + rangeScore(humidity, [45, 80], 35) * 0.25 + rangeScore(rainfall, [300, 900], 900) * 0.35);
-    return { success: true, crop: "General crop", forecast_type: "environmental_suitability", yield_index: score, confidence: 45, confidence_note: "Indicative only. Select a crop for crop-specific ranges; this is not a validated yield forecast.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: temp > 35 ? "High temperature stress" : temp < 12 ? "Low temperature stress" : humidity > 85 ? "Excess humidity and disease pressure" : rainfall > 1600 ? "Excess rainfall / waterlogging risk" : rainfall < 250 ? "Low seasonal rainfall" : "No single severe environmental constraint", fungal_blight_risk: humidity >= 85 && temp >= 18 && temp <= 30 ? "High" : humidity >= 75 ? "Moderate" : "Low", inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, agronomic_recommendations: [humidity >= 80 ? "Increase canopy scouting and avoid unnecessary overhead irrigation." : "Maintain balanced irrigation and inspect soil moisture before watering.", rainfall < 250 ? "Plan supplemental irrigation according to soil moisture and crop stage." : rainfall > 1200 ? "Check drainage and watch for waterlogging after heavy rain." : "Maintain normal irrigation while checking root-zone moisture.", "Use crop-stage and soil observations before fertilizer or pesticide decisions."] };
-  }
-  const ts = rangeScore(temp, p.temp, 12), hs = rangeScore(humidity, p.humidity, 30), rs = rangeScore(rainfall, p.rain, Math.max(250, p.rain[1] - p.rain[0]));
-  let score = Math.round(ts * 0.4 + hs * 0.2 + rs * 0.4);
-  if (temp > 38) score -= 10;
-  if (temp < 8) score -= 8;
-  if (humidity > 92) score -= 8;
-  if (rainfall > p.rain[1] * 1.5) score -= 8;
-  score = clamp(score, 0, 100);
-  let limiting = "Environmental conditions are within a generally suitable range.";
-  if (temp < p.temp[0]) limiting = `Temperature is below the preferred range (${p.temp[0]}–${p.temp[1]}°C).`;
-  else if (temp > p.temp[1]) limiting = `Temperature is above the preferred range (${p.temp[0]}–${p.temp[1]}°C).`;
-  else if (rainfall < p.rain[0]) limiting = `Seasonal rainfall is below the preferred range (${p.rain[0]}–${p.rain[1]} mm).`;
-  else if (rainfall > p.rain[1]) limiting = `Seasonal rainfall is above the preferred range (${p.rain[0]}–${p.rain[1]} mm).`;
-  else if (humidity < p.humidity[0]) limiting = "Low relative humidity may increase atmospheric water demand.";
-  else if (humidity > p.humidity[1]) limiting = "High humidity increases disease pressure and canopy wetness risk.";
-  const disease = humidity > 88 && temp >= 18 && temp <= 30 ? "High" : humidity > 75 ? "Moderate" : "Low";
-  return { success: true, crop: p.label, season: p.season, forecast_type: "crop_specific_environmental_suitability", yield_index: score, confidence: 65, confidence_note: "Indicative suitability score, not a measured yield prediction. Soil, cultivar, crop stage, irrigation, nutrients and historical yield data are not included.", productivity_rating: score >= 80 ? "Favorable conditions" : score >= 60 ? "Moderately favorable" : "Stress conditions", limiting_factor: limiting, fungal_blight_risk: disease, inputs_used: { temperature_c: temp, relative_humidity_pct: humidity, seasonal_rainfall_mm: rainfall }, preferred_ranges: { temperature_c: p.temp, relative_humidity_pct: p.humidity, seasonal_rainfall_mm: p.rain }, agronomic_recommendations: [temp > p.temp[1] ? "Use heat-management practices such as timely irrigation where appropriate." : temp < p.temp[0] ? "Protect the crop from cold stress and avoid unnecessary irrigation during cold periods." : "Temperature is suitable; continue monitoring crop stage and soil moisture.", rainfall < p.rain[0] ? "Supplement rainfall with irrigation based on root-zone soil moisture and crop stage." : rainfall > p.rain[1] ? "Check field drainage and avoid irrigation until the root zone has drained." : "Rainfall is broadly suitable; adjust irrigation using soil moisture rather than a fixed schedule.", disease === "High" ? "Scout frequently for leaf spots, mildew and blight; use locally approved controls only when needed." : "Continue routine pest and disease scouting, especially after prolonged leaf wetness."] };
-}
-function predictYield(req, res) { try { return res.json(forecast(req.body, req.session?.user)); } catch (e) { console.error("Yield forecast error:", e); return res.status(400).json({ success: false, error: "Invalid forecast inputs." }); } }
-function recommendCrop(req, res) {
-  const temp = clamp(num(req.body?.temp, 25), -10, 55), rainfall = clamp(num(req.body?.rainfall, 100), 0, 3000);
-  const ranked = Object.entries(CROP_PROFILES).map(([key, p]) => ({ key, crop: p.label, score: Math.round(rangeScore(temp, p.temp, 12) * 0.45 + rangeScore(rainfall, p.rain, Math.max(250, p.rain[1] - p.rain[0])) * 0.55) })).sort((a, b) => b.score - a.score);
-  return res.json({ success: true, recommendation: ranked[0].crop, score: ranked[0].score, alternatives: ranked.slice(0, 3), inputs_used: { temperature_c: temp, seasonal_rainfall_mm: rainfall }, note: "Climate-based recommendation only; soil, market, water availability and crop rotation should also be considered." });
-}
-function aiStats(_req, res) { return res.json({ success: true, accuracy: null, validation_status: "not_validated", model_type: "rule_based_environmental_suitability", message: "No validated historical yield dataset is connected, so an accuracy percentage is not claimed." }); }
-function signedIn(req, res) {
-  const user = req.session?.user;
-  if (!user?.firebaseVerified || !user?.uid) return res.redirect("/signin.html");
-  return res.sendFile(path.join(process.cwd(), "templates", "signedin.html"));
-}
+const SESSION_COOKIE="agri_session";
+const SESSION_MAX_AGE=5*24*60*60*1000;
+const originalGet=express.application.get;
+const originalPost=express.application.post;
+const originalUse=express.application.use;
+let sessionInstalled=false;
+const parseCookies=(h="")=>Object.fromEntries(String(h).split(";").map(p=>{const i=p.indexOf("=");if(i<0)return ["",""];let v=p.slice(i+1).trim();try{v=decodeURIComponent(v)}catch{}return[p.slice(0,i).trim(),v]}).filter(x=>x[0]));
+async function sessionMiddleware(req,res,next){req.session={};const token=parseCookies(req.headers.cookie||"")[SESSION_COOKIE];if(token){try{const d=await(await getFirebaseAdminAuth()).verifySessionCookie(token,true);req.session.user={uid:d.uid,email:d.email||"",name:d.name||d.email?.split("@")[0]||"Smart Farmer",photo:d.picture||null,provider:d.firebase?.sign_in_provider||"password",emailVerified:Boolean(d.email_verified),firebaseVerified:true};}catch{res.clearCookie(SESSION_COOKIE,{httpOnly:true,sameSite:"lax",secure:process.env.NODE_ENV==="production"||process.env.RENDER==="true",path:"/"});}}next();}
+function ensureSession(app){if(!sessionInstalled){sessionInstalled=true;originalUse.call(app,sessionMiddleware);}}
+function isRoute(r){return typeof r==="string"&&r.startsWith("/")}
+const protectedRoutes=new Set(["/signedin","/api/user_session","/api/update_profile","/predict","/scan_history","/scan_history/delete","/predict_yield","/recommend_crop","/plot_fertilizer","/calculate_profit","/api/agronomist_chat","/chat_with_agronomist","/ai_stats"]);
+function auth(req,res,next){if(!req.session?.user?.firebaseVerified||!req.session.user.uid){if(req.path==="/signedin")return res.redirect("/signin.html");return res.status(401).json({success:false,error:"Authentication required. Please sign in again."});}next();}
+express.application.use=function(route,...handlers){if(typeof route==="function"&&handlers.length===0){const s=Function.prototype.toString.call(route);if(s.includes("sessionStore.get")&&s.includes("req.session"))return this;}return originalUse.call(this,route,...handlers)};
+const upload=multer({storage:multer.memoryStorage(),limits:{fileSize:Number(process.env.MAX_FILE_SIZE||8*1024*1024),files:1}});
+function realImage(f){if(!f?.buffer)return false;const b=f.buffer;return(b.length>=3&&b[0]===255&&b[1]===216&&b[2]===255)||(b.length>=8&&b.slice(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))||(b.length>=12&&b.toString("ascii",0,4)==="RIFF"&&b.toString("ascii",8,12)==="WEBP")}
+let ai;const getAI=()=>ai||(process.env.GEMINI_API_KEY&&(ai=new GoogleGenAI({apiKey:process.env.GEMINI_API_KEY})),ai);
+const parseJson=t=>{const s=String(t||"").replace(/^```(?:json)?\s*/i,"").replace(/\s*```$/i,"").trim(),a=s.indexOf("{"),b=s.lastIndexOf("}");if(a<0||b<=a)throw Error("Invalid model JSON");return JSON.parse(s.slice(a,b+1))};
+async function diagnose(req,res){if(!req.file)return res.status(400).json({success:false,error:"Image is required"});if(!realImage(req.file))return res.status(400).json({success:false,error:"Invalid image. Upload a real JPEG, PNG or WebP file."});const clientCheck=(()=>{try{return JSON.parse(req.body?.client_optical_check||"null")}catch{return null}})();if(clientCheck?.isLikelyFaceOrSkin)return res.status(422).json({success:false,is_plant:false,disease:"Non-Plant Subject",confidence:null,error:"Please upload a clear agricultural plant image."});const client=getAI();if(!client)return res.status(503).json({success:false,error:"Plant diagnosis is temporarily unavailable because the AI service is not configured."});const prompt="Analyze this agricultural image. Do not guess. Return ONLY JSON: is_plant(boolean), detected_subject, plant, disease, severity(Healthy/Mild/Moderate/Critical/N/A), cause, is_healthy(boolean), is_insect_caused(boolean), culprit, damage_mechanism, confidence(number 0-100 or null when unclear), summary, organic_treatment, chemical_treatment, recovery_protocol(array), prevention_tips(array). If no clear plant is visible, set is_plant=false, confidence=null and do not invent a disease or treatment. For chemical advice say to use only locally registered products according to the current crop-specific label.";let out=null,model=null;for(const m of [process.env.GEMINI_MODEL,"gemini-3.1-flash-lite","gemini-flash-latest"].filter(Boolean)){try{const r=await client.models.generateContent({model:m,contents:{parts:[{inlineData:{data:req.file.buffer.toString("base64"),mimeType:req.file.mimetype||"image/jpeg"}},{text:prompt}]},config:{responseMimeType:"application/json"}});out=parseJson(r.text);model=m;break}catch(e){if(m==="gemini-flash-latest")console.warn("Diagnosis model failed:",e.message)}}if(!out)return res.status(503).json({success:false,error:"Plant diagnosis is temporarily unavailable. No fallback diagnosis was generated."});if(!out.is_plant)return res.status(422).json({success:false,...out,confidence:null,error:"No reliable plant specimen was detected. Please upload a clear crop image."});return res.json({success:true,...out,confidence:Number.isFinite(Number(out.confidence))?Math.max(0,Math.min(100,Number(out.confidence))):null,source:`Gemini AI (${model})`,id:crypto.randomUUID(),timestamp:new Date().toISOString(),user:req.session.user.name||"Farmer"})}
+const crops={wheat:{label:"Wheat",temp:[15,24],rain:[350,550]},rice:{label:"Rice",temp:[24,30],rain:[900,1400]},maize:{label:"Maize",temp:[20,30],rain:[500,800]},tomato:{label:"Tomato",temp:[20,28],rain:[400,700]},potato:{label:"Potato",temp:[15,23],rain:[450,700]},cotton:{label:"Cotton",temp:[21,32],rain:[500,900]},soybean:{label:"Soybean",temp:[20,30],rain:[450,700]}};
+const n=(v,d)=>Number.isFinite(Number(v))?Number(v):d,clamp=(v,a,b)=>Math.min(b,Math.max(a,v));function score(v,r,t){return v>=r[0]&&v<=r[1]?100:clamp(100-Math.abs(v-(v<r[0]?r[0]:r[1]))/t*100,0,100)}
+function yieldHandler(req,res){const t=clamp(n(req.body?.temp,25),-10,55),r=clamp(n(req.body?.rainfall,100),0,3000),k=Object.keys(crops).find(x=>String(req.body?.crop||req.session.user?.primaryCrop||"").toLowerCase().includes(x)),p=k?crops[k]:null,s=p?Math.round(score(t,p.temp,12)*.45+score(r,p.rain,Math.max(250,p.rain[1]-p.rain[0]))*.55):Math.round(score(t,[18,32],15)*.4+score(r,[300,900],900)*.6);res.json({success:true,crop:p?.label||"General crop",forecast_type:"environmental_suitability",yield_index:s,confidence:null,confidence_note:"Indicative suitability score, not a validated yield prediction. Soil, cultivar, crop stage and historical yield are not included.",inputs_used:{temperature_c:t,seasonal_rainfall_mm:r}})}
+function cropHandler(req,res){const t=clamp(n(req.body?.temp,25),-10,55),r=clamp(n(req.body?.rainfall,100),0,3000),ranked=Object.values(crops).map(p=>({crop:p.label,score:Math.round(score(t,p.temp,12)*.45+score(r,p.rain,Math.max(250,p.rain[1]-p.rain[0]))*.55)})).sort((a,b)=>b.score-a.score);res.json({success:true,recommendation:ranked[0].crop,score:ranked[0].score,alternatives:ranked.slice(0,3),inputs_used:{temperature_c:t,seasonal_rainfall_mm:r},note:"Climate-based recommendation only; soil, water, market and crop rotation are not included."})}
+function stats(_q,res){res.json({success:true,accuracy:null,validation_status:"not_validated",model_type:"Gemini vision + rule-based agriculture tools",message:"No independent validation dataset is connected, so no accuracy percentage is claimed."})}
+async function setSession(req,res){try{const cookie=await(await getFirebaseAdminAuth()).createSessionCookie(req.firebaseIdToken,{expiresIn:SESSION_MAX_AGE});const secure=process.env.NODE_ENV==="production"||process.env.RENDER==="true";res.cookie(SESSION_COOKIE,cookie,{httpOnly:true,secure,sameSite:"lax",path:"/",maxAge:SESSION_MAX_AGE});return res.json({success:true,user:req.body});}catch(e){console.warn("Session cookie creation failed:",e.message);return res.status(401).json({success:false,error:"Unable to create a secure session. Please sign in again."})}}
+express.application.get=function(route,...handlers){if(isRoute(route))ensureSession(this);if(route==="/signedin")return originalGet.call(this,route,auth,(req,res)=>res.sendFile(path.join(process.cwd(),"templates","signedin.html")));if(route==="/ai_stats")return originalGet.call(this,route,auth,stats);if(protectedRoutes.has(route))return originalGet.call(this,route,auth,...handlers);return originalGet.call(this,route,...handlers)};
+express.application.post=function(route,...handlers){if(isRoute(route))ensureSession(this);if(route==="/set_session")return originalPost.call(this,route,setSession);if(route==="/predict")return originalPost.call(this,route,auth,upload.single("image"),diagnose);if(route==="/predict_yield")return originalPost.call(this,route,auth,yieldHandler);if(route==="/recommend_crop")return originalPost.call(this,route,auth,cropHandler);if(protectedRoutes.has(route))return originalPost.call(this,route,auth,...handlers);return originalPost.call(this,route,...handlers)};
