@@ -1,12 +1,12 @@
-/* Final crop recommendation UI. Uses only the current API contract and never masks missing fields. */
+/* Final crop recommendation UI. Uses the current API contract and never renders undefined. */
 (() => {
-  const VERSION = "2026-09-10-crop-ui-v4";
+  const VERSION = "2026-09-10-crop-ui-v5";
   if (window.__KISAN_CROP_UI__ === VERSION) return;
   window.__KISAN_CROP_UI__ = VERSION;
-  const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" }[m] || m));
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m] || m));
   const num = v => { const n = Number(v); return Number.isFinite(n) ? n : null; };
   const text = (v, fallback) => { const s = String(v ?? "").trim(); return s || fallback; };
-  const fitText = (v) => { const n = num(v); return n === null ? "—" : `${Math.round(Math.max(0, Math.min(100, n)))}/100`; };
+  const fitText = v => { const n = num(v); return n === null ? "—" : `${Math.round(Math.max(0, Math.min(100, n)))}/100`; };
 
   async function recommendCrop() {
     const out = document.getElementById("cropResult");
@@ -21,24 +21,15 @@
     if (btn) { btn.disabled = true; btn.textContent = "Analyzing…"; }
     out.innerHTML = "<div style='opacity:.75'>Comparing crops against the climate profile…</div>";
     try {
-      const r = await fetch("/recommend_crop", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        credentials: "same-origin",
-        cache: "no-store",
-        body: JSON.stringify({ temp, rainfall: rain })
-      });
+      const r = await fetch("/recommend_crop", { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, credentials: "same-origin", cache: "no-store", body: JSON.stringify({ temp, rainfall: rain }) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || d.success !== true) throw Error(d.error || `Crop recommendation failed (${r.status}).`);
       const crop = text(d.crop || d.recommendation, "No recommendation");
-      const score = num(d.score);
-      const tempFit = num(d.temperature_fit);
-      const rainFit = num(d.rainfall_fit);
-      const season = text(d.season, "Not available");
-      const water = text(d.water_requirement, "Not available");
+      const score = num(d.score), tempFit = num(d.temperature_fit), rainFit = num(d.rainfall_fit);
+      const season = text(d.season, "Not available"), water = text(d.water_requirement, "Not available");
       const label = text(d.suitability_label, "Climate screening");
       const alternatives = Array.isArray(d.alternatives) ? d.alternatives : [];
-      const alt = alternatives.map(x => `${esc(text(x?.crop, "Unknown crop"))} · ${fitText(x?.score)}`).join("</span><span style=\"display:inline-block;padding:5px 9px;margin:2px;border-radius:10px;background:rgba(255,255,255,.07)\">`);
+      const alt = alternatives.map(x => `<span style="display:inline-block;padding:5px 9px;margin:2px;border-radius:10px;background:rgba(255,255,255,.07)">${esc(text(x?.crop, "Unknown crop"))} · ${fitText(x?.score)}</span>`).join("");
       out.innerHTML = `<div style="padding:14px;border-radius:12px;border:1px solid rgba(52,211,153,.4);background:rgba(16,185,129,.08)">
         <div style="font-size:1.2rem;font-weight:700;color:var(--accent-green)">${esc(crop)}</div>
         <div style="margin-top:6px">Climate suitability: <b>${fitText(score)}</b> · ${esc(label)}</div>
