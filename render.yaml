@@ -2,7 +2,7 @@ services:
   - type: web
     name: agriculture-prediction
     runtime: node
-    buildCommand: npm ci
+    buildCommand: npm ci && npm run train:yield
     startCommand: npm start
     healthCheckPath: /health
     envVars:
