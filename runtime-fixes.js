@@ -11,7 +11,7 @@ const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260911-guard
 const DASHBOARD_BINDING_TAG = `<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
 const YIELD_UI_TAG = `<script src="/static/js/yield-ui-hardening.js?v=20260911-final" defer></script>`;
 const CROP_UI_TAG = `<script src="/static/js/crop-yield-ui-hardening.js?v=20260911-final" defer></script>`;
-const FORCE_PREDICTION_TAG = `<script src="/static/js/prediction-force.js?v=20260911-v1" defer></script>`;
+const FORCE_PREDICTION_TAG = `<script src="/static/js/prediction-force.js?v=20260911-v2" defer></script>`;
 const DISABLED_SW = `// KisanAI service worker disabled for compatibility.\nconst KISANAI_SW_VERSION="disabled-2026-09-10-v2";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));\n`;
 function clearSession(res){res.clearCookie(COOKIE,{httpOnly:true,secure:process.env.NODE_ENV==="production"||process.env.RENDER==="true",sameSite:"lax",path:"/"});res.setHeader("Cache-Control","no-store");}
 function readCookie(req,name){const header=String(req.headers.cookie||"");for(const part of header.split(";")){const i=part.indexOf("=");if(i<0||part.slice(0,i).trim()!==name)continue;try{return decodeURIComponent(part.slice(i+1).trim());}catch{return part.slice(i+1).trim();}}return "";}
