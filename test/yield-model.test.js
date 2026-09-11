@@ -21,20 +21,20 @@ test("yield prediction accepts acres and returns tonnes per hectare", () => {
   assert.ok(r.prediction_interval_tpha.high > r.yield_tpha);
 });
 
-test("changing farm area changes production but not yield per hectare", () => {
+test("farm area is not a direct yield multiplier when input intensity is unchanged", () => {
   const base = {
     state: "Uttar Pradesh",
     crop: "Wheat",
     season: "Rabi",
     year: 2026,
     rainfall: 600,
-    fertilizer: 100,
     pesticide: 10
   };
-  const one = predictYieldModel({ ...base, area_acre: 1 });
-  const two = predictYieldModel({ ...base, area_acre: 2 });
+  const one = predictYieldModel({ ...base, area_acre: 1, fertilizer: 100, pesticide: 10 });
+  const two = predictYieldModel({ ...base, area_acre: 2, fertilizer: 200, pesticide: 20 });
   assert.equal(one.yield_tpha, two.yield_tpha);
   assert.equal(one.inputs_used.area_acre, 1);
   assert.equal(two.inputs_used.area_acre, 2);
-  assert.ok(two.inputs_used.fertilizer_kg_per_ha < one.inputs_used.fertilizer_kg_per_ha);
+  assert.ok(Math.abs(one.inputs_used.fertilizer_kg_per_ha - two.inputs_used.fertilizer_kg_per_ha) < 1e-9);
+  assert.ok(Math.abs(one.inputs_used.pesticide_kg_per_ha - two.inputs_used.pesticide_kg_per_ha) < 1e-9);
 });
