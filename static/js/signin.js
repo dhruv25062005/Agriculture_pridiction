@@ -19,6 +19,15 @@ console.log("✅ signin.js initialized");
 const signinForm = document.getElementById("signin-form");
 const loginFeedback = document.getElementById("login-feedback");
 const googleBtns = document.querySelectorAll(".google-btn, #google-signin-btn, #google-signup-btn");
+const AUTH_TIMEOUT_MS = 15000;
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 function disableGuestAccess() {
   document.querySelectorAll(".guest-btn").forEach((btn) => {
@@ -61,8 +70,15 @@ export async function syncUserProfile(user, additionalData = {}) {
   try {
     const userRef = doc(currentDB, "users", user.uid);
     let existing = null;
+
+    // Firestore must never block authentication. A database/rules/network issue
+    // should not leave the Sign In button stuck forever.
     try {
-      existing = await getDoc(userRef);
+      existing = await withTimeout(
+        getDoc(userRef),
+        5000,
+        "Firestore profile read timed out"
+      );
     } catch (error) {
       console.warn("Could not read existing user profile; continuing with sign-in:", error.message);
     }
@@ -76,8 +92,18 @@ export async function syncUserProfile(user, additionalData = {}) {
     };
 
     if (!existing?.exists()) profile.createdAt = new Date().toISOString();
-    await setDoc(userRef, profile, { merge: true });
-    return true;
+
+    try {
+      await withTimeout(
+        setDoc(userRef, profile, { merge: true }),
+        5000,
+        "Firestore profile write timed out"
+      );
+      return true;
+    } catch (error) {
+      console.warn("Firestore profile write unavailable; authentication will continue:", error.message);
+      return false;
+    }
   } catch (error) {
     console.warn("Firestore profile sync unavailable; server authentication will continue:", error.message);
     return false;
@@ -86,20 +112,29 @@ export async function syncUserProfile(user, additionalData = {}) {
 
 export async function establishServerSession(user, provider) {
   if (!user) throw new Error("No authenticated Firebase user was returned.");
-  const idToken = await user.getIdToken(true);
+
+  const idToken = await withTimeout(
+    user.getIdToken(true),
+    AUTH_TIMEOUT_MS,
+    "Firebase token request timed out. Please try again."
+  );
   if (!idToken) throw new Error("Firebase did not provide an ID token.");
 
-  const response = await fetch("/set_session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "same-origin",
-    body: JSON.stringify({ idToken, provider })
-  });
+  const response = await withTimeout(
+    fetch("/set_session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ idToken, provider })
+    }),
+    AUTH_TIMEOUT_MS,
+    "Server authentication timed out. Please try again."
+  );
 
   let data = {};
   try { data = await response.json(); } catch (_) {}
   if (!response.ok || data.success !== true || data.user?.firebaseVerified !== true) {
-    throw new Error(data.error || "Server rejected the Firebase authentication session.");
+    throw new Error(data.error || `Server rejected authentication (HTTP ${response.status}).`);
   }
   return data;
 }
@@ -144,11 +179,17 @@ if (signinForm) {
     }
 
     try {
-      await firebaseReady;
+      await withTimeout(firebaseReady, AUTH_TIMEOUT_MS, "Firebase initialization timed out. Please refresh and try again.");
       const currentAuth = auth || getFirebaseAuth();
       if (!currentAuth) throw new Error("Firebase Authentication is not configured.");
 
-      const userCredential = await signInWithEmailAndPassword(currentAuth, email, password);
+      const userCredential = await withTimeout(
+        signInWithEmailAndPassword(currentAuth, email, password),
+        AUTH_TIMEOUT_MS,
+        "Firebase sign-in timed out. Please check your connection and try again."
+      );
+
+      // Profile persistence is best-effort and can never block authentication.
       await syncUserProfile(userCredential.user);
       await establishServerSession(userCredential.user, "password");
 
@@ -182,13 +223,17 @@ const handleGoogleSignIn = async () => {
   if (googleButton) googleButton.disabled = true;
 
   try {
-    await firebaseReady;
+    await withTimeout(firebaseReady, AUTH_TIMEOUT_MS, "Firebase initialization timed out. Please refresh and try again.");
     const currentAuth = auth || getFirebaseAuth();
     if (!currentAuth) throw new Error("Firebase Authentication is not configured.");
 
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
-    const result = await signInWithPopup(currentAuth, provider);
+    const result = await withTimeout(
+      signInWithPopup(currentAuth, provider),
+      60000,
+      "Google sign-in timed out. Please try again."
+    );
     const user = result.user;
 
     await syncUserProfile(user);
