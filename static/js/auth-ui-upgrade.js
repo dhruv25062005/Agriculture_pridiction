@@ -219,7 +219,7 @@
             <path fill="url(#agriLeafGradient)" d="M52.8 7.5C37.1 9.7 20.1 16.1 14 29.1c-4.2 9-1.1 17.1 6.8 19.9C14.5 55.2 10.7 58 7.4 61h6.2c4.8-4.7 9.1-8.4 14.2-11.6 8.5-5.2 17.2-8.9 22.1-17.7 3.5-6.2 3.7-15.7 2.9-24.2Z"/>
             <path fill="rgba(4,55,42,.85)" d="M16.8 51.8c8.4-12.7 18.2-20.6 31.4-28.2-11.2 9.4-18.4 17.5-26.8 30.1Z"/>
           </svg>
-          <div><div class="agri-brand-name">AgriSense <span>AI</span></div><div class="agri-brand-sub">Smarter agriculture</div></div>
+          <div><div class="agri-brand-name">AI Smart Agriculture</div><div class="agri-brand-sub">Smarter agriculture</div></div>
         </div>
         <div class="agri-hero-copy">
           <div class="agri-pill"><i></i> AI POWERED</div>
