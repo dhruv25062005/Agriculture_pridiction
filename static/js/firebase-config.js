@@ -58,4 +58,5 @@ export{app,auth,db,doc,getDocFromServer,setDoc,getDoc,getDocs,collection,query,o
 // Decorative authentication scene. It loads independently and never blocks auth initialization.
 if(typeof document!=="undefined"){
   import("/static/js/auth-3d.js?v=20260911-auth3d1").catch(error=>console.debug("Auth visual scene unavailable:",error));
+  import("/static/js/auth-ui-upgrade.js?v=20260911-authui1").catch(error=>console.debug("Auth UI layer unavailable:",error));
 }
