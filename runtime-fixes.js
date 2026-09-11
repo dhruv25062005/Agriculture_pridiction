@@ -7,10 +7,11 @@ const COOKIE = "agri_session";
 const history = new Map();
 const observedApps = new WeakSet();
 const MAX_MEMORY_SCANS_PER_USER = 20;
-const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260910-live-optimized-7";
+const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260911-guard";
 const DASHBOARD_BINDING_TAG = `<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
-const YIELD_UI_TAG = `<script src="/static/js/yield-ui-hardening.js?v=20260910-6" defer></script>`;
-const CROP_UI_TAG = `<script src="/static/js/crop-yield-ui-hardening.js?v=20260910-6" defer></script>`;
+const YIELD_UI_TAG = `<script src="/static/js/yield-ui-hardening.js?v=20260911-final" defer></script>`;
+const CROP_UI_TAG = `<script src="/static/js/crop-yield-ui-hardening.js?v=20260911-final" defer></script>`;
+const FORCE_PREDICTION_TAG = `<script src="/static/js/prediction-force.js?v=20260911-v1" defer></script>`;
 const DISABLED_SW = `// KisanAI service worker disabled for compatibility.\nconst KISANAI_SW_VERSION="disabled-2026-09-10-v2";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));\n`;
 
 function clearSession(res) {
@@ -34,51 +35,27 @@ async function verifyDashboardSession(req) {
     return decoded?.uid ? decoded : null;
   } catch { return null; }
 }
-
 async function getFirestore() {
-  try {
-    const { getFirestore } = await import("firebase-admin/firestore");
-    return getFirestore();
-  } catch { return null; }
+  try { const { getFirestore } = await import("firebase-admin/firestore"); return getFirestore(); } catch { return null; }
 }
 async function persistScan(uid, scan) {
-  const db = await getFirestore();
-  if (!db) return false;
-  try {
-    await db.collection("users").doc(uid).collection("scans").doc(String(scan.id)).set({ ...scan, createdAt: scan.timestamp || new Date().toISOString() }, { merge: true });
-    return true;
-  } catch (err) {
-    console.warn("Scan history persistence failed:", err.message);
-    return false;
-  }
+  const db = await getFirestore(); if (!db) return false;
+  try { await db.collection("users").doc(uid).collection("scans").doc(String(scan.id)).set({ ...scan, createdAt: scan.timestamp || new Date().toISOString() }, { merge: true }); return true; }
+  catch (err) { console.warn("Scan history persistence failed:", err.message); return false; }
 }
 async function readPersistedScans(uid) {
-  const db = await getFirestore();
-  if (!db) return null;
-  try {
-    const snap = await db.collection("users").doc(uid).collection("scans").orderBy("createdAt", "desc").limit(50).get();
-    return snap.docs.map(doc => doc.data());
-  } catch (err) {
-    console.warn("Scan history read failed:", err.message);
-    return null;
-  }
+  const db = await getFirestore(); if (!db) return null;
+  try { const snap = await db.collection("users").doc(uid).collection("scans").orderBy("createdAt", "desc").limit(50).get(); return snap.docs.map(doc => doc.data()); }
+  catch (err) { console.warn("Scan history read failed:", err.message); return null; }
 }
 async function deletePersistedScan(uid, id) {
-  const db = await getFirestore();
-  if (!db) return false;
+  const db = await getFirestore(); if (!db) return false;
   try {
     if (id) await db.collection("users").doc(uid).collection("scans").doc(id).delete();
-    else {
-      const snap = await db.collection("users").doc(uid).collection("scans").limit(50).get();
-      if (!snap.empty) await Promise.all(snap.docs.map(doc => doc.ref.delete()));
-    }
+    else { const snap = await db.collection("users").doc(uid).collection("scans").limit(50).get(); if (!snap.empty) await Promise.all(snap.docs.map(doc => doc.ref.delete())); }
     return true;
-  } catch (err) {
-    console.warn("Scan history delete failed:", err.message);
-    return false;
-  }
+  } catch (err) { console.warn("Scan history delete failed:", err.message); return false; }
 }
-
 async function sendDashboard(req, res) {
   const session = await verifyDashboardSession(req);
   if (!session) return res.redirect("/signin");
@@ -87,82 +64,36 @@ async function sendDashboard(req, res) {
     const normalized = file.replaceAll("https://www.gstatic.com/firebasejs/10.8.0/", "https://www.gstatic.com/firebasejs/12.18.0/");
     const withoutBindings = normalized
       .replace(/<script\s+src=["']\/static\/js\/dashboard-bindings\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "")
-      .replace(/<script\s+src=["']\/static\/js\/(?:yield-ui-hardening|crop-yield-ui-hardening)\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
-    const html = withoutBindings.replace(/<\/head>/i, `${DASHBOARD_BINDING_TAG}\n${YIELD_UI_TAG}\n${CROP_UI_TAG}\n</head>`);
+      .replace(/<script\s+src=["']\/static\/js\/(?:yield-ui-hardening|crop-yield-ui-hardening|prediction-force)\.js(?:\?[^"']*)?["']\s+defer><\/script>/gi, "");
+    const html = withoutBindings.replace(/<\/head>/i, `${YIELD_UI_TAG}\n${CROP_UI_TAG}\n${DASHBOARD_BINDING_TAG}\n${FORCE_PREDICTION_TAG}\n</head>`);
     res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
     res.setHeader("Surrogate-Control", "no-store");
     res.type("html").send(html);
-  } catch (err) {
-    console.error("Dashboard render failed:", err.message);
-    res.status(500).send("Dashboard could not be loaded.");
-  }
+  } catch (err) { console.error("Dashboard render failed:", err.message); res.status(500).send("Dashboard could not be loaded."); }
 }
-
-function rememberScan(uid, payload) {
-  const list = history.get(uid) || [];
-  list.unshift({ ...payload });
-  history.set(uid, list.slice(0, MAX_MEMORY_SCANS_PER_USER));
-}
-
+function rememberScan(uid, payload) { const list = history.get(uid) || []; list.unshift({ ...payload }); history.set(uid, list.slice(0, MAX_MEMORY_SCANS_PER_USER)); }
 function observer(req, res, next) {
   const originalJson = res.json.bind(res);
-  res.json = payload => {
-    if (req.path === "/predict" && req.session?.user?.uid && payload?.success) {
-      const uid = req.session.user.uid;
-      rememberScan(uid, payload);
-      void persistScan(uid, payload);
-    }
-    return originalJson(payload);
-  };
+  res.json = payload => { if (req.path === "/predict" && req.session?.user?.uid && payload?.success) { const uid=req.session.user.uid; rememberScan(uid,payload); void persistScan(uid,payload); } return originalJson(payload); };
   next();
 }
-
 const originalUse = express.application.use;
 express.application.use = function patchedUse(route, ...handlers) {
-  if (typeof route === "function" && handlers.length === 0 && route !== observer && !observedApps.has(this)) {
-    observedApps.add(this);
-    originalUse.call(this, observer);
-  }
+  if (typeof route === "function" && handlers.length === 0 && route !== observer && !observedApps.has(this)) { observedApps.add(this); originalUse.call(this, observer); }
   return originalUse.call(this, route, ...handlers);
 };
-
 const originalGet = express.application.get;
 express.application.get = function patchedGet(route, ...handlers) {
-  if (route === "/sw.js") return originalGet.call(this, route, (_req, res) => {
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
-    res.setHeader("Pragma", "no-cache");
-    res.type("application/javascript").send(DISABLED_SW);
-  });
+  if (route === "/sw.js") return originalGet.call(this, route, (_req,res) => { res.setHeader("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"); res.setHeader("Pragma","no-cache"); res.type("application/javascript").send(DISABLED_SW); });
   if (route === "/signedin") return this.route(route).get(sendDashboard);
-  if (route === "/scan_history") return originalGet.call(this, route, async (req, res) => {
-    const uid = req.session?.user?.uid;
-    if (!uid) return res.status(401).json({ success: false, error: "Authentication required." });
-    res.setHeader("Cache-Control", "no-store");
-    const persisted = await readPersistedScans(uid);
-    const scans = persisted ?? (history.get(uid) || []);
-    return res.json({ success: true, total: scans.length, scans });
-  });
+  if (route === "/scan_history") return originalGet.call(this, route, async (req,res) => { const uid=req.session?.user?.uid; if(!uid)return res.status(401).json({success:false,error:"Authentication required."}); res.setHeader("Cache-Control","no-store"); const persisted=await readPersistedScans(uid); const scans=persisted ?? (history.get(uid)||[]); return res.json({success:true,total:scans.length,scans}); });
   return originalGet.call(this, route, ...handlers);
 };
-
 const originalPost = express.application.post;
 express.application.post = function patchedPost(route, ...handlers) {
-  if (route === "/signout" || route === "/logout") return originalPost.call(this, route, (req, res) => {
-    clearSession(res);
-    history.delete(req.session?.user?.uid);
-    res.json({ success: true });
-  });
-  if (route === "/scan_history/delete") return originalPost.call(this, route, async (req, res) => {
-    const uid = req.session?.user?.uid;
-    if (!uid) return res.status(401).json({ success: false, error: "Authentication required." });
-    const id = String(req.body?.id || "").trim();
-    const list = history.get(uid) || [];
-    const next = id ? list.filter(item => String(item?.id || "") !== id) : [];
-    history.set(uid, next);
-    await deletePersistedScan(uid, id);
-    return res.json({ success: true, deleted: id || "all" });
-  });
+  if (route === "/signout" || route === "/logout") return originalPost.call(this, route, (req,res) => { clearSession(res); history.delete(req.session?.user?.uid); res.json({success:true}); });
+  if (route === "/scan_history/delete") return originalPost.call(this, route, async (req,res) => { const uid=req.session?.user?.uid; if(!uid)return res.status(401).json({success:false,error:"Authentication required."}); const id=String(req.body?.id||"").trim(); const list=history.get(uid)||[]; const next=id?list.filter(item=>String(item?.id||"")!==id:[]); history.set(uid,next); await deletePersistedScan(uid,id); return res.json({success:true,deleted:id||"all"}); });
   return originalPost.call(this, route, ...handlers);
 };
