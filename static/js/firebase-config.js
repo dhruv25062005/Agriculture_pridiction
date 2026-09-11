@@ -6,7 +6,23 @@ import { initializeFirestore, getFirestore, doc, getDocFromServer, setDoc, getDo
 let app=null,auth=null,db=null;
 export const OperationType={CREATE:"create",UPDATE:"update",DELETE:"delete",LIST:"list",GET:"get",WRITE:"write"};
 export function handleFirestoreError(error,operationType,path){const errInfo={error:error instanceof Error?error.message:String(error),operationType,path:path||null,authInfo:{userId:auth?.currentUser?.uid||null,email:auth?.currentUser?.email||null,emailVerified:auth?.currentUser?.emailVerified||null}};console.warn("Firestore Notice:",JSON.stringify(errInfo));return errInfo;}
-export async function testConnection(){if(!db)return;try{await Promise.race([getDocFromServer(doc(db,"test","connection")),new Promise((_,reject)=>setTimeout(()=>reject(new Error("Probe timeout")),4000))]);console.log("✅ Firestore connection validated");}catch(error){console.log("ℹ️ Firestore connection probe unavailable; this does not block normal reads/writes.");}}
+
+export async function testConnection(){
+  if(!db)return false;
+  try{
+    await Promise.race([
+      getDocFromServer(doc(db,"test","connection")),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Probe timeout")),4000))
+    ]);
+    window.__AGRI_FIRESTORE_READY__=true;
+    console.log("✅ Firestore connection validated");
+    return true;
+  }catch(error){
+    window.__AGRI_FIRESTORE_READY__=false;
+    console.log("ℹ️ Firestore is unavailable; authentication does not depend on it.");
+    return false;
+  }
+}
 
 async function fetchWithTimeout(url, options={}, timeoutMs=10000){
   const controller=new AbortController();
@@ -26,10 +42,14 @@ async function initFirebase(){
     auth=getAuth(app);
     const dbId=String(cfg.firestoreDatabaseId||"(default)").trim()||"(default)";
     try{db=initializeFirestore(app,{experimentalForceLongPolling:true},dbId);}catch(_){db=getFirestore(app,dbId);}
-    console.log(`✅ Firebase initialized (Firestore database: ${dbId})`);
+    // Do not probe Firestore during initialization. A missing database produces
+    // repeated SDK retries/noise and must not interfere with Firebase Auth.
+    window.__AGRI_FIRESTORE_READY__=false;
+    console.log(`✅ Firebase initialized (Firestore database: ${dbId}; auth independent)`);
     return{app,auth,db};
   }catch(err){
     app=null;auth=null;db=null;
+    window.__AGRI_FIRESTORE_READY__=false;
     console.error("❌ Firebase initialization failed:",err.message);
     return{app:null,auth:null,db:null,error:err};
   }
