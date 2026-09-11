@@ -51,5 +51,28 @@
 
   window.recommendCrop = recommendCrop;
   window.predictYield = predictYield;
-  window.__KISAN_PREDICTION_FORCE__ = "2026-09-11-v1";
+  window.__KISAN_PREDICTION_FORCE__ = "2026-09-11-v2";
+
+  // The legacy dashboard also attaches inline/form listeners to these buttons.
+  // Capture-phase interception prevents those old handlers from running and
+  // guarantees that the current API-backed handlers above receive the click.
+  function normalizeLabel(value) {
+    return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+  document.addEventListener("click", event => {
+    const target = event.target?.closest?.("button, [role='button'], input[type='button'], input[type='submit']");
+    if (!target) return;
+    const label = normalizeLabel(target.textContent || target.value || target.getAttribute("aria-label"));
+    if (label.includes("recommend crop")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      void recommendCrop();
+      return;
+    }
+    if (label.includes("estimate crop yield") || label.includes("estimate yield") || label === "predict yield") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      void predictYield();
+    }
+  }, true);
 })();
