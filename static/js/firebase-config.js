@@ -59,5 +59,5 @@ export{app,auth,db,doc,getDocFromServer,setDoc,getDoc,getDocs,collection,query,o
 if(typeof document!=="undefined"){
   import("/static/js/auth-3d.js?v=20260911-auth3d1").catch(error=>console.debug("Auth visual scene unavailable:",error));
   import("/static/js/auth-ui-upgrade.js?v=20260911-authui1").catch(error=>console.debug("Auth UI layer unavailable:",error));
-  import("/static/js/auth-background.js?v=20260911-fieldbg1").catch(error=>console.debug("Auth background unavailable:",error));
+  import("/static/js/auth-premium-polish.js?v=20260911-premium1").catch(error=>console.debug("Auth premium layer unavailable:",error));
 }
