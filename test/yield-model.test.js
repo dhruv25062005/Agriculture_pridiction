@@ -23,7 +23,35 @@ test("yield prediction accepts acres and returns tonnes per hectare", () => {
   assert.ok(r.model_inputs_used.includes("Crop"));
 });
 
-test("farm area does not directly change yield per hectare", () => {
+test("farm area does not act as a direct yield multiplier when input rates stay constant", () => {
+  const base = {
+    state: "Uttar Pradesh",
+    crop: "Wheat",
+    season: "Rabi",
+    year: 2020,
+    rainfall: 600,
+    fertilizer: 100,
+    pesticide: 10
+  };
+
+  // Fertilizer and pesticide are supplied as aggregate amounts. Keep the
+  // per-hectare rates constant when changing farm area so the model receives
+  // identical effective agronomic inputs.
+  const one = predictYieldModel({ ...base, area_acre: 1 });
+  const two = predictYieldModel({
+    ...base,
+    area_acre: 2,
+    fertilizer: 200,
+    pesticide: 20
+  });
+
+  assert.equal(one.yield_tpha, two.yield_tpha);
+  assert.equal(one.inputs_used.area_acre, 1);
+  assert.equal(two.inputs_used.area_acre, 2);
+  assert.ok(two.estimated_production_tonnes > one.estimated_production_tonnes);
+});
+
+test("area can affect yield only through fertilizer and pesticide per-hectare rates", () => {
   const base = {
     state: "Uttar Pradesh",
     crop: "Wheat",
@@ -35,10 +63,9 @@ test("farm area does not directly change yield per hectare", () => {
   };
   const one = predictYieldModel({ ...base, area_acre: 1 });
   const two = predictYieldModel({ ...base, area_acre: 2 });
-  assert.equal(one.yield_tpha, two.yield_tpha);
-  assert.equal(one.inputs_used.area_acre, 1);
-  assert.equal(two.inputs_used.area_acre, 2);
-  assert.ok(two.estimated_production_tonnes > one.estimated_production_tonnes);
+
+  assert.notEqual(one.yield_tpha, two.yield_tpha);
+  assert.ok(two.estimated_production_tonnes > 0);
 });
 
 test("unsupported categories are rejected instead of falling back to a global average", () => {
