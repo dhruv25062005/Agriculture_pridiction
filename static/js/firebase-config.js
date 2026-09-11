@@ -15,11 +15,9 @@ export async function testConnection(){
       new Promise((_,reject)=>setTimeout(()=>reject(new Error("Probe timeout")),4000))
     ]);
     window.__AGRI_FIRESTORE_READY__=true;
-    console.log("✅ Firestore connection validated");
     return true;
   }catch(error){
     window.__AGRI_FIRESTORE_READY__=false;
-    console.log("ℹ️ Firestore is unavailable; authentication does not depend on it.");
     return false;
   }
 }
@@ -38,14 +36,18 @@ async function initFirebase(){
     const cfg=await response.json();
     const missing=["apiKey","authDomain","projectId","appId"].filter(k=>!cfg?.[k]);
     if(missing.length)throw new Error(`Firebase configuration is incomplete: ${missing.join(", ")}`);
+
     app=initializeApp(cfg);
     auth=getAuth(app);
-    const dbId=String(cfg.firestoreDatabaseId||"(default)").trim()||"(default)";
-    try{db=initializeFirestore(app,{experimentalForceLongPolling:true},dbId);}catch(_){db=getFirestore(app,dbId);}
-    // Do not probe Firestore during initialization. A missing database produces
-    // repeated SDK retries/noise and must not interfere with Firebase Auth.
+
+    // The current Firebase project does not have a Firestore database. Do not
+    // initialize the Firestore client in that situation: the SDK will otherwise
+    // repeatedly retry the nonexistent `(default)` database and flood the
+    // console. Authentication is completely independent of Firestore.
+    // Firestore can be enabled later without changing the authentication flow.
+    db=null;
     window.__AGRI_FIRESTORE_READY__=false;
-    console.log(`✅ Firebase initialized (Firestore database: ${dbId}; auth independent)`);
+    console.log("✅ Firebase Auth initialized (Firestore unavailable; auth is independent)");
     return{app,auth,db};
   }catch(err){
     app=null;auth=null;db=null;
