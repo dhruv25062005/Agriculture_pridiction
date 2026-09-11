@@ -60,52 +60,34 @@ function clearLoginMessage() {
 document.getElementById("signin-email")?.addEventListener("input", clearLoginMessage);
 document.getElementById("signin-password")?.addEventListener("input", clearLoginMessage);
 
+// Firestore is optional application data storage. Authentication must never
+// depend on it because a Firebase project can legitimately have no Firestore
+// database. In particular, do not call getDoc/setDoc from the login flow.
 export async function syncUserProfile(user, additionalData = {}) {
   const currentDB = db || getFirebaseDB();
-  if (!currentDB || !user) {
-    console.warn("Firestore profile sync skipped: Firebase Firestore is not initialized.");
-    return false;
-  }
+  if (!currentDB || !user) return false;
+
+  // Only persist a profile when Firestore has explicitly been confirmed by
+  // the application. This flag is intentionally opt-in so a missing/default
+  // database cannot generate background retry traffic during authentication.
+  if (window.__AGRI_FIRESTORE_READY__ !== true) return false;
 
   try {
     const userRef = doc(currentDB, "users", user.uid);
-    let existing = null;
-
-    // Firestore must never block authentication. A database/rules/network issue
-    // should not leave the Sign In button stuck forever.
-    try {
-      existing = await withTimeout(
-        getDoc(userRef),
-        5000,
-        "Firestore profile read timed out"
-      );
-    } catch (error) {
-      console.warn("Could not read existing user profile; continuing with sign-in:", error.message);
-    }
-
+    const now = new Date().toISOString();
+    const existing = await withTimeout(getDoc(userRef), 5000, "Firestore profile read timed out");
     const profile = {
       userId: user.uid,
       email: user.email || "",
       displayName: user.displayName || additionalData.displayName || "Smart Farmer",
       preferredLanguage: additionalData.preferredLanguage || "en",
-      updatedAt: new Date().toISOString()
+      updatedAt: now
     };
-
-    if (!existing?.exists()) profile.createdAt = new Date().toISOString();
-
-    try {
-      await withTimeout(
-        setDoc(userRef, profile, { merge: true }),
-        5000,
-        "Firestore profile write timed out"
-      );
-      return true;
-    } catch (error) {
-      console.warn("Firestore profile write unavailable; authentication will continue:", error.message);
-      return false;
-    }
+    if (!existing?.exists()) profile.createdAt = now;
+    await withTimeout(setDoc(userRef, profile, { merge: true }), 5000, "Firestore profile write timed out");
+    return true;
   } catch (error) {
-    console.warn("Firestore profile sync unavailable; server authentication will continue:", error.message);
+    console.warn("Firestore profile sync skipped:", error.message);
     return false;
   }
 }
@@ -189,10 +171,8 @@ if (signinForm) {
         "Firebase sign-in timed out. Please check your connection and try again."
       );
 
-      // Profile persistence is best-effort and can never block authentication.
-      await syncUserProfile(userCredential.user);
+      // Firestore is deliberately excluded from authentication.
       await establishServerSession(userCredential.user, "password");
-
       window.location.replace("/signedin");
     } catch (error) {
       console.warn("Login failed:", error.code || error.message);
@@ -236,7 +216,7 @@ const handleGoogleSignIn = async () => {
     );
     const user = result.user;
 
-    await syncUserProfile(user);
+    // Firestore is deliberately excluded from authentication.
     await establishServerSession(user, "google");
     window.location.replace("/signedin");
   } catch (error) {
