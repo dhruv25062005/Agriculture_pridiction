@@ -12,10 +12,7 @@ const DASHBOARD_BINDING_TAG=`<script src="${DASHBOARD_BINDING_SRC}" defer></scri
 const YIELD_UI_TAG=`<script src="/static/js/yield-ui-hardening.js?v=20260911-v10" defer></script>`;
 const CROP_UI_TAG=`<script src="/static/js/crop-yield-ui-hardening.js?v=20260911-v7" defer></script>`;
 const VISUAL_UPGRADE_TAG=`<script src="/static/js/visual-upgrade.js?v=20260911-premium1" defer></script>`;
-// Render-blocking stylesheet: the final dashboard visual system is loaded before first paint.
-const FIELD_POLISH_LINK=`<link rel="stylesheet" href="/static/css/dashboard-field-polish.css?v=20260911-field4">`;
-// The template still contains a large legacy inline stylesheet for layout/functional components.
-// Keep it for compatibility, but never let that legacy visual state be painted before the final stylesheet is ready.
+const FIELD_POLISH_LINK=`<link rel="stylesheet" href="/static/css/dashboard-field-polish.css?v=20260911-field5">`;
 const DASHBOARD_PAINT_GUARD=`<style id="dashboard-paint-guard">html{background:#03110d!important}body{visibility:hidden!important;opacity:0!important}html.dashboard-ready body{visibility:visible!important;opacity:1!important;transition:opacity .12s ease}</style><script>document.addEventListener("DOMContentLoaded",()=>requestAnimationFrame(()=>document.documentElement.classList.add("dashboard-ready")),{once:true});</script>`;
 const DISABLED_SW=`// KisanAI service worker retired.\nconst KISANAI_SW_VERSION="retired-2026-09-11-v4";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil((async()=>{try{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}catch(_){}try{await self.registration.unregister();}catch(_){}try{const clients=await self.clients.matchAll({type:"window"});for(const c of clients){try{c.navigate(c.url);}catch(_){} }}catch(_){} })()));\n`;
 function clearSession(res){res.clearCookie(COOKIE,{httpOnly:true,secure:process.env.NODE_ENV==="production"||process.env.RENDER==="true",sameSite:"lax",path:"/"});res.setHeader("Cache-Control","no-store");}
