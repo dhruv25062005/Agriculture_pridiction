@@ -8,6 +8,7 @@
     "test": "npm run lint && node --test",
     "train:yield": "node scripts/train-yield-model.mjs",
     "build": "npm run lint",
+    "postinstall": "node scripts/train-yield-model.mjs",
     "start": "node --import ./app-hardening.js --import ./disease-hardening.js --import ./disease-fast.js --import ./weather-hardening.js --import ./runtime-fixes.js --import ./crop-yield-hardening.js server.js"
   },
   "engines": {
