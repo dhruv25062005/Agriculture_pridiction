@@ -17,24 +17,39 @@ test("yield prediction accepts acres and returns tonnes per hectare", () => {
   assert.ok(r.yield_tpha > 0);
   assert.equal(r.inputs_used.area_acre, 1);
   assert.ok(Math.abs(r.inputs_used.area_ha - 0.40468564224) < 1e-9);
-  assert.ok(r.prediction_interval_tpha.low < r.yield_tpha);
-  assert.ok(r.prediction_interval_tpha.high > r.yield_tpha);
+  assert.ok(r.indicative_range_tpha.low < r.yield_tpha);
+  assert.ok(r.indicative_range_tpha.high >= r.yield_tpha);
+  assert.equal(r.confidence, "Low");
+  assert.ok(r.model_inputs_used.includes("Crop"));
 });
 
-test("farm area is not a direct yield multiplier when input intensity is unchanged", () => {
+test("farm area does not directly change yield per hectare", () => {
   const base = {
     state: "Uttar Pradesh",
     crop: "Wheat",
     season: "Rabi",
-    year: 2026,
+    year: 2020,
     rainfall: 600,
+    fertilizer: 100,
     pesticide: 10
   };
-  const one = predictYieldModel({ ...base, area_acre: 1, fertilizer: 100, pesticide: 10 });
-  const two = predictYieldModel({ ...base, area_acre: 2, fertilizer: 200, pesticide: 20 });
+  const one = predictYieldModel({ ...base, area_acre: 1 });
+  const two = predictYieldModel({ ...base, area_acre: 2 });
   assert.equal(one.yield_tpha, two.yield_tpha);
   assert.equal(one.inputs_used.area_acre, 1);
   assert.equal(two.inputs_used.area_acre, 2);
-  assert.ok(Math.abs(one.inputs_used.fertilizer_kg_per_ha - two.inputs_used.fertilizer_kg_per_ha) < 1e-9);
-  assert.ok(Math.abs(one.inputs_used.pesticide_kg_per_ha - two.inputs_used.pesticide_kg_per_ha) < 1e-9);
+  assert.ok(two.estimated_production_tonnes > one.estimated_production_tonnes);
+});
+
+test("unsupported categories are rejected instead of falling back to a global average", () => {
+  assert.throws(() => predictYieldModel({
+    state: "Unknown State",
+    crop: "Wheat",
+    season: "Rabi",
+    year: 2020,
+    area_acre: 1,
+    rainfall: 600,
+    fertilizer: 100,
+    pesticide: 10
+  }), /Unsupported state/);
 });
