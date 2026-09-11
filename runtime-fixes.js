@@ -3,15 +3,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { getFirebaseAdminAuth } from "./config/security.js";
 
-const COOKIE = "agri_session";
-const history = new Map();
-const observedApps = new WeakSet();
-const MAX_MEMORY_SCANS_PER_USER = 20;
-const DASHBOARD_BINDING_SRC = "/static/js/dashboard-bindings.js?v=20260911-final2";
-const DASHBOARD_BINDING_TAG = `<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
-const YIELD_UI_TAG = `<script src="/static/js/yield-ui-hardening.js?v=20260911-v6" defer></script>`;
-const CROP_UI_TAG = `<script src="/static/js/crop-yield-ui-hardening.js?v=20260911-v6" defer></script>`;
-const DISABLED_SW = `// KisanAI service worker retired.\nconst KISANAI_SW_VERSION="retired-2026-09-11-v3";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil((async()=>{try{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}catch(_){}try{await self.registration.unregister();}catch(_){}try{const clients=await self.clients.matchAll({type:"window"});for(const c of clients){try{c.navigate(c.url);}catch(_){} }}catch(_){} })()));\n`;
+const COOKIE="agri_session";
+const history=new Map();
+const observedApps=new WeakSet();
+const MAX_MEMORY_SCANS_PER_USER=20;
+const DASHBOARD_BINDING_SRC="/static/js/dashboard-bindings.js?v=20260911-final2";
+const DASHBOARD_BINDING_TAG=`<script src="${DASHBOARD_BINDING_SRC}" defer></script>`;
+const YIELD_UI_TAG=`<script src="/static/js/yield-ui-hardening.js?v=20260911-v6" defer></script>`;
+const CROP_UI_TAG=`<script src="/static/js/crop-yield-ui-hardening.js?v=20260911-v7" defer></script>`;
+const DISABLED_SW=`// KisanAI service worker retired.\nconst KISANAI_SW_VERSION="retired-2026-09-11-v4";\nself.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));\nself.addEventListener("activate",event=>event.waitUntil((async()=>{try{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}catch(_){}try{await self.registration.unregister();}catch(_){}try{const clients=await self.clients.matchAll({type:"window"});for(const c of clients){try{c.navigate(c.url);}catch(_){} }}catch(_){} })()));\n`;
 function clearSession(res){res.clearCookie(COOKIE,{httpOnly:true,secure:process.env.NODE_ENV==="production"||process.env.RENDER==="true",sameSite:"lax",path:"/"});res.setHeader("Cache-Control","no-store");}
 function readCookie(req,name){const header=String(req.headers.cookie||"");for(const part of header.split(";")){const i=part.indexOf("=");if(i<0||part.slice(0,i).trim()!==name)continue;try{return decodeURIComponent(part.slice(i+1).trim());}catch{return part.slice(i+1).trim();}}return "";}
 async function verifyDashboardSession(req){const token=readCookie(req,COOKIE);if(!token)return null;try{const decoded=await(await getFirebaseAdminAuth()).verifySessionCookie(token,true);return decoded?.uid?decoded:null;}catch{return null;}}
