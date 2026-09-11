@@ -1,5 +1,36 @@
-// Leakage-safe historical target-encoding model trained from the supplied train/test CSVs.
-// Production is excluded because Yield is derived from Production / Area.
+// Leakage-safe historical target-encoding model.
+// Production is intentionally excluded because Yield = Production / Area.
+// The source dataset covers Indian crop/state/season records from 1997-2020.
 const MODEL={"global":1.098091,"crop":{"Arecanut":1.3,"Arhar/Tur":0.879565,"Bajra":1.057671,"Banana":25.3638255,"Barley":1.5710715,"Black pepper":0.45,"Cardamom":0.103809,"Cashewnut":0.466667,"Castor seed":0.605556,"Coconut":9101.813684,"Coriander":0.591244,"Cotton(lint)":1.3,"Cowpea(Lobia)":0.7667595,"Dry chillies":1,"Garlic":4.181104,"Ginger":6.0103125,"Gram":0.904375,"Grapes":23.292771,"Groundnut":1.183043,"Guar seed":0.812642,"Horse-gram":0.5,"Jowar":1.012727,"Jute":8.500625,"Khesari":0.8310415,"Lentil":0.931455,"Linseed":0.459473,"Maize":2.102917,"Mango":6.921642,"Masoor":0.76,"Mesta":5.77622,"Moong":0.6989835,"Moong(Green Gram)":0.5688865,"Moth":0.535,"Mustard":1.454839,"Niger seed":0.364091,"Oilseeds total":1.293545,"Onion":11.09362,"Other  Rabi pulses":0.764667,"Other Cereals":0.7929715,"Other Kharif pulses":0.7325555,"Other Summer Pulses":0.426364,"Peas & beans (Pulses)":0.987,"Potato":10.6943705,"Ragi":0.992667,"Rapeseed &Mustard":0.781111,"Rice":2.1825,"Rubber":1.544829,"Safflower":0.5795,"Sannhamp":0.404857,"Sesamum":0.472,"Small millets":0.783684,"Soyabean":1.0371875,"Sugarcane":58.61248,"Sunflower":0.987567,"Sweet potato":8.514545,"Tapioca":13.003333,"Tobacco":1.266156,"Tomato":23.480618,"Turmeric":3.106209,"Urad":0.618889,"Wheat":1.8925715,"other oilseeds":0.7611435},"state":{"Andhra Pradesh":1.408779,"Arunachal Pradesh":1.499583,"Assam":0.878119,"Bihar":1.094706,"Chhattisgarh":0.546667,"Delhi":2.780342,"Goa":1.840043,"Gujarat":1.501572,"Haryana":1.3146015,"Himachal Pradesh":0.778571,"Jammu and Kashmir":0.6688395,"Jharkhand":1.01,"Karnataka":0.952174,"Kerala":1.505,"Madhya Pradesh":0.996667,"Maharashtra":0.798152,"Manipur":1.180187,"Meghalaya":1.53,"Mizoram":1.32,"Nagaland":1.0625,"Odisha":0.758106,"Puducherry":1.8,"Punjab":1.329412,"Rajasthan":1.331498,"Sikkim":0.984352,"Tamil Nadu":1.717698,"Telangana":1.584091,"Tripura":0.880038,"Uttar Pradesh":1.142879,"Uttarakhand":0.955455,"West Bengal":1.121667},"season":{"Autumn":1.088571,"Kharif":0.9829715,"Rabi":0.956829,"Summer":1.350294,"Whole Year":5.556364,"Winter":9.838815},"weights":{"crop":0.7,"state":0.2,"season":0.1},"metrics":{"mae_tpha":39.319581,"rmse_tpha":462.773843,"r2":0.759336,"median_absolute_error_tpha":0.438653},"train_rows":17400,"test_rows":4350};
-export const MODEL_INFO={type:"Historical median target encoder",target:"Yield (tonnes/hectare)",training_rows:MODEL.train_rows,test_rows:MODEL.test_rows,production_excluded:true,test_metrics:MODEL.metrics};
-export function predictYieldModel(input){const state=String(input.state??"").trim(),crop=String(input.crop??"").trim(),season=String(input.season??"").trim();const year=Number(input.year),area=Number(input.area),rainfall=Number(input.rainfall),fertilizer=Number(input.fertilizer),pesticide=Number(input.pesticide);if(!state||!crop||!season)throw new Error("State, crop and season are required.");if([year,area,rainfall,fertilizer,pesticide].some(v=>!Number.isFinite(v)||v<0))throw new Error("Year, area, rainfall, fertilizer and pesticide must be valid non-negative numbers.");const c=MODEL.crop[crop]??MODEL.global,s=MODEL.state[state]??MODEL.global,se=MODEL.season[season]??MODEL.global;const y=Math.max(0,MODEL.global+MODEL.weights.crop*(c-MODEL.global)+MODEL.weights.state*(s-MODEL.global)+MODEL.weights.season*(se-MODEL.global));return {success:true,yield_tpha:Number(y.toFixed(3)),unit:"tonnes/hectare",model:MODEL_INFO.type,model_test_metrics:MODEL_INFO.test_metrics,inputs_used:{state,crop,season,year,area_ha:area,annual_rainfall_mm:rainfall,fertilizer,pesticide},leakage_safe:true,note:"Production is excluded. This is a historical-data baseline and should be treated as an indicative estimate, not a guaranteed farm yield."};}
+
+const CROP_ALIASES={"Other Rabi pulses":"Other  Rabi pulses"};
+export const SUPPORTED_CROPS=Object.freeze(Object.keys(MODEL.crop).map(c=>c==="Other  Rabi pulses"?"Other Rabi pulses":c));
+export const SUPPORTED_STATES=Object.freeze(Object.keys(MODEL.state));
+export const SUPPORTED_SEASONS=Object.freeze(Object.keys(MODEL.season));
+export const MODEL_INFO={type:"Historical median target encoder",target:"Yield (tonnes/hectare)",training_rows:MODEL.train_rows,test_rows:MODEL.test_rows,training_year_range:[1997,2020],production_excluded:true,test_metrics:MODEL.metrics,validation_status:"random historical holdout; temporal validation is not yet established"};
+
+function canonicalCrop(crop){const raw=String(crop??"").trim();return CROP_ALIASES[raw]??raw;}
+export function predictYieldModel(input){
+  const state=String(input.state??"").trim();
+  const cropInput=String(input.crop??"").trim();
+  const crop=canonicalCrop(cropInput);
+  const season=String(input.season??"").trim();
+  const year=Number(input.year);
+  const area=Number(input.area);
+  const rainfall=Number(input.rainfall);
+  const fertilizer=Number(input.fertilizer);
+  const pesticide=Number(input.pesticide);
+  if(!state||!cropInput||!season)throw new Error("State, crop and season are required.");
+  if(!SUPPORTED_STATES.includes(state))throw new Error(`Unsupported state: ${state}.`);
+  if(!SUPPORTED_CROPS.includes(cropInput))throw new Error(`Unsupported crop: ${cropInput}.`);
+  if(!SUPPORTED_SEASONS.includes(season))throw new Error(`Unsupported season: ${season}.`);
+  if(!Number.isInteger(year)||year<1997||year>2100)throw new Error("Year must be an integer from 1997 to 2100.");
+  if(!Number.isFinite(area)||area<=0)throw new Error("Area must be greater than zero.");
+  if(!Number.isFinite(rainfall)||rainfall<0||rainfall>10000)throw new Error("Annual rainfall must be between 0 and 10000 mm.");
+  if(!Number.isFinite(fertilizer)||fertilizer<0)throw new Error("Fertilizer must be a non-negative number.");
+  if(!Number.isFinite(pesticide)||pesticide<0)throw new Error("Pesticide must be a non-negative number.");
+
+  const c=MODEL.crop[crop],s=MODEL.state[state],se=MODEL.season[season];
+  const yield_tpha=Math.max(0,MODEL.global+MODEL.weights.crop*(c-MODEL.global)+MODEL.weights.state*(s-MODEL.global)+MODEL.weights.season*(se-MODEL.global));
+  return {success:true,yield_tpha:Number(yield_tpha.toFixed(3)),unit:"tonnes/hectare",model:MODEL_INFO.type,model_test_metrics:MODEL_INFO.test_metrics,inputs_used:{state,crop:cropInput,season,year,area_ha:area,annual_rainfall_mm:rainfall,fertilizer,pesticide},leakage_safe:true,note:"Production is excluded. This is a historical-data baseline, not a guaranteed farm yield."};
+}
