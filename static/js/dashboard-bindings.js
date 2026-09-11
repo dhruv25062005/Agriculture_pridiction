@@ -22,9 +22,8 @@
   // =========================================================
   // CLIMATE CROP RECOMMENDATION + YIELD — canonical client API
   // =========================================================
-  // The old inline handlers expected a legacy response shape. These bindings
-  // intentionally own the two buttons and accept both the current and legacy
-  // server shapes so an old Render instance cannot produce "undefined" cards.
+  // The legacy handlers below remain as a compatibility fallback. The newer
+  // crop/yield hardening scripts are authoritative when they are loaded.
   const finite = (v, fallback = null) => {
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
@@ -137,8 +136,11 @@
       if (box) box.innerHTML = `<div style="color:#ef4444;padding:10px;">${escapeHtml(e.message || "Yield service unavailable.")}</div>`;
     }
   }
-  window.recommendCrop = recommendCropCanonical;
-  window.predictYield = predictYieldCanonical;
+  // IMPORTANT: do not overwrite the newer hardening handlers. This file may
+  // load before or after them, so only install the compatibility handlers when
+  // a newer handler is not already present.
+  if (typeof window.recommendCrop !== "function") window.recommendCrop = recommendCropCanonical;
+  if (typeof window.predictYield !== "function") window.predictYield = predictYieldCanonical;
 
   /* LIVE DISEASE SCANNER — quota-aware production implementation */
   let liveStream=null, liveFacing="environment", liveBusy=false, liveFrozen=false, liveTimer=null, torchOn=false, liveScanGeneration=0;
@@ -158,5 +160,5 @@
   function switchScannerMode(mode){const live=String(mode).toLowerCase()==="live";byId("tabUploadMode")?.classList.toggle("active",!live);byId("tabLiveMode")?.classList.toggle("active",live);byId("photoUploadPanel")?.classList.toggle("hidden",live);byId("liveScannerPanel")?.classList.toggle("hidden",!live);if(live)startLiveCameraStream();else stopLiveCameraStream();}
   function showToastNoticeSafe(msg){try{if(typeof window.showToastNotice==="function")return window.showToastNotice(msg);}catch(_){}console.warn(msg);}
   window.startLiveCameraStream=startLiveCameraStream;window.stopLiveCameraStream=stopLiveCameraStream;window.switchScannerMode=switchScannerMode;window.flipLiveCamera=flipLiveCamera;window.toggleTorch=toggleTorch;window.toggleFreezeLiveStream=toggleFreezeLiveStream;window.performLiveFrameAnalysis=performLiveFrameAnalysis;window.toggleAutoLiveScan=toggleAutoLiveScan;
-  window.__KISAN_DASHBOARD_BINDINGS__="2026-09-10-crop-yield-fixed-1";
+  window.__KISAN_DASHBOARD_BINDINGS__="2026-09-11-crop-yield-handler-guard";
 })();
