@@ -9,7 +9,7 @@ A smart-agriculture web application using **Node.js, Express, Firebase Authentic
 - **Weather:** live Open-Meteo current/hourly/7-day forecast data. Invalid locations and upstream failures return errors instead of fabricated weather values.
 - **Authentication:** Firebase Authentication on the client with Firebase Admin-verified server sessions in HttpOnly cookies.
 - **Scan history:** authenticated users only; diagnostic records are isolated by Firebase UID in the runtime session layer.
-- **PWA:** static assets may be cached, while authenticated pages and application/API responses are not cached by the service worker.
+- **PWA:** the legacy service worker has been retired; authenticated pages and application/API responses are not cached.
 
 ## Tech stack
 
@@ -103,7 +103,7 @@ Weather requests are resolved from the supplied city/place or valid latitude/lon
 - CORS is allow-listed through environment configuration.
 - Helmet security headers and rate limiting are enabled.
 - Authenticated responses are marked `no-store` where appropriate.
-- The service worker caches static resources only; it does not cache authenticated dashboard/API responses.
+- The retired service-worker endpoint does not cache authenticated dashboard/API responses.
 - Uploads use memory storage with strict size and file-signature validation.
 
 ## Limitations
