@@ -84,8 +84,19 @@ function cropRecommendation(req,res) {
 function trainedYield(req,res) {
   try {
     const p=req.body||{};
-    const result=predictYieldModel({state:p.state,crop:p.crop,season:p.season,year:p.year??new Date().getFullYear(),area:p.area??p.area_ha,rainfall:p.rainfall??p.annual_rainfall??p.Annual_Rainfall,fertilizer:p.fertilizer??p.Fertilizer,pesticide:p.pesticide??p.Pesticide});
-    return res.json({...result,api_version:"2026-09-11-crop-yield-v3",forecast_type:"historical_data_model",confidence_note:"Held-out test metrics describe the original historical model; they are not a guarantee of farm yield."});
+    const result=predictYieldModel({
+      state:p.state,
+      crop:p.crop,
+      season:p.season,
+      year:p.year??new Date().getFullYear(),
+      area_acre:p.area_acre,
+      area_ha:p.area_ha,
+      area:p.area,
+      rainfall:p.rainfall??p.annual_rainfall??p.Annual_Rainfall,
+      fertilizer:p.fertilizer??p.Fertilizer,
+      pesticide:p.pesticide??p.Pesticide
+    });
+    return res.json({...result,api_version:"2026-09-11-yield-v2",forecast_type:"historical_data_model",confidence_note:"The underlying held-out metrics describe the historical baseline; the calibrated estimate is not a guarantee of farm yield."});
   } catch(error) { return res.status(400).json({success:false,error:error?.message||"Unable to calculate yield."}); }
 }
 function patchedPost(originalPost){return function(route,...handlers){if(route==="/recommend_crop")return originalPost.call(this,route,cropRecommendation);if(route==="/predict_yield")return originalPost.call(this,route,trainedYield);return originalPost.call(this,route,...handlers);};}
