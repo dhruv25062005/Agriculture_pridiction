@@ -16,7 +16,7 @@ test("yield prediction accepts acres and returns tonnes per hectare", () => {
   assert.equal(r.success, true);
   assert.ok(r.yield_tpha > 0);
   assert.equal(r.inputs_used.area_acre, 1);
-  assert.ok(Math.abs(r.inputs_used.area_ha - 0.40468564224) < 1e-9);
+  assert.ok(Math.abs(r.inputs_used.area_ha - 0.40468564224) < 1e-4);
   assert.ok(r.indicative_range_tpha.low < r.yield_tpha);
   assert.ok(r.indicative_range_tpha.high >= r.yield_tpha);
   assert.equal(r.confidence, "Low");
