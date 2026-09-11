@@ -37,6 +37,7 @@
       }
       .bg-orb{display:none!important;}
 
+      /* The hero side is completely transparent: no panel backdrop/filter/blur. */
       .auth-card{
         width:min(1420px,100%)!important;
         max-width:none!important;
@@ -47,6 +48,10 @@
         gap:clamp(26px,5vw,80px)!important;
         overflow:visible!important;
         background:transparent!important;
+        background-color:transparent!important;
+        backdrop-filter:none!important;
+        -webkit-backdrop-filter:none!important;
+        filter:none!important;
         box-shadow:none!important;
         border:0!important;
         position:relative!important;
@@ -62,6 +67,10 @@
         min-width:0!important;
         border:0!important;
         background:transparent!important;
+        background-color:transparent!important;
+        backdrop-filter:none!important;
+        -webkit-backdrop-filter:none!important;
+        filter:none!important;
         display:flex!important;
         align-items:center!important;
       }
@@ -70,6 +79,10 @@
         height:auto!important;
         padding:0 10px 0 26px!important;
         display:block!important;
+        background:transparent!important;
+        backdrop-filter:none!important;
+        -webkit-backdrop-filter:none!important;
+        filter:none!important;
       }
 
       /* Keep the hero copy deliberately short so the photograph remains visible. */
@@ -91,10 +104,10 @@
       .agri-description{max-width:500px;color:rgba(240,249,246,.78);font-size:15px;line-height:1.55;}
       .agri-features{display:grid;gap:9px;margin-top:22px;max-width:450px;}
       .agri-feature{display:flex;align-items:center;gap:12px;color:rgba(250,255,253,.88);font-size:14px;}
-      .agri-feature-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;border:1px solid rgba(57,242,176,.20);background:rgba(4,38,35,.18);backdrop-filter:blur(7px);font-size:18px;}
+      .agri-feature-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;border:1px solid rgba(57,242,176,.20);background:rgba(4,38,35,.18);backdrop-filter:none;-webkit-backdrop-filter:none;font-size:18px;}
       .agri-footer{display:none!important;}
 
-      /* Very light glass: the photograph should remain visible through it. */
+      /* Only the authentication form keeps a subtle glass surface. */
       .right{
         width:min(480px,38vw)!important;
         min-width:390px!important;
