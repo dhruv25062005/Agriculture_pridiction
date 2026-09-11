@@ -39,12 +39,6 @@ async function initFirebase(){
 
     app=initializeApp(cfg);
     auth=getAuth(app);
-
-    // The current Firebase project does not have a Firestore database. Do not
-    // initialize the Firestore client in that situation: the SDK will otherwise
-    // repeatedly retry the nonexistent `(default)` database and flood the
-    // console. Authentication is completely independent of Firestore.
-    // Firestore can be enabled later without changing the authentication flow.
     db=null;
     window.__AGRI_FIRESTORE_READY__=false;
     console.log("✅ Firebase Auth initialized (Firestore unavailable; auth is independent)");
@@ -60,3 +54,8 @@ async function initFirebase(){
 export const firebaseReady=initFirebase();
 export function getFirebaseAuth(){return auth} export function getFirebaseDB(){return db}
 export{app,auth,db,doc,getDocFromServer,setDoc,getDoc,getDocs,collection,query,orderBy,onSnapshot,deleteDoc};
+
+// Decorative authentication scene. It loads independently and never blocks auth initialization.
+if(typeof document!=="undefined"){
+  import("/static/js/auth-3d.js?v=20260911-auth3d1").catch(error=>console.debug("Auth visual scene unavailable:",error));
+}
