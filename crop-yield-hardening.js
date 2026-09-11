@@ -1,13 +1,12 @@
 import express from "express";
 import { strictRateLimiter } from "./config/security.js";
 import { predictYieldModel } from "./models/yield-model-enhanced.js";
+import { predictYieldModel as safePredictYieldModel } from "./models/yield-model-safe.js";
 
 const originalApplicationPost=express.application.post;
 const originalRouterPost=express.Router.prototype.post;
 const num=(v,fallback)=>Number.isFinite(Number(v))?Number(v):fallback;
 
-// Climate-screening profiles are deliberately kept separate from the yield model.
-// They are useful for crop choice, but must not silently change historical yield.
 const profiles=[
   ["Pearl millet (Bajra)",[25,35],[200,500],"Kharif/Summer","Low","high"],
   ["Sorghum (Jowar)",[20,32],[250,600],"Kharif/Rabi","Low-Moderate","high"],
@@ -45,17 +44,18 @@ function cropRecommendation(req,res){
   return res.json({success:true,api_version:"2026-09-11-crop-v4",crop:best.crop,recommendation:best.crop,score:best.score,suitability_label:classify(best.score),temperature_fit:best.temperature_fit,rainfall_fit:best.rainfall_fit,season:best.season,water_requirement:best.water_requirement,resilience:best.resilience,recommended_temperature_range_c:best.temperature_range_c,recommended_rainfall_range_mm:best.rainfall_range_mm,recommendation_confidence:"Climate screening only",alternatives:ranked.slice(1,6),inputs_used:{temperature_c:temp,seasonal_rainfall_mm:rainfall},note:`${recommendationReason(best,rainfall)} Climate screening does not include soil, irrigation, cultivar, sowing date, pests, disease pressure or market conditions.`});
 }
 function trainedYield(req,res){
+  const p=req.body||{};
+  const input={state:p.state,crop:p.crop,season:p.season,year:p.year??new Date().getFullYear(),area_acre:p.area_acre,area_ha:p.area_ha,area:p.area,rainfall:p.rainfall??p.annual_rainfall??p.Annual_Rainfall,fertilizer:p.fertilizer??p.Fertilizer,pesticide:p.pesticide??p.Pesticide};
   try{
-    const p=req.body||{};
-    const result=predictYieldModel({state:p.state,crop:p.crop,season:p.season,year:p.year??new Date().getFullYear(),area_acre:p.area_acre,area_ha:p.area_ha,area:p.area,rainfall:p.rainfall??p.annual_rainfall??p.Annual_Rainfall,fertilizer:p.fertilizer??p.Fertilizer,pesticide:p.pesticide??p.Pesticide});
-    return res.json({...result,api_version:"2026-09-11-yield-v3",forecast_type:"historical_data_estimate",confidence_note:"This is an indicative historical estimate. It is not a farm guarantee and is not temporally validated for future years."});
+    let result=predictYieldModel(input);
+    if(!result||result.success!==true||!Number.isFinite(Number(result.yield_tpha))){
+      result=safePredictYieldModel({...input,area_ha:Number(input.area_ha??input.area??(Number(input.area_acre)*0.40468564224))});
+      result={...result,success:true,model:`${result.model} (safe finite fallback)`,confidence:"Low",fallback_reason:"The temporal model returned a non-finite value, so the leakage-safe historical baseline was used."};
+    }
+    if(!Number.isFinite(Number(result.yield_tpha)))throw new Error("Yield model could not produce a finite estimate.");
+    return res.json({...result,api_version:"2026-09-11-yield-v4",forecast_type:"historical_data_estimate",confidence_note:"Indicative historical estimate; model output is checked for finite values and no unverified fallback number is silently presented."});
   }catch(error){return res.status(400).json({success:false,error:error?.message||"Unable to calculate yield."});}
 }
-
-// Preserve all previously registered middleware (especially authentication).
-// The old implementation replaced the entire route with a bare handler, which
-// could accidentally remove auth middleware. Only the final business handler
-// is replaced; auth and other middleware remain in the chain.
 function withFinalHandler(handlers,finalHandler){
   const preserved=handlers.length?handlers.slice(0,-1):[];
   return [...preserved,strictRateLimiter,finalHandler];
