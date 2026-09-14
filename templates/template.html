@@ -1,505 +1,756 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Smart Agriculture</title>
-<meta name="theme-color" content="#00e676">
-<meta name="description" content="Smart precision farming portal featuring multimodal AI plant disease & insect pest detection, real-time live field scanner, plot fertilizer calculation, yield prediction, and live weather insights.">
-<meta property="og:title" content="AI Smart Agriculture">
-<meta property="og:description" content="Smart precision farming portal featuring multimodal AI plant disease & insect pest detection, real-time live field scanner, plot fertilizer calculation, yield prediction, and live weather insights.">
-<link rel="manifest" href="/static/manifest.json">
-<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Smart Agriculture</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --bg1:#0b1320;
-  --bg2:#0f2720;
-  --bg3:#041a12;
+  <style>
+    :root {
+      --bg1: #0b1320;
+      --bg2: #0f2720;
+      --bg3: #041a12;
 
-  --glass:rgba(255,255,255,0.07);
-  --blur:blur(22px);
+      --glass: rgba(255, 255, 255, 0.07);
+      --blur: blur(22px);
 
-  --primary:#00e676;
-  --primary-glow:#00ffcc;
+      --primary: #00e676;
+      --primary-glow: #00ffcc;
 
-  --input:rgba(15,23,42,0.65);
-  --text:#f0fdf4;
-  --muted:#94a3b8;
-}
+      --input: rgba(15, 23, 42, 0.65);
+      --text: #f0fdf4;
+      --muted: #94a3b8;
+    }
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:'Poppins',sans-serif;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
 
-body{
-  min-height:100vh;
-  background:#03140f;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--text);
-  overflow-x:hidden;
-  padding:20px;
-  position:relative;
-}
+    body {
+      min-height: 100vh;
+      background: #03140f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      overflow-x: hidden;
+      padding: 20px;
+      position: relative;
+    }
 
-/* SUBTLE AMBIENT BACKGROUND GLOW */
-.bg-orb{
-  position:fixed;
-  border-radius:50%;
-  filter:blur(90px);
-  z-index:-1;
-  pointer-events:none;
-  opacity:0.25;
-}
-.orb-1{
-  width:360px;
-  height:360px;
-  background:rgba(0,230,118,0.1);
-  top:-40px;
-  left:-60px;
-}
-.orb-2{
-  width:420px;
-  height:420px;
-  background:rgba(0,255,204,0.06);
-  bottom:-80px;
-  right:-80px;
-}
+    /* SUBTLE AMBIENT BACKGROUND GLOW */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.25;
+    }
 
-/* REFINED AUTH CARD */
-.auth-card{
-  width:1120px;
-  max-width:96%;
-  min-height:640px;
-  background:var(--glass);
-  backdrop-filter:var(--blur);
-  -webkit-backdrop-filter:var(--blur);
-  border-radius:24px;
-  display:flex;
-  overflow:hidden;
-  box-shadow:0 18px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.12);
-  transition:transform 0.25s ease-out, box-shadow 0.3s ease;
-  position:relative;
-}
+    .orb-1 {
+      width: 360px;
+      height: 360px;
+      background: rgba(0, 230, 118, 0.1);
+      top: -40px;
+      left: -60px;
+    }
 
-.auth-card:hover{
-  box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,255,200,0.25);
-}
+    .orb-2 {
+      width: 420px;
+      height: 420px;
+      background: rgba(0, 255, 204, 0.06);
+      bottom: -80px;
+      right: -80px;
+    }
 
-/* SHINE OVERLAY */
-.shine-layer{
-  display:none;
-}
+    /* REFINED AUTH CARD */
+    .auth-card {
+      width: 1120px;
+      max-width: 96%;
+      min-height: 640px;
+      background: var(--glass);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border-radius: 24px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      transition: transform 0.25s ease-out, box-shadow 0.3s ease;
+      position: relative;
+    }
 
-/* LEFT PANEL */
-.left{
-  width:46%;
-  position:relative;
-  background:
-    linear-gradient(180deg, rgba(4,32,24,0.65), rgba(3,20,15,0.88)),
-    -webkit-image-set(url("/static/smart_agri_hero.webp") 1x, url("/static/smart_agri_hero.jpg") 1x) center/cover no-repeat,
-    url("/static/smart_agri_hero.webp") center/cover no-repeat;
-  border-right:1px solid rgba(255,255,255,0.1);
-}
+    .auth-card:hover {
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 255, 200, 0.25);
+    }
 
-.left-content{
-  height:100%;
-  padding:45px 38px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
+    /* SHINE OVERLAY */
+    .shine-layer {
+      display: none;
+    }
 
-.brand-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding:8px 18px;
-  border-radius:30px;
-  background:rgba(255,255,255,0.1);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(0,255,200,0.3);
-  font-size:14px;
-  font-weight:600;
-  letter-spacing:0.5px;
-  color:#a7f3d0;
-  box-shadow:0 8px 20px rgba(0,0,0,0.25);
-}
+    /* LEFT PANEL */
+    .left {
+      width: 46%;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(4, 32, 24, 0.65), rgba(3, 20, 15, 0.88)),
+        -webkit-image-set(url("/static/smart_agri_hero.webp") 1x, url("/static/smart_agri_hero.jpg") 1x) center/cover no-repeat,
+        url("/static/smart_agri_hero.webp") center/cover no-repeat;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-.tagline{
-  margin:40px 0 20px;
-}
-.tagline h2{
-  font-size:2.2rem;
-  font-weight:800;
-  line-height:1.25;
-  background:linear-gradient(135deg, #ffffff, #a7f3d0, #34d399);
-  -webkit-background-clip:text;
-  color:transparent;
-}
-.tagline p{
-  margin-top:14px;
-  font-size:0.95rem;
-  color:rgba(255,255,255,0.85);
-  line-height:1.6;
-}
+    .left-content {
+      height: 100%;
+      padding: 45px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-/* RIGHT PANEL */
-.right{
-  width:54%;
-  padding:50px 60px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #a7f3d0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
 
-.auth-header{
-  margin-bottom:24px;
-}
-.auth-header h1{
-  font-size:1.9rem;
-  font-weight:700;
-  color:#ffffff;
-}
-.auth-header p{
-  font-size:0.88rem;
-  color:var(--muted);
-  margin-top:6px;
-}
-.auth-header a{
-  color:var(--primary-glow);
-  font-weight:600;
-  cursor:pointer;
-  text-decoration:none;
-}
-.auth-header a:hover{
-  text-decoration:underline;
-}
+    .tagline {
+      margin: 40px 0 20px;
+    }
 
-/* FORM */
-.form{
-  width:100%;
-}
+    .tagline h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.25;
+      color: white;
+    }
 
-.row{
-  display:flex;
-  gap:12px;
-}
+    .tagline p {
+      margin-top: 14px;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+    }
 
-input{
-  width:100%;
-  padding:14px 18px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,0.16);
-  background:var(--input);
-  color:var(--text);
-  margin-bottom:14px;
-  outline:none;
-  font-size:0.95rem;
-  transition:all 0.25s ease;
-}
+    /* RIGHT PANEL */
+    .right {
+      width: 54%;
+      padding: 50px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
-input:focus{
-  border-color:var(--primary-glow);
-  box-shadow:0 0 0 3px rgba(0,230,118,0.25);
-  background:rgba(15,23,42,0.85);
-}
 
-input::placeholder{
-  color:#64748b;
-}
+    }
 
-button.primary-btn{
-  width:100%;
-  padding:15px;
-  border-radius:16px;
-  border:none;
-  background:linear-gradient(135deg, #00c853, #00e676, #1de9b6);
-  color:#022c22;
-  font-size:1rem;
-  font-weight:700;
-  cursor:pointer;
-  transition:all 0.3s ease;
-  box-shadow:0 8px 25px rgba(0,230,118,0.35);
-}
+    .auth-header {
+      margin-bottom: 24px;
+    }
 
-button.primary-btn:hover{
-  transform:translateY(-2px) scale(1.01);
-  box-shadow:0 12px 35px rgba(0,230,118,0.55);
-}
+    .auth-header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
 
-.guest-btn{
-  width:100%;
-  padding:14px;
-  border-radius:16px;
-  border:1px solid rgba(0,255,200,0.35);
-  background:rgba(255,255,255,0.08);
-  color:#a7f3d0;
-  font-size:0.95rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:all 0.3s ease;
-}
+    .auth-header p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
 
-/* AUTH ERROR & FEEDBACK BANNERS */
-.auth-feedback{
-  display:none;
-  padding:12px 15px;
-  border-radius:14px;
-  margin-bottom:16px;
-  font-size:0.86rem;
-  line-height:1.5;
-  animation:fadeSlide 0.3s ease-out;
-}
-@keyframes fadeSlide{
-  from{opacity:0; transform:translateY(-6px);}
-  to{opacity:1; transform:translateY(0);}
-}
-.auth-feedback.error{
-  display:block;
-  background:rgba(239,68,68,0.15);
-  border:1px solid rgba(239,68,68,0.4);
-  color:#fca5a5;
-}
-.auth-feedback.success{
-  display:block;
-  background:rgba(16,185,129,0.15);
-  border:1px solid rgba(16,185,129,0.4);
-  color:#6ee7b7;
-}
-.auth-feedback.info{
-  display:block;
-  background:rgba(56,189,248,0.15);
-  border:1px solid rgba(56,189,248,0.4);
-  color:#7dd3fc;
-}
-.auth-action-btn{
-  display:inline-block;
-  margin-top:8px;
-  padding:5px 12px;
-  background:rgba(56,189,248,0.25);
-  border:1px solid rgba(56,189,248,0.5);
-  border-radius:8px;
-  color:#ffffff;
-  font-size:0.8rem;
-  font-weight:600;
-  cursor:pointer;
-  text-decoration:none;
-  transition:all 0.2s ease;
-}
-.auth-action-btn:hover{
-  background:rgba(56,189,248,0.45);
-}
-  transition:all 0.3s ease;
-  backdrop-filter:blur(8px);
-}
+    .auth-header a {
+      color: var(--primary-glow);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
 
-.guest-btn:hover{
-  background:rgba(0,230,118,0.18);
-  border-color:var(--primary-glow);
-  box-shadow:0 8px 25px rgba(0,255,140,0.25);
-  transform:translateY(-2px);
-}
+    .auth-header a:hover {
+      text-decoration: underline;
+    }
 
-.google-btn{
-  width:100%;
-  padding:13px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,0.15);
-  background:rgba(255,255,255,0.06);
-  color:#ffffff;
-  font-size:0.92rem;
-  font-weight:500;
-  cursor:pointer;
-  transition:all 0.25s ease;
-}
-.google-btn:hover{
-  background:rgba(255,255,255,0.12);
-  box-shadow:0 8px 20px rgba(0,0,0,0.3);
-}
+    /* FORM */
+    .form {
+      width: 100%;
+    }
 
-.forgot-wrapper{
-  text-align:right;
-  margin-bottom:14px;
-}
-.forgot-btn{
-  background:none;
-  border:none;
-  color:var(--primary-glow);
-  font-size:0.85rem;
-  cursor:pointer;
-  font-weight:500;
-}
-.forgot-btn:hover{
-  text-decoration:underline;
-}
+    .row {
+      display: flex;
+      gap: 12px;
+    }
 
-.hidden{display:none !important;}
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: var(--input);
+      color: var(--text);
+      margin-bottom: 14px;
+      outline: none;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
 
-/* RESPONSIVE */
-@media(max-width:960px){
-  .auth-card{flex-direction:column;height:auto;}
-  .left,.right{width:100%;}
-  .left{min-height:360px;}
-  .right{padding:35px 25px;}
-}
-</style>
+    input:focus {
+      border-color: var(--primary-glow);
+      box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.25);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    input::placeholder {
+      color: #64748b;
+    }
+
+    button.primary-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, #00c853, #00e676, #1de9b6);
+      color: #022c22;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 230, 118, 0.35);
+    }
+
+    button.primary-btn:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 12px 35px rgba(0, 230, 118, 0.55);
+    }
+
+    .guest-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 200, 0.35);
+      background: rgba(255, 255, 255, 0.08);
+      color: #a7f3d0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    /* AUTH ERROR & FEEDBACK BANNERS */
+    .auth-feedback {
+      display: none;
+      padding: 12px 15px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      animation: fadeSlide 0.3s ease-out;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-feedback.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .auth-feedback.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .auth-feedback.info {
+      display: block;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+    }
+
+    .auth-action-btn {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 12px;
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .auth-action-btn:hover {
+      background: rgba(56, 189, 248, 0.45);
+    }
+
+    .guest-btn:hover {
+      background: rgba(0, 230, 118, 0.18);
+      border-color: var(--primary-glow);
+      box-shadow: 0 8px 25px rgba(0, 255, 140, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .google-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .forgot-wrapper {
+      text-align: right;
+      margin-bottom: 14px;
+    }
+
+    .forgot-btn {
+      background: none;
+      border: none;
+      color: var(--primary-glow);
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .forgot-btn:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:960px) {
+      .auth-card {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .left,
+      .right {
+        width: 100%;
+      }
+
+      .left {
+        min-height: 360px;
+      }
+
+      .right {
+        padding: 35px 25px;
+      }
+    }
+
+    /* ==========================================
+      📲 KISANAI PWA INSTALL — TOP RIGHT
+      ========================================== */
+
+    .pwa-install-container {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      z-index: 99999;
+
+      display: none;
+      text-align: center;
+    }
+
+    /* Main Install Button */
+    .pwa-install-floating {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+
+      width: auto;
+      min-width: 170px;
+      padding: 11px 18px;
+
+      border-radius: 999px;
+      border: 1px solid rgba(0, 230, 118, 0.45);
+
+      background: rgba(3, 20, 15, 0.94);
+
+      color: #a7f3d0;
+
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+
+      cursor: pointer;
+
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.40),
+        0 0 20px rgba(0, 230, 118, 0.12);
+
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    /* Hover */
+    .pwa-install-floating:hover {
+      transform: translateY(-2px);
+
+      background: rgba(0, 230, 118, 0.14);
+      border-color: rgba(0, 230, 118, 0.70);
+
+      box-shadow:
+        0 14px 35px rgba(0, 0, 0, 0.45),
+        0 0 28px rgba(0, 230, 118, 0.25);
+    }
+
+    /* Click */
+    .pwa-install-floating:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    /* Icon */
+    .pwa-icon {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    /* Button text */
+    .pwa-text {
+      white-space: nowrap;
+    }
+
+    /* Small helper text */
+    .pwa-install-hint {
+      margin-top: 6px;
+
+      color: #64748b;
+
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 400;
+
+      opacity: 0.9;
+    }
+
+    /* ==========================================
+          📱 MOBILE
+          ========================================== */
+
+    @media (max-width: 600px) {
+
+      .pwa-install-container {
+        top: 12px;
+        right: 12px;
+      }
+
+      .pwa-install-floating {
+        min-width: 0;
+        padding: 9px 14px;
+        font-size: 0.78rem;
+      }
+
+      .pwa-icon {
+        font-size: 0.95rem;
+      }
+
+      .pwa-install-hint {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="bg-orb orb-1"></div>
-<div class="bg-orb orb-2"></div>
 
-<div class="auth-card" id="authCard">
 
-  <!-- LEFT PANEL WITH 3D DEPTH -->
-  <div class="left">
-    <div class="left-content">
-      <div>
-        <div class="brand-badge">
-          🌱 AI Smart Agriculture
+  <div class="auth-card" id="authCard">
+
+    <!-- LEFT PANEL WITH 3D DEPTH -->
+    <div class="left">
+      <div class="left-content">
+        <div>
+          <div class="brand-badge">
+            🌱 AI Smart Agriculture
+          </div>
+        </div>
+
+        <div class="tagline" style="margin-top:auto; margin-bottom:0;">
+          <h2>Cultivating the Future</h2>
+          <p>Intelligent crop diagnostics and precision agronomy.</p>
         </div>
       </div>
+    </div>
 
-      <div class="tagline" style="margin-top:auto; margin-bottom:0;">
-        <h2>Cultivating the Future</h2>
-        <p>Intelligent crop diagnostics and precision agronomy.</p>
+    <!-- RIGHT PANEL (SIGN UP / SIGN IN / FORGOT) -->
+    <div class="right">
+      <!-- PWA INSTALL -->
+      <!-- 📲 FLOATING PWA INSTALL BUTTON -->
+      <div id="pwaInstallContainer" class="pwa-install-container">
+        <button type="button" id="pwaInstallBtn" class="pwa-install-floating"
+          aria-label="Install KisanAI Smart Agriculture Advisor">
+          <span class="pwa-icon">📲</span>
+          <span class="pwa-text">Install KisanAI App</span>
+        </button>
+
+        <div class="pwa-install-hint">
+          Install KisanAI for faster access
+        </div>
       </div>
+      <!-- SIGN UP BOX -->
+      <div id="signup-box">
+        <div class="auth-header">
+          <h1>Create Account</h1>
+          <p>Already have an account? <a onclick="showLogin()">Sign in here</a></p>
+        </div>
+
+        <div id="signup-feedback" class="auth-feedback"></div>
+
+        <form class="form" id="signup-form">
+          <div class="row">
+            <input placeholder="First name" id="signup-firstname">
+            <input placeholder="Last name" id="signup-lastname">
+          </div>
+
+          <input type="email" id="signup-email" placeholder="Email address" required>
+          <input type="password" id="signup-password" placeholder="Create a secure password" required>
+
+          <button type="submit" class="primary-btn">Create Account</button>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <button type="button" id="google-signup-btn" class="google-btn">Continue with Google</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SIGN IN BOX -->
+      <div id="login-box" class="hidden">
+        <div class="auth-header">
+          <h1>Welcome Back</h1>
+          <p>Don’t have an account yet? <a onclick="showSignup()">Create one now</a></p>
+        </div>
+
+        <div id="login-feedback" class="auth-feedback"></div>
+
+        <form class="form" id="signin-form">
+          <input type="email" id="signin-email" placeholder="Email address" required>
+          <input type="password" id="signin-password" placeholder="Password" required>
+
+          <div class="forgot-wrapper">
+            <button type="button" class="forgot-btn" onclick="showForgot()">Forgot password?</button>
+          </div>
+
+          <button type="submit" class="primary-btn">Sign In</button>
+
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <button type="button" id="google-signin-btn" class="google-btn">Continue with Google</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- FORGOT PASSWORD BOX -->
+      <div id="forgot-box" class="hidden">
+        <div class="auth-header">
+          <h1>Reset Password</h1>
+          <p>Enter your registered email to receive a recovery link</p>
+        </div>
+
+        <div id="forgot-feedback" class="auth-feedback"></div>
+
+        <form class="form" id="forgot-form">
+          <input type="email" id="forgot-email" placeholder="Email address" required>
+          <button type="submit" class="primary-btn">Send Reset Link</button>
+        </form>
+
+        <p style="margin-top:18px;">
+          <a onclick="showLogin()"
+            style="color:var(--primary-glow); cursor:pointer; text-decoration:none; font-size:0.9rem;">← Back to sign
+            in</a>
+        </p>
+      </div>
+
     </div>
   </div>
+  `
+  <!-- 3D INTERACTIVE TILT SYSTEM -->
 
-  <!-- RIGHT PANEL (SIGN UP / SIGN IN / FORGOT) -->
-  <div class="right">
 
-    <!-- SIGN UP BOX -->
-    <div id="signup-box">
-      <div class="auth-header">
-        <h1>Create Account</h1>
-        <p>Already have an account? <a onclick="showLogin()">Sign in here</a></p>
-      </div>
+  <script>
+    function showLogin() {
+      signupBox(false); forgotBox(false); loginBox(true);
+    }
+    function showSignup() {
+      loginBox(false); forgotBox(false); signupBox(true);
+    }
+    function showForgot() {
+      loginBox(false); signupBox(false); forgotBox(true);
+    }
+    function signupBox(v) { document.getElementById("signup-box").classList.toggle("hidden", !v) }
+    function loginBox(v) { document.getElementById("login-box").classList.toggle("hidden", !v) }
+    function forgotBox(v) { document.getElementById("forgot-box").classList.toggle("hidden", !v) }
+  </script>
 
-      <div id="signup-feedback" class="auth-feedback"></div>
+  <!-- FIREBASE AUTH SCRIPTS -->
+  <script type="module" src="/static/js/firebase-config.js"></script>
+  <script type="module" src="/static/js/signup.js"></script>
+  <script type="module" src="/static/js/signin.js"></script>
+  <script type="module" src="/static/js/forgot-password.js"></script>
 
-      <form class="form" id="signup-form">
-        <div class="row">
-          <input placeholder="First name" id="signup-firstname">
-          <input placeholder="Last name" id="signup-lastname">
-        </div>
+  <script>
+    // ==========================================
+    // 📲 KISANAI PWA INSTALLATION
+    // ==========================================
 
-        <input type="email" id="signup-email" placeholder="Email address" required>
-        <input type="password" id="signup-password" placeholder="Create a secure password" required>
+    let deferredPwaPrompt = null;
 
-        <button type="submit" class="primary-btn">Create Account</button>
+    window.addEventListener("beforeinstallprompt", (event) => {
+      console.log("📲 PWA installation is available.");
 
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-          <button type="button" id="google-signup-btn" class="google-btn">Continue with Google</button>
-          <button type="button" class="guest-btn" onclick="continueAsGuest()">🌱 Instant Access: Continue as Guest Farmer</button>
-        </div>
-      </form>
-    </div>
+      // Prevent Chrome from showing its automatic prompt.
+      event.preventDefault();
 
-    <!-- SIGN IN BOX -->
-    <div id="login-box" class="hidden">
-      <div class="auth-header">
-        <h1>Welcome Back</h1>
-        <p>Don’t have an account yet? <a onclick="showSignup()">Create one now</a></p>
-      </div>
+      deferredPwaPrompt = event;
 
-      <div id="login-feedback" class="auth-feedback"></div>
+      const container = document.getElementById("pwaInstallContainer");
+      const button = document.getElementById("pwaInstallBtn");
 
-      <form class="form" id="signin-form">
-        <input type="email" id="signin-email" placeholder="Email address" required>
-        <input type="password" id="signin-password" placeholder="Password" required>
+      if (container) {
+        container.style.display = "block";
+      }
 
-        <div class="forgot-wrapper">
-          <button type="button" class="forgot-btn" onclick="showForgot()">Forgot password?</button>
-        </div>
-
-        <button type="submit" class="primary-btn">Sign In</button>
-
-        <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
-          <button type="button" id="google-signin-btn" class="google-btn">Continue with Google</button>
-          <button type="button" class="guest-btn" onclick="continueAsGuest()">🌱 Instant Access: Continue as Guest Farmer</button>
-        </div>
-      </form>
-    </div>
-
-    <!-- FORGOT PASSWORD BOX -->
-    <div id="forgot-box" class="hidden">
-      <div class="auth-header">
-        <h1>Reset Password</h1>
-        <p>Enter your registered email to receive a recovery link</p>
-      </div>
-
-      <div id="forgot-feedback" class="auth-feedback"></div>
-
-      <form class="form" id="forgot-form">
-        <input type="email" id="forgot-email" placeholder="Email address" required>
-        <button type="submit" class="primary-btn">Send Reset Link</button>
-      </form>
-
-      <p style="margin-top:18px;">
-        <a onclick="showLogin()" style="color:var(--primary-glow); cursor:pointer; text-decoration:none; font-size:0.9rem;">← Back to sign in</a>
-      </p>
-    </div>
-
-  </div>
-</div>
-
-<!-- 3D INTERACTIVE TILT SYSTEM -->
-<script type="module">
-import { init3DEffects } from "/static/js/3d-engine.js";
-init3DEffects();
-</script>
-
-<script>
-function showLogin(){
-  signupBox(false); forgotBox(false); loginBox(true);
-}
-function showSignup(){
-  loginBox(false); forgotBox(false); signupBox(true);
-}
-function showForgot(){
-  loginBox(false); signupBox(false); forgotBox(true);
-}
-function signupBox(v){document.getElementById("signup-box").classList.toggle("hidden",!v)}
-function loginBox(v){document.getElementById("login-box").classList.toggle("hidden",!v)}
-function forgotBox(v){document.getElementById("forgot-box").classList.toggle("hidden",!v)}
-
-async function continueAsGuest() {
-  try {
-    await fetch("/set_session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uid: "guest-farmer-" + Date.now(),
-        email: "guest.farmer@smartagriculture.local",
-        name: "Guest Farmer",
-        provider: "guest"
-      })
+      if (button) {
+        button.disabled = false;
+      }
     });
-  } catch (e) {
-    console.warn("Guest session notice:", e.message);
-  }
-  window.location.href = "/signedin";
-}
-</script>
 
-<!-- FIREBASE AUTH SCRIPTS -->
-<script type="module" src="/static/js/firebase-config.js"></script>
-<script type="module" src="/static/js/signup.js"></script>
-<script type="module" src="/static/js/signin.js"></script>
-<script type="module" src="/static/js/forgot-password.js"></script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const installButton = document.getElementById("pwaInstallBtn");
+
+      if (!installButton) return;
+
+      installButton.addEventListener("click", async () => {
+        if (!deferredPwaPrompt) {
+          console.warn("PWA installation prompt is not available.");
+
+          return;
+        }
+
+        try {
+          await deferredPwaPrompt.prompt();
+
+          const choice = await deferredPwaPrompt.userChoice;
+
+          console.log(
+            "📲 PWA installation result:",
+            choice.outcome
+          );
+
+          if (choice.outcome === "accepted") {
+            console.log("✅ KisanAI PWA installed.");
+          } else {
+            console.log("ℹ️ KisanAI PWA installation cancelled.");
+          }
+
+        } catch (error) {
+          console.error(
+            "❌ PWA installation error:",
+            error
+          );
+        } finally {
+          deferredPwaPrompt = null;
+
+          const container =
+            document.getElementById("pwaInstallContainer");
+
+          if (container) {
+            container.style.display = "none";
+          }
+        }
+      });
+    });
+
+    // Detect if the app is already running as an installed PWA.
+    window.addEventListener("appinstalled", () => {
+      console.log("🌾 KisanAI PWA installation completed.");
+
+      deferredPwaPrompt = null;
+
+      const container =
+        document.getElementById("pwaInstallContainer");
+
+      if (container) {
+        container.style.display = "block";
+      }
+    });
+  </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js", { scope: "/" })
+          .then((registration) => {
+            console.log(
+              "🌾 KisanAI Service Worker registered:",
+              registration.scope
+            );
+          })
+          .catch((error) => {
+            console.error(
+              "❌ KisanAI Service Worker registration failed:",
+              error
+            );
+          });
+      });
+    }
+  </script>
 
 </body>
+
 </html>

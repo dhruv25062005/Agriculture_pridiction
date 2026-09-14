@@ -1,3 +1,6 @@
+# Firebase service account credentials
+firebase-service-account.json
+firebase-service-account.json.json
 # Environment variables & secrets
 .env
 .env.local

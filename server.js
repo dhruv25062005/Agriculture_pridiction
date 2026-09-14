@@ -1,3 +1,4 @@
+import admin from "firebase-admin";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
@@ -11,14 +12,14 @@ import { GoogleGenAI, Type } from "@google/genai";
 
 // Import security and utility modules
 import logger from "./utils/logger.js";
-import { 
-  securityMiddleware, 
+import {
+  securityMiddleware,
   sessionSecurityOptions,
-  strictRateLimiter 
+  strictRateLimiter
 } from "./config/security.js";
-import { 
-  errorHandler, 
-  notFoundHandler, 
+import {
+  errorHandler,
+  notFoundHandler,
   asyncHandler
 } from "./middleware/errorHandler.js";
 import {
@@ -30,10 +31,55 @@ import {
   validateGeminiResponse
 } from "./middleware/validation.js";
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config();
+console.log(
+  "Gemini API key loaded:",
+  Boolean(process.env.GEMINI_API_KEY)
+);
+// Firebase Admin SDK initialization
+// ==========================================
+// FIREBASE ADMIN SDK INITIALIZATION
+// ==========================================
+
+let firebaseAdminInitialized = false;
+
+try {
+  const serviceAccountPath = path.join(
+    __dirname,
+    "firebase-service-account.json.json"
+  );
+
+  if (!fs.existsSync(serviceAccountPath)) {
+    throw new Error(
+      `Firebase service account file not found: ${serviceAccountPath}`
+    );
+  }
+
+  const serviceAccount = JSON.parse(
+    fs.readFileSync(serviceAccountPath, "utf8")
+  );
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+
+  firebaseAdminInitialized = true;
+
+  console.log(
+    "✅ Firebase Admin SDK initialized successfully"
+  );
+} catch (error) {
+  firebaseAdminInitialized = false;
+
+  console.error(
+    "❌ Firebase Admin SDK initialization failed:",
+    error.message
+  );
+}
+
 
 const app = express();
 
@@ -564,13 +610,18 @@ app.get("/sw.js", (req, res) => {
 // ===============================
 // FIREBASE CONFIG API
 // ===============================
+// ===============================
+// FIREBASE CONFIG API
+// ===============================
 app.get("/firebase_config", (req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.setHeader("Cache-Control", "no-store");
+
   const configPath = path.join(__dirname, "firebase-applet-config.json");
-  
+
   let config = {
-    projectId: process.env.FIREBASE_PROJECT_ID || "",
+    apiKey: process.env.FIREBASE_API_KEY || "",
     authDomain: process.env.FIREBASE_AUTH_DOMAIN || "",
+    projectId: process.env.FIREBASE_PROJECT_ID || "",
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "",
     messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "",
     appId: process.env.FIREBASE_APP_ID || ""
@@ -578,11 +629,34 @@ app.get("/firebase_config", (req, res) => {
 
   if (fs.existsSync(configPath)) {
     try {
-      const cfg = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-      config = { ...config, ...cfg };
+      const cfg = JSON.parse(
+        fs.readFileSync(configPath, "utf-8")
+      );
+
+      config = {
+        ...config,
+        ...cfg
+      };
     } catch (e) {
-      logger.warn("Failed to read firebase-applet-config.json: " + e.message);
+      logger.warn(
+        "Failed to read firebase-applet-config.json: " + e.message
+      );
     }
+  }
+
+  const missing = [
+    "apiKey",
+    "authDomain",
+    "projectId",
+    "appId"
+  ].filter(key => !config[key]);
+
+  if (missing.length) {
+    return res.status(500).json({
+      success: false,
+      error: "Firebase is not configured on the server.",
+      missing
+    });
   }
 
   res.json(config);
@@ -591,79 +665,159 @@ app.get("/firebase_config", (req, res) => {
 // ===============================
 // SESSION & USER PROFILE ROUTES
 // ===============================
-app.post("/set_session", (req, res) => {
+app.post("/set_session", async (req, res) => {
   try {
-    req.session.user = { ...(req.session.user || {}), ...req.body };
-    res.json({ status: "success" });
+    const { idToken, provider } = req.body || {};
+
+    if (!idToken) {
+      return res.status(401).json({
+        success: false,
+        status: "unauthenticated",
+        error: "Firebase ID token is required."
+      });
+    }
+
+    if (!firebaseAdminInitialized) {
+      return res.status(500).json({
+        success: false,
+        status: "error",
+        error: "Firebase Admin SDK is not initialized."
+      });
+    }
+
+    // Verify the Firebase ID token on the server.
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+    if (!decodedToken || !decodedToken.uid) {
+      return res.status(401).json({
+        success: false,
+        status: "unauthenticated",
+        error: "Invalid Firebase authentication token."
+      });
+    }
+
+    const verifiedUser = {
+      uid: decodedToken.uid,
+      email: decodedToken.email || "",
+      name:
+        decodedToken.name ||
+        decodedToken.email?.split("@")[0] ||
+        "Smart Farmer",
+      photoURL: decodedToken.picture || "",
+      provider: provider || "firebase",
+      firebaseVerified: true,
+      createdAt: new Date().toISOString()
+    };
+
+    req.session.user = verifiedUser;
+
+    logger.info("✅ Firebase session established", {
+      userId: verifiedUser.uid,
+      provider: verifiedUser.provider
+    });
+
+    return res.json({
+      success: true,
+      status: "authenticated",
+      user: verifiedUser
+    });
   } catch (err) {
-    res.status(400).json({ success: false, error: "Failed to set session" });
+    logger.error(
+      "❌ Firebase session verification failed: " + err.message
+    );
+
+    return res.status(401).json({
+      success: false,
+      status: "unauthenticated",
+      error: "Firebase authentication verification failed."
+    });
   }
 });
 
 app.get("/api/user_session", (req, res) => {
-  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  
-  if (req.session.user) {
+  res.setHeader(
+    "Cache-Control",
+    "no-cache, no-store, must-revalidate"
+  );
+
+  if (req.session?.user?.firebaseVerified === true) {
     return res.json({
       status: "authenticated",
       user: req.session.user
     });
   }
 
-  const guestUser = {
-    uid: "farmer-session-" + (req.sessionID ? req.sessionID.slice(0, 8) : "local"),
-    email: "farmer@smartagriculture.local",
-    name: "Smart Farmer",
-    farmLocation: "Local Agricultural Zone",
-    primaryCrop: "Wheat & Vegetables",
-    farmSize: "5 Acres",
-    provider: "guest",
-    createdAt: new Date().toISOString()
-  };
-
-  req.session.user = guestUser;
-  res.json({
-    status: "guest",
-    user: guestUser
+  return res.status(401).json({
+    status: "unauthenticated",
+    user: null
   });
 });
 
-app.post("/api/update_profile", validateProfileUpdate, strictRateLimiter, (req, res) => {
-  try {
-    const { name, farmLocation, preferredLanguage, primaryCrop, farmSize } = req.body || {};
+app.post(
+  "/api/update_profile",
+  validateProfileUpdate,
+  strictRateLimiter,
+  (req, res) => {
+    try {
+      const {
+        name,
+        farmLocation,
+        preferredLanguage,
+        primaryCrop,
+        farmSize
+      } = req.body || {};
 
-    if (!req.session.user) {
-      req.session.user = {
-        uid: "farmer-session-" + crypto.randomUUID().slice(0, 8),
-        email: "farmer@smartagriculture.local",
-        name: "Smart Farmer",
-        farmLocation: "Local Agricultural Zone",
-        primaryCrop: "Wheat & Vegetables",
-        farmSize: "5 Acres",
-        provider: "guest"
-      };
+      if (!req.session?.user?.firebaseVerified) {
+        return res.status(401).json({
+          success: false,
+          status: "unauthenticated",
+          error: "Authentication required."
+        });
+      }
+
+      const user = req.session.user;
+
+      if (name !== undefined) {
+        user.name = String(name).trim().slice(0, 100);
+      }
+
+      if (farmLocation !== undefined) {
+        user.farmLocation = String(farmLocation).trim().slice(0, 120);
+      }
+
+      if (preferredLanguage !== undefined) {
+        user.preferredLanguage = String(preferredLanguage).trim().slice(0, 10);
+      }
+
+      if (primaryCrop !== undefined) {
+        user.primaryCrop = String(primaryCrop).trim().slice(0, 80);
+      }
+
+      if (farmSize !== undefined) {
+        user.farmSize = String(farmSize).trim().slice(0, 60);
+      }
+
+      user.updatedAt = new Date().toISOString();
+
+      logger.info("Profile updated", {
+        userId: user.uid
+      });
+
+      return res.json({
+        success: true,
+        status: "success",
+        user
+      });
+    } catch (err) {
+      logger.error("Profile update error: " + err.message);
+
+      return res.status(500).json({
+        success: false,
+        error: "Profile update failed"
+      });
     }
-
-    if (name) req.session.user.name = String(name).slice(0, 100);
-    if (farmLocation) req.session.user.farmLocation = String(farmLocation).slice(0, 120);
-    if (preferredLanguage) req.session.user.preferredLanguage = String(preferredLanguage).slice(0, 10);
-    if (primaryCrop) req.session.user.primaryCrop = String(primaryCrop).slice(0, 80);
-    if (farmSize) req.session.user.farmSize = String(farmSize).slice(0, 60);
-    req.session.user.updatedAt = new Date().toISOString();
-
-    logger.info("Profile updated", { userId: req.session.user.uid });
-
-    res.json({
-      success: true,
-      status: "success",
-      user: req.session.user
-    });
-  } catch (err) {
-    logger.error("Profile update error: " + err.message);
-    res.status(500).json({ success: false, error: "Profile update failed" });
   }
-});
-
+);
 // ===============================
 // AUTH VIEW ROUTES
 // ===============================
@@ -676,14 +830,13 @@ app.get(["/template", "/signup", "/signin"], (req, res) => {
 });
 
 app.get("/signedin", (req, res) => {
-  if (!req.session.user) {
-    req.session.user = {
-      uid: "guest-farmer-" + Date.now(),
-      email: "farmer@smartagriculture.local",
-      name: "Guest Farmer"
-    };
+  if (!req.session?.user?.firebaseVerified) {
+    return res.redirect("/signin");
   }
-  res.sendFile(path.join(__dirname, "templates", "signedin.html"));
+
+  return res.sendFile(
+    path.join(__dirname, "templates", "signedin.html")
+  );
 });
 
 app.get(["/signout", "/logout"], (req, res) => {
@@ -790,78 +943,97 @@ const diagnosisResponseSchema = {
 };
 
 async function analyzeLeafWithGemini(ai, base64Image, mimeType, prompt) {
-  // Prioritize high-availability, low-latency vision models, with seamless fallback for peak demand periods
-  const candidateModels = ["gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.8-flash"];
+  const candidateModels = [
+    "gemini-3.8-flash",
+    "gemini-3.6-flash",
+    "gemini-3.1-flash-lite"
+  ];
 
   for (const model of candidateModels) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const aiResponse = await ai.models.generateContent({
-          model,
-          contents: {
-            parts: [
-              {
-                inlineData: {
-                  data: base64Image,
-                  mimeType
-                }
-              },
-              { text: prompt }
-            ]
-          },
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: diagnosisResponseSchema,
-            systemInstruction: "You are an expert plant pathologist, agricultural vision scientist, and entomologist. Inspect crop foliage, stems, fruits, pathology lesions, and pests with precision."
-          }
-        });
+    try {
+      logger.info(`🔎 Trying Gemini model: ${model}`);
 
-        if (aiResponse && aiResponse.text) {
-          let raw = aiResponse.text.trim();
-          if (raw.startsWith("```")) {
-            raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
-          }
-          const firstBrace = raw.indexOf("{");
-          const lastBrace = raw.lastIndexOf("}");
-          if (firstBrace !== -1 && lastBrace > firstBrace) {
-            raw = raw.slice(firstBrace, lastBrace + 1);
-          }
-
-          const parsed = JSON.parse(raw);
-          if (validateGeminiResponse(parsed)) {
-            logger.info("✅ Gemini prediction successful", { model, confidence: parsed.confidence, is_plant: parsed.is_plant });
-            return { data: parsed, modelUsed: model };
-          }
+      const aiResponse = await ai.models.generateContent({
+        model,
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                data: base64Image,
+                mimeType
+              }
+            },
+            {
+              text: prompt
+            }
+          ]
+        },
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: diagnosisResponseSchema,
+          systemInstruction:
+            "You are an expert plant pathologist, agricultural vision scientist, and entomologist. Analyze the supplied plant image accurately and return only valid JSON."
         }
-      } catch (err) {
-        const msg = err.message || "";
-        const isQuota = msg.includes("quota") || msg.includes("resource_exhausted") || msg.includes("429");
-        const isTemporaryHighDemand = msg.includes("503") || msg.includes("UNAVAILABLE") || msg.includes("high demand");
+      });
 
-        if (isTemporaryHighDemand) {
-          logger.info(`Model ${model} experiencing temporary load (503); immediately switching to fallback candidate`);
-          break; // Immediately move to next candidate without hammering the overloaded model
-        }
-
-        if (attempt === 1 && !isQuota) {
-          await new Promise(r => setTimeout(r, 400));
-          continue;
-        }
-        logger.info(`Model ${model} notice: ${msg.slice(0, 100)}`);
-        break;
+      if (!aiResponse?.text) {
+        logger.warn(`⚠️ Empty Gemini response from ${model}`);
+        continue;
       }
+
+      let raw = aiResponse.text.trim();
+
+      if (raw.startsWith("```")) {
+        raw = raw
+          .replace(/^```(?:json)?\s*/i, "")
+          .replace(/\s*```$/, "");
+      }
+
+      const firstBrace = raw.indexOf("{");
+      const lastBrace = raw.lastIndexOf("}");
+
+      if (firstBrace === -1 || lastBrace <= firstBrace) {
+        logger.warn(`⚠️ Invalid JSON returned by ${model}`);
+        continue;
+      }
+
+      raw = raw.slice(firstBrace, lastBrace + 1);
+
+      const parsed = JSON.parse(raw);
+
+      if (!validateGeminiResponse(parsed)) {
+        logger.warn(`⚠️ Gemini response validation failed: ${model}`);
+        continue;
+      }
+
+      logger.info("✅ Gemini prediction successful", {
+        model,
+        confidence: parsed.confidence,
+        is_plant: parsed.is_plant
+      });
+
+      return {
+        data: parsed,
+        modelUsed: model
+      };
+
+    } catch (err) {
+      logger.warn(`❌ Gemini ${model} failed: ${err.message}`);
+
+      // Immediately try the next model.
+      continue;
     }
   }
 
-  logger.info("⚠️ All Gemini models unavailable; using fallback agronomic engine");
+  logger.warn("⚠️ All Gemini models failed; using fallback agronomic engine");
   return null;
 }
 
 // ===============================
 // 🤖 PLANT DISEASE DETECTION
 // ===============================
-app.post("/predict", 
-  upload.single("image"), 
+app.post("/predict",
+  upload.single("image"),
   validateFileUpload,
   strictRateLimiter,
   asyncHandler(async (req, res) => {
@@ -882,7 +1054,7 @@ app.post("/predict",
       if (req.body.client_optical_check) {
         clientOpticalCheck = JSON.parse(req.body.client_optical_check);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     // Quick client-side optical rejection: if client pre-check detected strong human face/skin dominance
     if (clientOpticalCheck?.isLikelyFaceOrSkin) {
@@ -986,7 +1158,7 @@ Return ONLY valid JSON matching this schema:
           const result = aiResult.data;
 
           // Check if AI detected a human face or non-plant object
-          const isNonPlant = result.is_plant === false || 
+          const isNonPlant = result.is_plant === false ||
             (result.disease && /non-plant|human|face|person|none/i.test(result.disease)) ||
             (result.plant && /none|non-plant|human/i.test(result.plant));
 
@@ -1054,7 +1226,7 @@ Return ONLY valid JSON matching this schema:
     // FALLBACK: Agronomic Knowledge Base Engine with Non-Plant Guard
     try {
       const filename = (req.file.originalname || "").toLowerCase();
-      
+
       // Guard against non-plant filenames (selfie, face, human, profile, person, etc.)
       const nonPlantNameKeywords = ["face", "selfie", "person", "human", "man", "woman", "boy", "girl", "avatar", "profile", "me."];
       if (nonPlantNameKeywords.some(kw => filename.includes(kw))) {
@@ -1073,7 +1245,7 @@ Return ONLY valid JSON matching this schema:
         });
       }
 
-      let diseaseKey = Object.keys(KNOWLEDGE_BASE).find(key => 
+      let diseaseKey = Object.keys(KNOWLEDGE_BASE).find(key =>
         filename.includes(key.toLowerCase().replace(/_/g, ""))
       );
 
@@ -1222,10 +1394,10 @@ app.post("/predict_yield", (req, res) => {
     }
 
     const recommendations = [
-      humidity > 75 
+      humidity > 75
         ? "Apply prophylactic bio-fungicide (Trichoderma or Copper Oxychloride) before rainfall."
         : "Maintain standard drip fertigation cycle (20-25mm weekly equivalent).",
-      temp > 32 
+      temp > 32
         ? "Irrigate in late afternoon to reduce transpiration shock and canopy surface heat."
         : "Check soil drainage and apply light organic mulch around root crown.",
       "Conduct scouting for piercing-sucking insect pests (aphids, thrips) along perimeter borders."
@@ -1434,7 +1606,7 @@ app.post("/calculate_profit", validateProfitCalculation, (req, res) => {
   const acres = parseFloat(req.body.acres || 1);
   const customYield = parseFloat(req.body.yield_per_acre || 0);
 
-  const item = MARKET_COMMODITIES.find(c => 
+  const item = MARKET_COMMODITIES.find(c =>
     c.crop.toLowerCase().includes(cropName.toLowerCase())
   ) || MARKET_COMMODITIES[0];
 
@@ -1525,7 +1697,7 @@ app.get("/weather", asyncHandler(async (req, res) => {
   const lonParam = req.query.lon ? parseFloat(req.query.lon) : null;
 
   const hasCoords = latParam !== null && !isNaN(latParam) && lonParam !== null && !isNaN(lonParam);
-  const cacheKey = hasCoords 
+  const cacheKey = hasCoords
     ? `geo:${latParam.toFixed(3)},${lonParam.toFixed(3)}`
     : `city:${(cityParam || placeParam || "delhi").toLowerCase()}`;
 

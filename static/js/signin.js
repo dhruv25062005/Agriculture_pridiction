@@ -114,31 +114,14 @@ export async function establishServerSession(user, provider) {
   );
 
   let data = {};
-  try { data = await response.json(); } catch (_) {}
+  try { data = await response.json(); } catch (_) { }
   if (!response.ok || data.success !== true || data.user?.firebaseVerified !== true) {
     throw new Error(data.error || `Server rejected authentication (HTTP ${response.status}).`);
   }
   return data;
 }
 
-const originalFetch = window.fetch.bind(window);
-window.fetch = async (input, init = {}) => {
-  try {
-    const requestUrl = typeof input === "string" ? input : input.url;
-    const pathname = new URL(requestUrl, window.location.href).pathname;
-    if (pathname === "/set_session" && auth?.currentUser && init?.body) {
-      let payload;
-      try { payload = JSON.parse(init.body); } catch (_) { payload = {}; }
-      if (!payload.idToken) {
-        payload.idToken = await auth.currentUser.getIdToken(true);
-        init = { ...init, body: JSON.stringify(payload) };
-      }
-    }
-  } catch (error) {
-    console.warn("Session token injection failed:", error.message);
-  }
-  return originalFetch(input, init);
-};
+
 
 if (signinForm) {
   signinForm.addEventListener("submit", async (e) => {
