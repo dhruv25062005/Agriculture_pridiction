@@ -2098,14 +2098,31 @@ app.use(errorHandler);
 // ===============================
 // START SERVER
 // ===============================
-const server = app.listen(PORT, "0.0.0.0", () => {
-  logger.info(`🚀 Agriculture Prediction Server running`, {
-    port: PORT,
-    env: process.env.NODE_ENV || "development",
-    nodeVersion: process.version
+export default app;
+
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, "0.0.0.0", () => {
+    logger.info(`🚀 Agriculture Prediction Server running`, {
+      port: PORT,
+      env: process.env.NODE_ENV || "development",
+      nodeVersion: process.version
+    });
+
+    console.log(`✅ Server: http://localhost:${PORT}`);
   });
-  console.log(`✅ Server: http://localhost:${PORT}`);
-});
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE" && PORT !== 3000) {
+      logger.warn(`Port ${PORT} in use, falling back to port 3000...`);
+
+      app.listen(3000, "0.0.0.0", () => {
+        console.log(`✅ Server fallback: http://localhost:3000`);
+      });
+    } else {
+      logger.error("Server listen error: " + err.message);
+    }
+  });
+}
 
 server.on("error", (err) => {
   if (err.code === "EADDRINUSE" && PORT !== 3000) {
