@@ -2096,13 +2096,18 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // ===============================
-// START SERVER
+// VERCEL / EXPRESS ENTRYPOINT
 // ===============================
+
 export default app;
+
+// ===============================
+// LOCAL SERVER
+// ===============================
 
 if (!process.env.VERCEL) {
   const server = app.listen(PORT, "0.0.0.0", () => {
-    logger.info(`🚀 Agriculture Prediction Server running`, {
+    logger.info("🚀 Agriculture Prediction Server running", {
       port: PORT,
       env: process.env.NODE_ENV || "development",
       nodeVersion: process.version
@@ -2113,41 +2118,45 @@ if (!process.env.VERCEL) {
 
   server.on("error", (err) => {
     if (err.code === "EADDRINUSE" && PORT !== 3000) {
-      logger.warn(`Port ${PORT} in use, falling back to port 3000...`);
+      logger.warn(
+        `Port ${PORT} in use, falling back to port 3000...`
+      );
 
       app.listen(3000, "0.0.0.0", () => {
-        console.log(`✅ Server fallback: http://localhost:3000`);
+        console.log(
+          "✅ Server fallback: http://localhost:3000"
+        );
       });
     } else {
-      logger.error("Server listen error: " + err.message);
+      logger.error(
+        "Server listen error: " + err.message
+      );
     }
   });
 }
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE" && PORT !== 3000) {
-    logger.warn(`Port ${PORT} in use, falling back to port 3000...`);
-    app.listen(3000, "0.0.0.0", () => {
-      console.log(`✅ Server fallback: http://localhost:3000`);
-    });
-  } else {
-    logger.error("Server listen error: " + err.message);
-  }
-});
-
 // ===============================
 // GRACEFUL SHUTDOWN
 // ===============================
+
 process.on("SIGTERM", () => {
-  logger.info("SIGTERM signal received: closing HTTP server");
+  logger.info(
+    "SIGTERM signal received: closing HTTP server"
+  );
   process.exit(0);
 });
 
 process.on("uncaughtException", (err) => {
-  logger.error("Uncaught Exception: " + err.message, { stack: err.stack });
+  logger.error(
+    "Uncaught Exception: " + err.message,
+    { stack: err.stack }
+  );
   process.exit(1);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-  logger.error("Unhandled Rejection at promise", { reason });
+process.on("unhandledRejection", (reason) => {
+  logger.error(
+    "Unhandled Rejection",
+    { reason }
+  );
 });
