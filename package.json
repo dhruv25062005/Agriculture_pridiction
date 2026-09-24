@@ -6,20 +6,20 @@
   "engines": {
     "node": "22.x"
   },
-  "scripts": {
-    "dev": "node --watch --import ./app-hardening.js --import ./disease-hardening.js --import ./disease-fast.js --import ./weather-hardening.js --import ./runtime-fixes.js --import ./crop-yield-hardening.js server.js",
-    "start": "node --import ./app-hardening.js --import ./disease-hardening.js --import ./disease-fast.js --import ./weather-hardening.js --import ./runtime-fixes.js --import ./crop-yield-hardening.js server.js",
-    "lint": "npm run check:server && npm run check:models && npm run check:scripts && npm run check:frontend && npm run check:config",
-    "check:server": "node --check server.js && node --check app-hardening.js && node --check disease-hardening.js && node --check disease-fast.js && node --check weather-hardening.js && node --check runtime-fixes.js && node --check crop-yield-hardening.js",
-    "check:models": "node --check models/yield-model-safe.js && node --check models/yield-model-enhanced.js",
-    "check:scripts": "node --check scripts/train-yield-model.mjs",
-    "check:frontend": "node --check static/js/yield-ui-hardening.js && node --check static/js/crop-yield-ui-hardening.js",
-    "check:config": "node --check config/security.js && node --check middleware/validation.js && node --check utils/logger.js",
-    "test": "npm run lint && node --test",
-    "train:yield": "node scripts/train-yield-model.mjs",
-    "build": "npm run lint"
-  },
-  "dependencies": {
+"scripts": {
+  "dev": "node --watch --import ./app-hardening.js --import ./disease-hardening.js --import ./disease-fast.js --import ./weather-hardening.js --import ./runtime-fixes.js --import ./crop-yield-hardening.js server.js",
+  "start": "node --import ./app-hardening.js --import ./disease-hardening.js --import ./disease-fast.js --import ./weather-hardening.js --import ./runtime-fixes.js --import ./crop-yield-hardening.js server.js",
+  "lint": "npm run check:server && npm run check:models && npm run check:scripts && npm run check:frontend && npm run check:config",
+  "check:server": "node --check server.js && node --check app-hardening.js && node --check disease-hardening.js && node --check disease-fast.js && node --check weather-hardening.js && node --check runtime-fixes.js && node --check crop-yield-hardening.js",
+  "check:models": "node --check models/yield-model-safe.js && node --check models/yield-model-enhanced.js",
+  "check:scripts": "node --check scripts/train-yield-model.mjs",
+  "check:frontend": "node --check static/js/yield-ui-hardening.js && node --check static/js/crop-yield-ui-hardening.js",
+  "check:config": "node --check config/security.js && node --check middleware/validation.js && node --check utils/logger.js",
+  "test": "npm run lint && node --test",
+  "train:yield": "node scripts/train-yield-model.mjs",
+  "build": "npm run lint"
+},
+"dependencies": {
     "@google/genai": "^2.21.0",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",

@@ -2544,13 +2544,12 @@
 
     body.theme-sunlight .top-navbar {
       background: rgba(255, 255, 255, 0.92);
-      border-bottom: 2px solid rgba(16, 185, 129, 0.25);
+      border-bottom: 2px solid;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
     }
 
     body.theme-sunlight .brand-title {
-      background: linear-gradient(90deg, #065f46, #047857, #059669);
-      color: transparent;
+      color: #044e3b;
     }
 
     body.theme-sunlight .card-3d {
@@ -3908,6 +3907,7 @@
   <!-- ======================================================== -->
   <script type="module">
     import { TRANSLATIONS } from "/static/js/translations.js";
+
     import {
       auth,
       db,
@@ -3924,13 +3924,27 @@
       OperationType,
       firebaseReady
     } from "/static/js/firebase-config.js";
+
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Make globally accessible
-    window.speechEngine = speechEngine;
+
+    // =========================================================
+    // MAKE TRANSLATIONS AVAILABLE GLOBALLY
+    // =========================================================
+
     window.TRANSLATIONS = TRANSLATIONS;
+
+    console.log("✅ TRANSLATIONS loaded:", window.TRANSLATIONS);
+    console.log("🇮🇳 Hindi test:", window.TRANSLATIONS?.hi?.navScanner);
+
+
+    // =========================================================
+    // FIREBASE GLOBALS
+    // =========================================================
+
     window.firebaseAuth = auth;
     window.firebaseDB = db;
+
     window.doc = doc;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
@@ -3943,65 +3957,313 @@
     window.handleFirestoreError = handleFirestoreError;
     window.OperationType = OperationType;
 
-    // Initialize 3D subtle micro-tilt on cards
-    init3DEffects();
+
+    // =========================================================
+    // SPEECH ENGINE
+    // =========================================================
+
+    (function initSpeechEngine() {
+
+      const synth = window.speechSynthesis;
+
+      if (!synth) {
+        console.error("Speech synthesis is not supported.");
+        window.speechEngine = null;
+        return;
+      }
+
+      function getVoice(lang) {
+        const voices = synth.getVoices();
+
+        // Exact language match
+        let voice = voices.find(
+          v => v.lang.toLowerCase() === lang.toLowerCase()
+        );
+
+        // Base language match
+        if (!voice) {
+          const baseLang = lang.split("-")[0].toLowerCase();
+
+          voice = voices.find(
+            v => v.lang.toLowerCase().startsWith(baseLang)
+          );
+        }
+
+        return voice || null;
+      }
+
+      window.speechEngine = {
+
+        speak(text, lang = "en-US") {
+
+          if (!text || !text.trim()) {
+            console.warn("SpeechEngine: No text provided.");
+            return;
+          }
+
+          try {
+
+            // Stop previous speech
+            synth.cancel();
+
+            const utterance =
+              new SpeechSynthesisUtterance(text);
+
+            utterance.lang = lang;
+            utterance.rate = 0.95;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            const voice = getVoice(lang);
+
+            if (voice) {
+              utterance.voice = voice;
+            }
+
+            utterance.onstart = () => {
+              console.log("🔊 Speech started:", lang);
+            };
+
+            utterance.onend = () => {
+              console.log("🔊 Speech finished");
+            };
+
+            utterance.onerror = (event) => {
+              console.error(
+                "🔊 Speech error:",
+                event.error
+              );
+            };
+
+            synth.speak(utterance);
+
+          } catch (error) {
+
+            console.error(
+              "SpeechEngine error:",
+              error
+            );
+
+          }
+        },
+
+        stop() {
+          synth.cancel();
+        },
+
+        pause() {
+          synth.pause();
+        },
+
+        resume() {
+          synth.resume();
+        }
+      };
+
+      // Chrome loads voices asynchronously
+      synth.onvoiceschanged = () => {
+        console.log(
+          "🔊 Voices loaded:",
+          synth.getVoices().length
+        );
+      };
+
+      console.log("✅ Speech engine initialized");
+
+    })();
+    // Only expose speechEngine if it already exists.
+    function createFarmerFriendlySpeech(diagnosis) {
+        return `
+      Your plant has ${diagnosis.disease}.
+
+      In simple words, this means:
+      ${diagnosis.simple_explanation}
+
+      You may notice:
+      ${diagnosis.symptoms}
+
+      What you should do:
+      ${diagnosis.treatment}
+
+      Important:
+      ${diagnosis.next_steps}
+      `;
+    }
+
+
+    // =========================================================
+    // 3D EFFECTS
+    // =========================================================
+
+    // Only call init3DEffects if the function exists.
+    if (typeof init3DEffects === "function") {
+      init3DEffects();
+    }
+
+
+    // =========================================================
+    // FIREBASE INITIALIZATION
+    // =========================================================
 
     firebaseReady.then((instances) => {
-      const currentAuth = instances?.auth || window.firebaseAuth;
-      const currentDB = instances?.db || window.firebaseDB;
+
+      const currentAuth =
+        instances?.auth || window.firebaseAuth;
+
+      const currentDB =
+        instances?.db || window.firebaseDB;
+
 
       if (currentAuth) {
+
         window.firebaseAuth = currentAuth;
         window.firebaseDB = currentDB;
 
+
         onAuthStateChanged(currentAuth, async (user) => {
-          const statusText = document.getElementById("firebaseStatusText");
-          const userTag = document.getElementById("userProfileTag");
+
+          const statusText =
+            document.getElementById("firebaseStatusText");
+
+          const userTag =
+            document.getElementById("userProfileTag");
+
 
           if (user) {
-            console.log("👤 Firebase Auth User:", user.uid, user.email);
+
+            console.log(
+              "👤 Firebase Auth User:",
+              user.uid,
+              user.email
+            );
+
+
             if (statusText) {
-              statusText.textContent = "☁️ Firestore Live (" + (user.email ? user.email.split("@")[0] : "Farmer") + ")";
+              statusText.textContent =
+                "☁️ Firestore Live (" +
+                (
+                  user.email
+                    ? user.email.split("@")[0]
+                    : "Farmer"
+                ) +
+                ")";
             }
+
+
             if (userTag) {
-              userTag.textContent = user.displayName || user.email || "Smart Farmer";
+              userTag.textContent =
+                user.displayName ||
+                user.email ||
+                "Smart Farmer";
+
               userTag.style.display = "inline-block";
             }
 
-            // Sync farmer profile
+
+            // =================================================
+            // SYNC FARMER PROFILE
+            // =================================================
+
             if (currentDB) {
+
               try {
-                await setDoc(doc(currentDB, "users", user.uid), {
-                  userId: user.uid,
-                  email: user.email || "farmer@agriculture.local",
-                  displayName: user.displayName || "Smart Farmer",
-                  preferredLanguage: window.currentLanguage || "en",
-                  updatedAt: new Date().toISOString()
-                }, { merge: true });
+
+                await setDoc(
+                  doc(currentDB, "users", user.uid),
+                  {
+                    userId: user.uid,
+
+                    email:
+                      user.email ||
+                      "farmer@agriculture.local",
+
+                    displayName:
+                      user.displayName ||
+                      "Smart Farmer",
+
+                    preferredLanguage:
+                      window.currentLanguage ||
+                      "en",
+
+                    updatedAt:
+                      new Date().toISOString()
+                  },
+                  {
+                    merge: true
+                  }
+                );
+
               } catch (e) {
-                console.warn("User profile sync notice:", e);
+
+                console.warn(
+                  "User profile sync notice:",
+                  e
+                );
+
               }
 
-              if (typeof window.initFirestoreScansListener === "function") {
+
+              // =============================================
+              // FIRESTORE SCAN LISTENER
+              // =============================================
+
+              if (
+                typeof window.initFirestoreScansListener ===
+                "function"
+              ) {
                 window.initFirestoreScansListener(user.uid);
               }
-              if (typeof window.initFirestorePlotsListener === "function") {
+
+
+              // =============================================
+              // FIRESTORE PLOTS LISTENER
+              // =============================================
+
+              if (
+                typeof window.initFirestorePlotsListener ===
+                "function"
+              ) {
                 window.initFirestorePlotsListener(user.uid);
               }
+
             }
+
           } else {
-            if (statusText) statusText.textContent = "☁️ Firestore Ready";
+
+            if (statusText) {
+              statusText.textContent =
+                "☁️ Firestore Ready";
+            }
+
           }
+
         });
+
       } else {
-        const statusText = document.getElementById("firebaseStatusText");
-        if (statusText) statusText.textContent = "☁️ Local Demo Mode";
+
+        const statusText =
+          document.getElementById("firebaseStatusText");
+
+        if (statusText) {
+          statusText.textContent =
+            "☁️ Local Demo Mode";
+        }
+
       }
+
+    }).catch((error) => {
+
+      console.error(
+        "❌ Firebase initialization failed:",
+        error
+      );
+
     });
+
   </script>
 
   <script>
-    let currentLanguage = "en";
+    window.currentLanguage = "en";
     let latestDiagnosisData = null;
     let latestFertilizerData = null;
 
@@ -4009,13 +4271,26 @@
     // 🌐 MULTILINGUAL SYSTEM
     // ==========================================
     function changeLanguage(lang) {
-      currentLanguage = lang;
-      const dict = window.TRANSLATIONS[lang] || window.TRANSLATIONS["en"];
+      console.log("LANGUAGE CHANGE CALLED:", lang);
+      console.log("TRANSLATIONS:", window.TRANSLATIONS);
 
-      // Update text elements with matching ID
+      currentLanguage = lang;
+
+      const dict = window.TRANSLATIONS?.[lang];
+
+      console.log("SELECTED DICTIONARY:", dict);
+
+      if (!dict) {
+        console.error("No translation dictionary found for:", lang);
+        return;
+      }
+
       for (const [key, value] of Object.entries(dict)) {
         const el = document.getElementById("t-" + key);
+
         if (el) {
+          console.log("Translating:", key, "→", value);
+
           if (el.tagName === "INPUT" && el.hasAttribute("placeholder")) {
             el.placeholder = value;
           } else {
@@ -4366,7 +4641,7 @@
           const formData = new FormData();
           formData.append("image", file);
           formData.append("method", methodChoice);
-          formData.append("lang", currentLanguage);
+          formData.append("lang", window.currentLanguage);
           if (clientOpticalCheck) {
             formData.append("client_optical_check", JSON.stringify(clientOpticalCheck));
           }
@@ -4384,6 +4659,11 @@
           if (!d) {
             throw new Error("AI service returned empty response");
           }
+
+          const diagnosisReliability =
+            calculateDiagnosisReliability(d);
+
+          d.reliability = diagnosisReliability;
 
           // Handle non-plant or human face detection
           if (d.is_plant === false) {
@@ -4430,7 +4710,7 @@
           }
 
           // Quick audio confirmation if sound enabled
-          if (window.speechEngine && currentLanguage === "hi") {
+          if (window.speechEngine && window.currentLanguage === "hi") {
             window.speechEngine.speak(`पहचाना गया: ${d.disease}, गंभीरता ${d.severity}`, "hi-IN");
           }
 
@@ -4481,7 +4761,7 @@
     }
 
     // Comprehensive Universal Diagnosis Card Markup Builder
-    function generateDiagnosisCardMarkup(d, viewContext = "standard") {
+function generateDiagnosisCardMarkup(d, viewContext = "standard") {
       if (d && d.disease) {
         latestDiagnosisData = d;
       }
@@ -4546,88 +4826,860 @@
       }
 
       // Prevention tips list
-      let preventionHtml = "";
-      if (d.prevention_tips && d.prevention_tips.length > 0) {
-        preventionHtml = `
-            <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">🛡️ Agronomic Prevention & Crop Protection:</h4>
-            <ul class="protocol-list">
-              ${d.prevention_tips.map(tip => `<li><span style="color:#00ffcc;">🌿</span> <span>${tip}</span></li>`).join("")}
-            </ul>
-          `;
+let preventionHtml = "";
+
+if (d.prevention_tips && d.prevention_tips.length > 0) {
+  preventionHtml = `
+    <h4 style="color:#fff; margin-top:16px; font-size:0.95rem;">
+      🛡️ Agronomic Prevention & Crop Protection:
+    </h4>
+
+    <ul class="protocol-list">
+      ${d.prevention_tips
+        .map(tip => `
+          <li>
+            <span style="color:#00ffcc;">🌿</span>
+            <span>${tip}</span>
+          </li>
+        `)
+        .join("")}
+    </ul>
+  `;
+}
+
+
+// ============================================================
+// RELIABILITY INFORMATION
+// ============================================================
+
+const reliability =
+  d.reliability ||
+  calculateDiagnosisReliability(d);
+
+
+// ============================================================
+// RELIABILITY CARD
+// ============================================================
+
+let reliabilityHtml = "";
+
+if (reliability.level === "high") {
+
+  reliabilityHtml = `
+    <div style="
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:rgba(34,197,94,0.08);
+      border:1px solid rgba(34,197,94,0.30);
+    ">
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+      ">
+
+        <span style="
+          color:#22c55e;
+          font-weight:700;
+          font-size:0.88rem;
+        ">
+          🟢 High reliability
+        </span>
+
+        ${
+          reliability.score !== null &&
+          reliability.score !== undefined
+            ? `
+              <span style="
+                color:#cbd5e1;
+                font-size:0.78rem;
+              ">
+                Evidence score: ${reliability.score}/100
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div style="
+        margin-top:5px;
+        color:#94a3b8;
+        font-size:0.78rem;
+        line-height:1.5;
+      ">
+        ${reliability.message}
+      </div>
+
+    </div>
+  `;
+
+} else if (reliability.level === "medium") {
+
+  reliabilityHtml = `
+    <div style="
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:rgba(245,158,11,0.08);
+      border:1px solid rgba(245,158,11,0.35);
+    ">
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+      ">
+
+        <span style="
+          color:#f59e0b;
+          font-weight:700;
+          font-size:0.88rem;
+        ">
+          🟡 Medium reliability
+        </span>
+
+        ${
+          reliability.score !== null &&
+          reliability.score !== undefined
+            ? `
+              <span style="
+                color:#cbd5e1;
+                font-size:0.78rem;
+              ">
+                Evidence score: ${reliability.score}/100
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div style="
+        margin-top:5px;
+        color:#94a3b8;
+        font-size:0.78rem;
+        line-height:1.5;
+      ">
+        ${reliability.message}
+      </div>
+
+    </div>
+  `;
+
+} else if (reliability.level === "low") {
+
+  reliabilityHtml = `
+    <div style="
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:rgba(239,68,68,0.08);
+      border:1px solid rgba(239,68,68,0.35);
+    ">
+
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        flex-wrap:wrap;
+      ">
+
+        <span style="
+          color:#ef4444;
+          font-weight:700;
+          font-size:0.88rem;
+        ">
+          🔴 Low reliability
+        </span>
+
+        ${
+          reliability.score !== null &&
+          reliability.score !== undefined
+            ? `
+              <span style="
+                color:#cbd5e1;
+                font-size:0.78rem;
+              ">
+                Evidence score: ${reliability.score}/100
+              </span>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div style="
+        margin-top:5px;
+        color:#94a3b8;
+        font-size:0.78rem;
+        line-height:1.5;
+      ">
+        ${reliability.message}
+      </div>
+
+      <div style="
+        margin-top:9px;
+        padding:8px 10px;
+        border-radius:8px;
+        background:rgba(239,68,68,0.08);
+        color:#fecaca;
+        font-size:0.78rem;
+      ">
+        📸 For a better result, take another clear photo
+        showing the affected leaf closely.
+      </div>
+
+    </div>
+  `;
+
+} else {
+
+  reliabilityHtml = `
+    <div style="
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:rgba(148,163,184,0.08);
+      border:1px solid rgba(148,163,184,0.25);
+    ">
+
+      <div style="
+        color:#cbd5e1;
+        font-weight:700;
+        font-size:0.88rem;
+      ">
+        ⚪ Reliability unavailable
+      </div>
+
+      <div style="
+        margin-top:5px;
+        color:#94a3b8;
+        font-size:0.78rem;
+        line-height:1.5;
+      ">
+        ${reliability.message}
+      </div>
+
+    </div>
+  `;
+}
+
+
+// ============================================================
+// ORGANISM / FEEDING DAMAGE MECHANISM
+// ============================================================
+
+const culpritCardHtml = `
+  <div class="culprit-card ${
+    isInsect
+      ? "insect"
+      : (isHealthy ? "healthy" : "pathogen")
+  }">
+
+    <div
+      class="culprit-title"
+      style="
+        color:${
+          isInsect
+            ? "#fbbf24"
+            : isHealthy
+              ? "#4ade80"
+              : "#38bdf8"
+        };
+      "
+    >
+
+      ${
+        isInsect
+          ? "🎯 Causal Insect / Arthropod Pest"
+          : isHealthy
+            ? "🌱 Plant Status"
+            : "🎯 Causal Organism / Pathogen"
       }
 
-      // Organism & feeding damage mechanism highlight
-      const culpritCardHtml = `
-          <div class="culprit-card ${isInsect ? 'insect' : (isHealthy ? 'healthy' : 'pathogen')}">
-            <div class="culprit-title" style="color:${isInsect ? '#fbbf24' : isHealthy ? '#4ade80' : '#38bdf8'};">
-              ${isInsect ? '🎯 Causal Insect / Arthropod Pest' : isHealthy ? '🌱 Plant Status' : '🎯 Causal Organism / Pathogen'} (${d.culprit_type || d.cause || 'Biological'})
-            </div>
-            <div class="culprit-name">${d.culprit || (isInsect ? 'Insect Pest Organism' : 'Pathological Microbial Agent')}</div>
-            ${d.damage_mechanism ? `
-              <div class="culprit-mech">
-                <b>${isInsect ? 'Damage Mechanism & Feeding Behavior' : 'Pathological Symptomology'}:</b> ${d.damage_mechanism}
-              </div>` : ''}
+      (${d.culprit_type || d.cause || "Biological"})
+
+    </div>
+
+    <div class="culprit-name">
+      ${
+        d.culprit ||
+        (
+          isInsect
+            ? "Insect Pest Organism"
+            : "Pathological Microbial Agent"
+        )
+      }
+    </div>
+
+    ${
+      d.damage_mechanism
+        ? `
+          <div class="culprit-mech">
+
+            <b>
+              ${
+                isInsect
+                  ? "Damage Mechanism & Feeding Behavior"
+                  : "Pathological Symptomology"
+              }:
+            </b>
+
+            ${d.damage_mechanism}
+
           </div>
-        `;
-
-      return `
-          <div class="diagnosis-result-card" style="border-color:${isInsect ? 'rgba(245,158,11,0.45)' : 'rgba(0,255,170,0.3)'};">
-            <div class="diagnosis-header">
-              <div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-                  ${categoryBadge}
-                  <span class="disease-plant" style="font-weight:700;">${d.plant || "Crop Specimen"}</span>
-                </div>
-                <div class="disease-name">${d.disease}</div>
-                <div style="font-size:0.82rem; color:var(--text-muted); margin-top:4px;">
-                  Cause: <b>${d.cause || "Biological"}</b> • Confidence: <b>${d.confidence}%</b> • Source: <b>${d.source}</b>
-                </div>
-              </div>
-              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-                <span class="severity-pill ${sevClass}">${d.severity}</span>
-                <button type="button" class="btn-tts" onclick="readDiagnosisAloud()">
-                  🔊 Listen / आवाज
-                </button>
-              </div>
-            </div>
-
-            ${culpritCardHtml}
-
-            <p style="font-size:0.92rem; line-height:1.6; color:#e2e8f0; margin:10px 0 14px 0;">
-              ${d.summary || ""}
-            </p>
-
-            <div class="treatment-box">
-              <h4>💊 Recommended Treatment (${d.method || "Standard"} Protocol):</h4>
-              <p style="font-size:0.92rem; line-height:1.6; color:#f0fdf4;">
-                ${d.treatment}
-              </p>
-            </div>
-
-            <div style="display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 6px 0;">
-              <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Organic')">
-                🌱 View Organic / Bio-Control
-              </button>
-              <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px;" onclick="switchTreatmentView('Chemical')">
-                🧪 View Chemical Active
-              </button>
-              <button type="button" class="btn-secondary" style="font-size:0.85rem; padding:8px 16px; border-color:var(--accent-green); color:#34d399;" onclick="askAgronomistAboutCurrentDiagnosis()">
-                🤖 Consult Kisan Mitra AI
-              </button>
-              <button type="button" class="btn-report-export" onclick="exportDiagnosisPDF()">
-                📄 Download / Print PDF Report
-              </button>
-              <button type="button" class="btn-whatsapp-share" onclick="shareDiagnosisWhatsApp()">
-                💬 Share on WhatsApp
-              </button>
-            </div>
-
-            ${protocolHtml}
-            ${preventionHtml}
-          </div>
-        `;
+        `
+        : ""
     }
 
+  </div>
+`;
+
+
+// ============================================================
+// FINAL DIAGNOSIS CARD
+// ============================================================
+
+return `
+  <div
+    class="diagnosis-result-card"
+    style="
+      border-color:${
+        isInsect
+          ? "rgba(245,158,11,0.45)"
+          : "rgba(0,255,170,0.3)"
+      };
+    "
+  >
+
+    <!-- ============================= -->
+    <!-- DIAGNOSIS HEADER -->
+    <!-- ============================= -->
+
+    <div class="diagnosis-header">
+
+      <div>
+
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+          margin-bottom:6px;
+          flex-wrap:wrap;
+        ">
+
+          ${categoryBadge}
+
+          <span
+            class="disease-plant"
+            style="font-weight:700;"
+          >
+            ${d.plant || "Crop Specimen"}
+          </span>
+
+        </div>
+
+
+        <div class="disease-name">
+          ${d.disease || "Unknown Condition"}
+        </div>
+
+
+        <div style="
+          font-size:0.82rem;
+          color:var(--text-muted);
+          margin-top:4px;
+        ">
+
+          Cause:
+          <b>
+            ${d.cause || "Biological"}
+          </b>
+
+          • Source:
+
+          <b>
+            ${d.source || "Vision AI"}
+          </b>
+
+        </div>
+
+
+        <!-- RELIABILITY -->
+
+        ${reliabilityHtml}
+
+      </div>
+
+
+      <!-- ============================= -->
+      <!-- SEVERITY + VOICE -->
+      <!-- ============================= -->
+
+      <div style="
+        display:flex;
+        flex-direction:column;
+        align-items:flex-end;
+        gap:8px;
+      ">
+
+        <span
+          class="severity-pill ${sevClass}"
+        >
+          ${d.severity || "Unknown"}
+        </span>
+
+
+        <button
+          type="button"
+          class="btn-tts"
+          onclick="readDiagnosisAloud()"
+        >
+          🔊 Listen / आवाज
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- ORGANISM / PATHOGEN -->
+    <!-- ============================= -->
+
+    ${culpritCardHtml}
+
+
+    <!-- ============================= -->
+    <!-- SUMMARY -->
+    <!-- ============================= -->
+
+    <p style="
+      font-size:0.92rem;
+      line-height:1.6;
+      color:#e2e8f0;
+      margin:10px 0 14px 0;
+    ">
+      ${d.summary || "No additional summary was provided."}
+    </p>
+
+
+    <!-- ============================= -->
+    <!-- TREATMENT -->
+    <!-- ============================= -->
+
+    <div class="treatment-box">
+
+      <h4>
+        💊 Recommended Treatment
+        (${d.method || "Standard"} Protocol):
+      </h4>
+
+      <p style="
+        font-size:0.92rem;
+        line-height:1.6;
+        color:#f0fdf4;
+      ">
+        ${d.treatment || "Treatment information is not available."}
+      </p>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- ACTION BUTTONS -->
+    <!-- ============================= -->
+
+    <div style="
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:14px 0 6px 0;
+    ">
+
+      <button
+        type="button"
+        class="btn-secondary"
+        style="
+          font-size:0.85rem;
+          padding:8px 16px;
+        "
+        onclick="switchTreatmentView('Organic')"
+      >
+        🌱 View Organic / Bio-Control
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-secondary"
+        style="
+          font-size:0.85rem;
+          padding:8px 16px;
+        "
+        onclick="switchTreatmentView('Chemical')"
+      >
+        🧪 View Chemical Active
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-secondary"
+        style="
+          font-size:0.85rem;
+          padding:8px 16px;
+          border-color:var(--accent-green);
+          color:#34d399;
+        "
+        onclick="askAgronomistAboutCurrentDiagnosis()"
+      >
+        🤖 Consult Kisan Mitra AI
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-report-export"
+        onclick="exportDiagnosisPDF()"
+      >
+        📄 Download / Print PDF Report
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-whatsapp-share"
+        onclick="shareDiagnosisWhatsApp()"
+      >
+        💬 Share on WhatsApp
+      </button>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- RECOVERY PROTOCOL -->
+    <!-- ============================= -->
+
+    ${protocolHtml}
+
+
+    <!-- ============================= -->
+    <!-- PREVENTION -->
+    <!-- ============================= -->
+
+    ${preventionHtml}
+
+  </div>
+`;
+    }
+
+    // ============================================================
+// KISANAI IMAGE QUALITY CHECK
+// Checks whether a photo is suitable for disease diagnosis
+// ============================================================
+
+    async function checkImageQuality(file) {
+      return new Promise((resolve) => {
+        const img = new Image();
+
+        img.onload = () => {
+          try {
+            const width = img.naturalWidth;
+            const height = img.naturalHeight;
+
+            // ----------------------------------------------------
+            // 1. Resolution check
+            // ----------------------------------------------------
+            const minWidth = 224;
+            const minHeight = 224;
+
+            if (width < minWidth || height < minHeight) {
+              resolve({
+                good: false,
+                reason: "low_resolution",
+                message:
+                  "The photo is too small. Please take a clearer and closer photo of the plant leaf."
+              });
+              return;
+            }
+
+            // ----------------------------------------------------
+            // 2. Draw image on small canvas
+            // ----------------------------------------------------
+            const canvas = document.createElement("canvas");
+
+            const sampleWidth = 300;
+            const sampleHeight = Math.round(
+              (height / width) * sampleWidth
+            );
+
+            canvas.width = sampleWidth;
+            canvas.height = sampleHeight;
+
+            const ctx = canvas.getContext("2d", {
+              willReadFrequently: true
+            });
+
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              sampleWidth,
+              sampleHeight
+            );
+
+            const imageData = ctx.getImageData(
+              0,
+              0,
+              sampleWidth,
+              sampleHeight
+            );
+
+            const pixels = imageData.data;
+
+            let brightnessSum = 0;
+            let greenPixels = 0;
+            let darkPixels = 0;
+            let brightPixels = 0;
+
+            const totalPixels = pixels.length / 4;
+
+            // ----------------------------------------------------
+            // 3. Analyze pixels
+            // ----------------------------------------------------
+            for (let i = 0; i < pixels.length; i += 4) {
+              const r = pixels[i];
+              const g = pixels[i + 1];
+              const b = pixels[i + 2];
+
+              const brightness = (r + g + b) / 3;
+
+              brightnessSum += brightness;
+
+              if (brightness < 35) {
+                darkPixels++;
+              }
+
+              if (brightness > 245) {
+                brightPixels++;
+              }
+
+              // Basic green vegetation indicator
+              if (
+                g > r * 1.05 &&
+                g > b * 1.05 &&
+                g > 50
+              ) {
+                greenPixels++;
+              }
+            }
+
+            const averageBrightness =
+              brightnessSum / totalPixels;
+
+            const darkRatio =
+              darkPixels / totalPixels;
+
+            const brightRatio =
+              brightPixels / totalPixels;
+
+            const greenRatio =
+              greenPixels / totalPixels;
+
+            // ----------------------------------------------------
+            // 4. Extremely dark image
+            // ----------------------------------------------------
+            if (
+              averageBrightness < 45 ||
+              darkRatio > 0.65
+            ) {
+              resolve({
+                good: false,
+                reason: "too_dark",
+                message:
+                  "The photo is too dark. Please take the photo in better lighting."
+              });
+              return;
+            }
+
+            // ----------------------------------------------------
+            // 5. Extremely bright image
+            // ----------------------------------------------------
+            if (
+              averageBrightness > 225 ||
+              brightRatio > 0.70
+            ) {
+              resolve({
+                good: false,
+                reason: "too_bright",
+                message:
+                  "The photo is too bright. Avoid direct glare and take another photo."
+              });
+              return;
+            }
+
+            // ----------------------------------------------------
+            // 6. Very little vegetation
+            // ----------------------------------------------------
+            if (greenRatio < 0.03) {
+              resolve({
+                good: false,
+                reason: "no_visible_leaf",
+                message:
+                  "A clear plant leaf was not detected. Please point the camera directly at a crop leaf."
+              });
+              return;
+            }
+
+            // ----------------------------------------------------
+            // 7. Image passed basic checks
+            // ----------------------------------------------------
+            resolve({
+              good: true,
+              width,
+              height,
+              averageBrightness: Math.round(averageBrightness),
+              greenRatio: Number(greenRatio.toFixed(3))
+            });
+
+          } catch (error) {
+            console.warn(
+              "Image quality analysis failed:",
+              error
+            );
+
+            // Do not block diagnosis if the quality checker itself fails.
+            resolve({
+              good: true,
+              checkerError: true
+            });
+          }
+
+          URL.revokeObjectURL(img.src);
+        };
+
+        img.onerror = () => {
+          URL.revokeObjectURL(img.src);
+
+          resolve({
+            good: false,
+            reason: "invalid_image",
+            message:
+              "The selected image could not be read. Please choose another photo."
+          });
+        };
+
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    // ============================================================
+    // KISANAI DIAGNOSIS RELIABILITY CALCULATOR
+    // IMPORTANT: This is NOT model accuracy.
+    // It is a UI-level reliability estimate based on available
+    // evidence such as confidence and image quality.
+    // ============================================================
+
+    function calculateDiagnosisReliability(d, qualityResult = null) {
+      const confidence = Number(d?.confidence);
+
+      // If the backend didn't provide a usable confidence value,
+      // don't pretend that we know it.
+      if (!Number.isFinite(confidence)) {
+        return {
+          score: null,
+          level: "unknown",
+          label: "Reliability unavailable",
+          icon: "⚪",
+          message:
+            "The system could not determine how reliable this diagnosis is. Please verify the result with a clear photo.",
+          color: "#94a3b8"
+        };
+      }
+
+      // Keep the value between 0 and 100.
+      let score = Math.max(0, Math.min(100, confidence));
+
+      // ----------------------------------------------------------
+      // Image-quality adjustment
+      // ----------------------------------------------------------
+
+      if (qualityResult) {
+
+        // Slight penalty if the image was accepted despite
+        // quality concerns.
+        if (qualityResult.averageBrightness !== undefined) {
+
+          if (
+            qualityResult.averageBrightness < 70 ||
+            qualityResult.averageBrightness > 200
+          ) {
+            score -= 5;
+          }
+        }
+
+        // Very little visible green/vegetation means the
+        // diagnosis has less visual evidence.
+        if (
+          qualityResult.greenRatio !== undefined &&
+          qualityResult.greenRatio < 0.08
+        ) {
+          score -= 5;
+        }
+      }
+
+      score = Math.round(
+        Math.max(0, Math.min(100, score))
+      );
+
+      // ----------------------------------------------------------
+      // Reliability levels
+      // ----------------------------------------------------------
+
+      if (score >= 85) {
+        return {
+          score,
+          level: "high",
+          label: "High reliability",
+          icon: "🟢",
+          message:
+            "The image provides reasonably strong evidence for this diagnosis. Still verify symptoms in the field.",
+          color: "#22c55e"
+        };
+      }
+
+      if (score >= 65) {
+        return {
+          score,
+          level: "medium",
+          label: "Medium reliability",
+          icon: "🟡",
+          message:
+            "The system found a possible match, but the result should be confirmed with a clearer photo or additional symptoms.",
+          color: "#f59e0b"
+        };
+      }
+
+      return {
+        score,
+        level: "low",
+        label: "Low reliability",
+        icon: "🔴",
+        message:
+          "The system is not confident enough to rely on this diagnosis. Please take another clear photo.",
+        color: "#ef4444"
+      };
+    }
 
     // Classic Photo Upload & Single-Snapshot Submission
     predictForm.onsubmit = async (e) => {
@@ -4650,7 +5702,7 @@
       const translations = window.TRANSLATIONS || {};
 
       const dict =
-        translations[currentLanguage] ||
+        translations[window.currentLanguage] ||
         translations["en"] ||
         {};
 
@@ -4666,14 +5718,68 @@
 
 
       try {
-        const rawFile = imageInput.files[0];
-        const optimizedFile = await compressImageIfNeeded(rawFile);
+              const rawFile = imageInput.files[0];
+
+              // ============================================================
+              // IMAGE QUALITY CHECK
+              // ============================================================
+
+              const qualityResult = await checkImageQuality(rawFile);
+
+              if (!qualityResult.good) {
+                diseaseResult.innerHTML = `
+                  <div class="diagnosis-result-card"
+                      style="
+                        border-color:rgba(245,158,11,0.7);
+                        background:rgba(245,158,11,0.08);
+                      ">
+
+                    <div style="font-size:42px; margin-bottom:10px;">
+                      📸
+                    </div>
+
+                    <h3 style="color:#fbbf24;">
+                      Photo Not Suitable
+                    </h3>
+
+                    <p style="
+                      margin-top:10px;
+                      line-height:1.6;
+                      color:#e2e8f0;
+                    ">
+                      ${qualityResult.message}
+                    </p>
+
+                    <div style="
+                      margin-top:14px;
+                      padding:12px;
+                      border-radius:12px;
+                      background:rgba(15,23,42,0.7);
+                      color:#cbd5e1;
+                      font-size:0.88rem;
+                    ">
+                      <b>For a better diagnosis:</b><br>
+                      🌿 Keep one leaf clearly visible<br>
+                      ☀️ Use good natural light<br>
+                      📱 Keep the camera steady<br>
+                      🔍 Move closer to the affected area<br>
+                      🚫 Avoid heavy shadows and glare
+                    </div>
+
+                  </div>
+                `;
+
+                return;
+              }
+
+              // Continue with your existing optimization
+              const optimizedFile = await compressImageIfNeeded(rawFile);
         const methodChoice = document.getElementById("treatmentMethodSelect")?.value || "Chemical";
 
         const formData = new FormData();
         formData.append("image", optimizedFile);
         formData.append("method", methodChoice);
-        formData.append("lang", currentLanguage);
+        formData.append("lang", window.currentLanguage);
 
         const res = await fetch("/predict", {
           method: "POST",
@@ -4699,6 +5805,14 @@
         if (!d) {
           throw new Error("Diagnosis service returned empty response");
         }
+          // ============================================================
+        // CALCULATE DIAGNOSIS RELIABILITY
+        // ============================================================
+
+        const diagnosisReliability =
+          calculateDiagnosisReliability(d, qualityResult);
+
+        d.reliability = diagnosisReliability;
 
         // Direct non-plant / human face detection presentation
         if (d.is_plant === false) {
@@ -4762,30 +5876,431 @@
       });
     }
 
+    
     function readDiagnosisAloud() {
-      if (!latestDiagnosisData || !window.speechEngine) return;
-      const speechLang = currentLanguage === "hi" ? "hi-IN"
-        : currentLanguage === "es" ? "es-ES"
-          : currentLanguage === "pa" ? "pa-IN"
-            : currentLanguage === "te" ? "te-IN"
-              : currentLanguage === "bn" ? "bn-IN"
-                : "en-US";
+      if (!latestDiagnosisData || !window.speechEngine) {
+        console.warn("Speech: No diagnosis data or speech engine available.");
+        return;
+      }
+
+      const d = latestDiagnosisData;
+
+      // =========================================================
+      // LANGUAGE
+      // =========================================================
+
+      const currentLang = window.currentLanguage || "en";
+
+      const speechLang =
+        currentLang === "hi" ? "hi-IN" :
+        currentLang === "es" ? "es-ES" :
+        currentLang === "pa" ? "pa-IN" :
+        currentLang === "te" ? "te-IN" :
+        currentLang === "bn" ? "bn-IN" :
+        "en-US";
+
+      // =========================================================
+      // HELPERS
+      // =========================================================
+
+      function cleanText(value) {
+        if (value === null || value === undefined) {
+          return "";
+        }
+
+        if (Array.isArray(value)) {
+          return value
+            .map(item => {
+              if (item && typeof item === "object") {
+                // Handle recovery schedule objects such as:
+                // { day: "...", action: "..." }
+                if (item.day && item.action) {
+                  return `${item.day}. ${item.action}`;
+                }
+
+                return Object.values(item).join(". ");
+              }
+
+              return String(item);
+            })
+            .filter(Boolean)
+            .join(". ");
+        }
+
+        return String(value)
+          .replace(/<[^>]*>/g, " ")
+          .replace(/[*#•_]/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function limitText(text, maxLength = 500) {
+        if (!text) return "";
+
+        text = cleanText(text);
+
+        if (text.length <= maxLength) {
+          return text;
+        }
+
+        const shortened = text.slice(0, maxLength);
+
+        // Avoid cutting in the middle of a word.
+        const lastSpace = shortened.lastIndexOf(" ");
+
+        return (
+          shortened.slice(0, lastSpace > 250 ? lastSpace : maxLength) +
+          "..."
+        );
+      }
+
+      function formatSeverity(value) {
+        const severity = cleanText(value).toLowerCase();
+
+        if (!severity) return "";
+
+        const map = {
+          low: "low",
+          mild: "mild",
+          moderate: "moderate",
+          medium: "moderate",
+          high: "high",
+          severe: "severe",
+          critical: "critical",
+          healthy: "healthy"
+        };
+
+        return map[severity] || cleanText(value);
+      }
+
+      // =========================================================
+      // DIAGNOSIS DATA
+      // =========================================================
+
+      const plant =
+        cleanText(d.plant) ||
+        "your crop";
+
+      const disease =
+        cleanText(d.disease) ||
+        "the detected condition";
+
+      const severity =
+        formatSeverity(d.severity) ||
+        "unknown";
+
+      const summary =
+        limitText(d.summary, 450);
+
+      const treatment =
+        limitText(d.treatment, 650);
+
+      const symptoms =
+        limitText(
+          d.symptoms ||
+          d.damage_mechanism,
+          450
+        );
+
+      const prevention =
+        limitText(d.prevention_tips, 450);
+
+      const recovery =
+        limitText(
+          d.recovery_protocol ||
+          d.recovery_schedule,
+          450
+        );
+
+      const culprit =
+        cleanText(
+          d.culprit ||
+          d.cause
+        );
+
+      // =========================================================
+      // CONDITION TYPE
+      // =========================================================
+
+      const isInsect =
+        Boolean(d.is_insect_caused) ||
+        String(d.category || "")
+          .toLowerCase()
+          .includes("insect") ||
+        String(d.category || "")
+          .toLowerCase()
+          .includes("pest");
+
+      const diseaseLower =
+        disease.toLowerCase();
+
+      const isHealthy =
+        Boolean(d.is_healthy) ||
+        diseaseLower.includes("healthy") ||
+        diseaseLower.includes("no disease") ||
+        diseaseLower.includes("no disease detected");
+
+      // =========================================================
+      // BUILD SPEECH
+      // =========================================================
 
       let readoutText = "";
-      const d = latestDiagnosisData;
-      const isInsect = d.is_insect_caused || (d.category && d.category.includes("Insect"));
 
-      if (currentLanguage === "hi") {
-        if (isInsect) {
-          readoutText = `फसल: ${d.plant}। कीट की पहचान: ${d.disease}। कारक कीट: ${d.culprit || 'कीट'}। गंभीरता: ${d.severity}। रोकथाम और उपचार: ${d.treatment}`;
+      // =========================================================
+      // ENGLISH
+      // =========================================================
+
+      if (currentLang === "en") {
+
+        if (isHealthy) {
+
+          readoutText = [
+            `Good news. Your ${plant} appears healthy.`,
+            `No major disease or pest problem was detected.`,
+            `Continue your normal crop care and regularly check the leaves for any changes.`
+          ].join(" ");
+
+        } else if (isInsect) {
+
+          const parts = [
+            `Here is your simple crop diagnosis.`,
+            `Your ${plant} may be affected by ${disease}.`,
+            `In simple words, this appears to be a pest or insect problem.`,
+            `The current severity is ${severity}.`
+          ];
+
+          if (culprit) {
+            parts.push(`The suspected pest or cause is ${culprit}.`);
+          }
+
+          if (symptoms) {
+            parts.push(`What you may notice: ${symptoms}.`);
+          }
+
+          if (treatment) {
+            parts.push(`What you should do now: ${treatment}.`);
+          }
+
+          if (prevention) {
+            parts.push(`To reduce the chance of the problem spreading: ${prevention}.`);
+          }
+
+          if (recovery) {
+            parts.push(`For recovery: ${recovery}.`);
+          }
+
+          parts.push(
+            `Keep checking the plant regularly. ` +
+            `If the symptoms become worse, scan the plant again for an updated diagnosis.`
+          );
+
+          readoutText = parts.join(" ");
+
         } else {
-          readoutText = `फसल: ${d.plant}। बीमारी: ${d.disease}। रोगकारक: ${d.culprit || 'रोगजनक'}। गंभीरता: ${d.severity}। रोकथाम और उपचार: ${d.treatment}`;
+
+          const parts = [
+            `Here is your simple crop diagnosis.`,
+            `Your ${plant} may be affected by ${disease}.`,
+            `In simple words, the plant is showing signs of this condition.`,
+            `The current severity is ${severity}.`
+          ];
+
+          if (culprit) {
+            parts.push(`The suspected cause is ${culprit}.`);
+          }
+
+          if (symptoms) {
+            parts.push(`What you may notice: ${symptoms}.`);
+          }
+
+          if (treatment) {
+            parts.push(`What you should do now: ${treatment}.`);
+          }
+
+          if (prevention) {
+            parts.push(
+              `To reduce the chance of the problem spreading: ${prevention}.`
+            );
+          }
+
+          if (recovery) {
+            parts.push(`For recovery: ${recovery}.`);
+          }
+
+          parts.push(
+            `Keep monitoring the plant. ` +
+            `If the condition gets worse, take another photo and scan the plant again.`
+          );
+
+          readoutText = parts.join(" ");
         }
+
+      // =========================================================
+      // HINDI
+      // =========================================================
+
+      } else if (currentLang === "hi") {
+
+        if (isHealthy) {
+
+          readoutText = [
+            `अच्छी खबर है। आपकी ${plant} की फसल स्वस्थ दिखाई दे रही है।`,
+            `इस समय किसी बड़ी बीमारी या कीट की समस्या की पहचान नहीं हुई है।`,
+            `फसल की सामान्य देखभाल करते रहें और पत्तियों में होने वाले बदलावों पर ध्यान दें।`
+          ].join(" ");
+
+        } else if (isInsect) {
+
+          const parts = [
+            `आपकी फसल की आसान भाषा में जानकारी।`,
+            `आपकी ${plant} की फसल में ${disease} की पहचान हुई है।`,
+            `आसान शब्दों में, यह किसी कीट या हानिकारक जीव से जुड़ी समस्या हो सकती है।`,
+            `समस्या की गंभीरता ${severity} है।`
+          ];
+
+          if (culprit) {
+            parts.push(`संभावित कारण या कीट है: ${culprit}.`);
+          }
+
+          if (symptoms) {
+            parts.push(`आपको ये लक्षण दिखाई दे सकते हैं: ${symptoms}.`);
+          }
+
+          if (treatment) {
+            parts.push(`अभी आपको यह करना चाहिए: ${treatment}.`);
+          }
+
+          if (prevention) {
+            parts.push(
+              `समस्या को फैलने से रोकने के लिए: ${prevention}.`
+            );
+          }
+
+          if (recovery) {
+            parts.push(
+              `फसल को ठीक करने के लिए: ${recovery}.`
+            );
+          }
+
+          parts.push(
+            `फसल की नियमित जांच करते रहें। ` +
+            `अगर समस्या बढ़ती है, तो दोबारा पौधे की फोटो लेकर जांच करें।`
+          );
+
+          readoutText = parts.join(" ");
+
+        } else {
+
+          const parts = [
+            `आपकी फसल की आसान भाषा में जानकारी।`,
+            `आपकी ${plant} की फसल में ${disease} की पहचान हुई है।`,
+            `आसान शब्दों में, पौधे में इस समस्या के लक्षण दिखाई दे रहे हैं।`,
+            `समस्या की गंभीरता ${severity} है।`
+          ];
+
+          if (culprit) {
+            parts.push(`संभावित कारण है: ${culprit}.`);
+          }
+
+          if (symptoms) {
+            parts.push(
+              `आपको ये लक्षण दिखाई दे सकते हैं: ${symptoms}.`
+            );
+          }
+
+          if (treatment) {
+            parts.push(
+              `अभी आपको यह करना चाहिए: ${treatment}.`
+            );
+          }
+
+          if (prevention) {
+            parts.push(
+              `समस्या को फैलने से रोकने के लिए: ${prevention}.`
+            );
+          }
+
+          if (recovery) {
+            parts.push(
+              `पौधे को ठीक करने के लिए: ${recovery}.`
+            );
+          }
+
+          parts.push(
+            `पौधे पर नजर बनाए रखें। ` +
+            `अगर समस्या बढ़ती है, तो दोबारा फोटो लेकर जांच करें।`
+          );
+
+          readoutText = parts.join(" ");
+        }
+
+      // =========================================================
+      // OTHER LANGUAGES
+      // =========================================================
+
       } else {
-        readoutText = `${d.plant}. Condition diagnosed: ${d.disease}. Organism: ${d.culprit || d.cause}. Severity is ${d.severity}. ${d.summary}. Recommended treatment: ${d.treatment}`;
+
+        /*
+        * Do not pretend this is translated if we don't have
+        * a proper translation here.
+        *
+        * The speech engine will use the selected language voice,
+        * but the content remains based on the available diagnosis.
+        */
+
+        const parts = [
+          `${plant}.`,
+          `${isInsect ? "Pest identified" : "Condition diagnosed"}: ${disease}.`,
+          `Severity: ${severity}.`
+        ];
+
+        if (culprit) {
+          parts.push(`Possible cause: ${culprit}.`);
+        }
+
+        if (symptoms) {
+          parts.push(`Symptoms: ${symptoms}.`);
+        }
+
+        if (treatment) {
+          parts.push(`Recommended action: ${treatment}.`);
+        }
+
+        if (prevention) {
+          parts.push(`Prevention: ${prevention}.`);
+        }
+
+        readoutText = parts.join(" ");
       }
-      window.speechEngine.speak(readoutText, speechLang);
+
+      // =========================================================
+      // FINAL CLEANUP
+      // =========================================================
+
+      readoutText = cleanText(readoutText);
+
+      if (!readoutText) {
+        console.warn("Speech: No readable diagnosis text generated.");
+        return;
+      }
+
+      console.log(
+        "🔊 Farmer-friendly diagnosis:",
+        readoutText
+      );
+
+      // Stop any previous speech before starting this diagnosis.
+      if (typeof window.speechEngine.stop === "function") {
+        window.speechEngine.stop();
+      }
+
+      window.speechEngine.speak(
+        readoutText,
+        speechLang
+      );
     }
+
+
 
     // 📄 PDF / Diagnostic Report Export
     function exportDiagnosisPDF() {
@@ -5536,9 +7051,9 @@
 
     function readWeatherAloud(city, temp, badge, reason, windowHours) {
       if (!window.speechEngine) return;
-      const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+      const speechLang = window.currentLanguage === "hi" ? "hi-IN" : "en-US";
       let readout = "";
-      if (currentLanguage === "hi") {
+      if (window.currentLanguage === "hi") {
         readout = `${city} के लिए मौसम और छिड़काव रिपोर्ट। वर्तमान तापमान ${temp} डिग्री सेल्सियस है। छिड़काव सलाह: ${badge}। ${reason}। छिड़काव का सर्वोत्तम समय ${windowHours} है।`;
       } else {
         readout = `Weather and spray advisory for ${city}. Current temperature is ${temp} degrees celsius. Spray status: ${badge}. ${reason}. Prime spraying window is ${windowHours}.`;
@@ -5986,7 +7501,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: msg,
-            lang: currentLanguage || "en",
+            lang: window.currentLanguage || "en",
             crop: currentCrop
           })
         });
@@ -6014,9 +7529,15 @@
         chatArea.scrollTop = chatArea.scrollHeight;
 
         // Speak aloud if sound enabled
-        if (window.speechEngine && isRecognizingSpeech) {
-          const cleanText = (d.reply || "").replace(/[*#•_-]/g, " ").slice(0, 200);
-          window.speechEngine.speak(cleanText, currentLanguage === "hi" ? "hi-IN" : "en-US");
+        if (window.speechEngine) {
+          const cleanText = (d.reply || "")
+            .replace(/[*#•_-]/g, " ")
+            .slice(0, 200);
+
+          window.speechEngine.speak(
+            cleanText,
+            window.currentLanguage === "hi" ? "hi-IN" : "en-US"
+          );
         }
       } catch (err) {
         console.warn("Chat error:", err.message);
@@ -6076,11 +7597,11 @@
         speechRecognitionInstance.continuous = false;
         speechRecognitionInstance.interimResults = false;
 
-        if (currentLanguage === "hi") speechRecognitionInstance.lang = "hi-IN";
-        else if (currentLanguage === "pa") speechRecognitionInstance.lang = "pa-Guru-IN";
-        else if (currentLanguage === "te") speechRecognitionInstance.lang = "te-IN";
-        else if (currentLanguage === "bn") speechRecognitionInstance.lang = "bn-IN";
-        else if (currentLanguage === "es") speechRecognitionInstance.lang = "es-ES";
+        if (window.currentLanguage === "hi") speechRecognitionInstance.lang = "hi-IN";
+        else if (window.currentLanguage === "pa") speechRecognitionInstance.lang = "pa-Guru-IN";
+        else if (window.currentLanguage === "te") speechRecognitionInstance.lang = "te-IN";
+        else if (window.currentLanguage === "bn") speechRecognitionInstance.lang = "bn-IN";
+        else if (window.currentLanguage === "es") speechRecognitionInstance.lang = "es-ES";
         else speechRecognitionInstance.lang = "en-US";
 
         speechRecognitionInstance.onstart = () => {
@@ -6124,7 +7645,7 @@
       if (meta) meta.remove();
 
       const text = clone.innerText.trim();
-      const speechLang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+      const speechLang = window.currentLanguage === "hi" ? "hi-IN" : "en-US";
       window.speechEngine.speak(text, speechLang);
     }
 
@@ -6162,7 +7683,7 @@
     function speakJournalScan(scanId) {
       const s = journalScansCache[scanId];
       if (!s || !window.speechEngine) return;
-      const lang = currentLanguage === "hi" ? "hi-IN" : "en-US";
+      const lang = window.currentLanguage === "hi" ? "hi-IN" : "en-US";
       const cleanTreatment = (s.treatment || "").replace(/[\r\n]+/g, " ");
       window.speechEngine.speak(`${s.disease} on ${s.plant}. Treatment: ${cleanTreatment}`, lang);
     }
@@ -6633,7 +8154,7 @@
             farmLocation,
             primaryCrop,
             farmSize,
-            preferredLanguage: typeof currentLanguage !== 'undefined' ? currentLanguage : 'en'
+            preferredLanguage: typeof window.currentLanguage !== 'undefined' ? window.currentLanguage : 'en'
           })
         });
 

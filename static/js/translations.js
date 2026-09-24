@@ -6,12 +6,13 @@ export const TRANSLATIONS = {
     logout: "🚪 Logout",
     poweredBy: "⚡ Powered by Gemini 3.8 Vision AI",
     navScanner: "Leaf Pathology",
+    navChat: "🤖 Kisan Mitra AI",
     navFertilizer: "Fertilizer Calculator",
     navWeather: "Spray & Weather",
     navMarket: "Mandi & Profit",
     navJournal: "Scan Journal",
     navYield: "Crop & Yield",
-    
+
     // Disease Scanner
     scannerTitle: "🦠 Vision-Powered AI Plant Doctor",
     scannerDesc: "Inspect any leaf or crop. Gemini AI diagnoses disease, severity, cause, recovery plan, and treatment.",
@@ -76,6 +77,10 @@ export const TRANSLATIONS = {
     humidityInput: "Relative Humidity (%)",
     predictYieldBtn: "Calculate Yield Index",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 Kisan Mitra — 24/7 AI Agronomist & Crop Doctor",
+    chatDesc: "Instant scientific advice for crop diseases, pesticide active ingredients, fertilizer split applications, weather risks, and farm decisions.",
+
     // Journal
     journalTitle: "📖 Scan History & Field Progress Journal",
     journalDesc: "Track disease spread and treatment recovery logs over time.",
@@ -90,6 +95,7 @@ export const TRANSLATIONS = {
     logout: "🚪 लॉगआउट",
     poweredBy: "⚡ जेमिनी 3.8 विज़न एआई द्वारा संचालित",
     navScanner: "पत्ती रोग पहचान",
+    navChat: "🤖 किसान मित्र एआई",
     navFertilizer: "उर्वरक कैलकुलेटर",
     navWeather: "मौसम व छिड़काव",
     navMarket: "मंडी भाव व लाभ",
@@ -160,6 +166,10 @@ export const TRANSLATIONS = {
     humidityInput: "हवा में नमी / आर्द्रता (%)",
     predictYieldBtn: "उपज सूचकांक निकालें",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 किसान मित्र — 24/7 एआई कृषि सलाहकार और फसल डॉक्टर",
+    chatDesc: "फसल रोग, कीटनाशक, खाद, मौसम जोखिम और खेती से जुड़े फैसलों पर तुरंत वैज्ञानिक सलाह लें।",
+
     // Journal
     journalTitle: "📖 स्कैन इतिहास एवं फसल स्वास्थ्य डायरी",
     journalDesc: "बीमारी के लक्षण और सुधार की स्थिति का रिकॉर्ड रखें।",
@@ -174,12 +184,14 @@ export const TRANSLATIONS = {
     logout: "🚪 Cerrar Sesión",
     poweredBy: "⚡ Impulsado por Gemini 3.8 Vision AI",
     navScanner: "Patología Foliar",
+    navChat: "🤖 Kisan Mitra IA",
     navFertilizer: "Calculadora de Fertilizante",
     navWeather: "Clima y Riego",
     navMarket: "Precios y Ganancia",
     navJournal: "Historial de Cultivo",
     navYield: "Cultivo y Rendimiento",
 
+    // Disease Scanner
     scannerTitle: "🦠 Médico de Plantas con IA Visual",
     scannerDesc: "Inspeccione cualquier hoja. La IA diagnostica enfermedades, severidad, causa y tratamiento.",
     dropText: "Haga clic o arrastre la imagen de la hoja aquí",
@@ -195,6 +207,7 @@ export const TRANSLATIONS = {
     preventionMeasures: "🛡️ Medidas Preventivas Agronómicas",
     saveJournal: "💾 Guardar en Diario de Campo",
 
+    // Fertilizer
     fertTitle: "🧪 Calculadora de Fertilizante por Parcela",
     fertDesc: "Calcule los sacos exactos de 50 kg necesarios, costo total y corrección de pH del suelo.",
     plotSizeLabel: "Superficie de la Parcela",
@@ -212,6 +225,7 @@ export const TRANSLATIONS = {
     microPrescription: "Micronutrientes (Zinc/Boro)",
     appSchedule: "Calendario de Aplicación",
 
+    // Weather & Spray
     weatherTitle: "🌦️ Asesor Meteorológico y Pulverización Segura",
     weatherDesc: "Evite el lavado de pesticidas y la deriva del viento. Ventanas óptimas de pulverización.",
     cityPlaceholder: "Ciudad o región agrícola",
@@ -220,6 +234,7 @@ export const TRANSLATIONS = {
     bestSprayTime: "Horario Óptimo de Pulverización",
     irrigationGuidance: "Orientación de Riego",
 
+    // Mandi & Profit
     marketTitle: "💰 Precios de Mercado y Estimador de Ganancias",
     marketDesc: "Cotizaciones de referencia por quintal y proyecciones de rentabilidad neta.",
     selectCropProfit: "Seleccionar Cultivo",
@@ -231,6 +246,7 @@ export const TRANSLATIONS = {
     netProfit: "Ganancia Neta Proyectada",
     roiRate: "Retorno de Inversión (ROI)",
 
+    // Classical Crop & Yield
     cropRecTitle: "🌾 Recomendación Climática de Cultivos",
     tempInput: "Temperatura (°C)",
     rainInput: "Precipitación (mm)",
@@ -239,6 +255,11 @@ export const TRANSLATIONS = {
     humidityInput: "Humedad Relativa (%)",
     predictYieldBtn: "Calcular Rendimiento",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 Kisan Mitra — Agrónomo y Médico de Cultivos con IA 24/7",
+    chatDesc: "Consejos científicos instantáneos sobre enfermedades, pesticidas, fertilización, riesgos climáticos y decisiones agrícolas.",
+
+    // Journal
     journalTitle: "📖 Historial y Diario de Campo",
     journalDesc: "Monitoree la evolución de enfermedades y respuestas a tratamientos.",
     printReport: "🖨️ Imprimir / Exportar Reporte",
@@ -252,12 +273,14 @@ export const TRANSLATIONS = {
     logout: "🚪 ਲੌਗ ਆਉਟ",
     poweredBy: "⚡ ਜੈਮਿਨੀ 3.8 ਵਿਜ਼ਨ ਏਆਈ ਦੁਆਰਾ ਸੰਚਾਲਿਤ",
     navScanner: "ਪੱਤਾ ਰੋਗ ਜਾਂਚ",
+    navChat: "🤖 ਕਿਸਾਨ ਮਿੱਤਰ ਏਆਈ",
     navFertilizer: "ਖਾਦ ਕੈਲਕੁਲੇਟਰ",
     navWeather: "ਮੌਸਮ ਤੇ ਸਪਰੇਅ",
     navMarket: "ਮੰਡੀ ਭਾਅ ਤੇ ਮੁਨਾਫਾ",
     navJournal: "ਖੇਤੀ ਡਾਇਰੀ",
     navYield: "ਫਸਲ ਤੇ ਝਾੜ",
 
+    // Disease Scanner
     scannerTitle: "🦠 ਏਆਈ ਪਲਾਂਟ ਡਾਕਟਰ (ਪੱਤਾ ਰੋਗ ਜਾਂਚ)",
     scannerDesc: "ਕਿਸੇ ਵੀ ਫਸਲ ਦੇ ਪੱਤੇ ਦੀ ਫੋਟੋ ਲਗਾਓ। ਏਆਈ ਬਿਮਾਰੀ, ਗੰਭੀਰਤਾ ਅਤੇ ਇਲਾਜ ਦੱਸੇਗਾ।",
     dropText: "ਇੱਥੇ ਪੌਦੇ ਦੇ ਪੱਤੇ ਦੀ ਫੋਟੋ ਲਗਾਓ ਜਾਂ ਕਲਿੱਕ ਕਰੋ",
@@ -273,6 +296,7 @@ export const TRANSLATIONS = {
     preventionMeasures: "🛡️ ਭਵਿੱਖੀ ਸੁਰੱਖਿਆ ਉਪਾਅ",
     saveJournal: "💾 ਡਾਇਰੀ ਵਿੱਚ ਸੇਵ ਕਰੋ",
 
+    // Fertilizer
     fertTitle: "🧪 ਖੇਤ ਦੇ ਆਕਾਰ ਅਨੁਸਾਰ ਖਾਦ ਕੈਲਕੁਲੇਟਰ",
     fertDesc: "ਆਪਣੇ ਖੇਤ ਲਈ ਯੂਰੀਆ, ਡੀਏਪੀ ਅਤੇ ਪੋਟਾਸ਼ ਦੇ ਗੱਟਿਆਂ ਦੀ ਗਿਣਤੀ ਅਤੇ ਖਰਚਾ ਜਾਣੋ।",
     plotSizeLabel: "ਖੇਤ ਦਾ ਰਕਬਾ",
@@ -290,6 +314,7 @@ export const TRANSLATIONS = {
     microPrescription: "ਸੂਖਮ ਤੱਤ (ਜ਼ਿੰਕ/ਬੋਰੋਨ)",
     appSchedule: "ਖਾਦ ਪਾਉਣ ਦਾ ਸਮਾਂ",
 
+    // Weather & Spray
     weatherTitle: "🌦️ ਮੌਸਮ ਅਤੇ ਸਪਰੇਅ ਸੁਰੱਖਿਆ ਸਲਾਹ",
     weatherDesc: "ਹਵਾ ਵਿੱਚ ਸਪਰੇਅ ਉੱਡਣ ਜਾਂ ਮੀਂਹ ਨਾਲ ਧੁਲਣ ਤੋਂ ਬਚੋ। ਸਹੀ ਸਮਾਂ ਜਾਣੋ।",
     cityPlaceholder: "ਜ਼ਿਲ੍ਹੇ ਜਾਂ ਸ਼ਹਿਰ ਦਾ ਨਾਂ (ਜਿਵੇਂ ਲੁਧਿਆਣਾ, ਜਲੰਧਰ)",
@@ -298,6 +323,7 @@ export const TRANSLATIONS = {
     bestSprayTime: "ਸਪਰੇਅ ਦਾ ਸਭ ਤੋਂ ਵਧੀਆ ਸਮਾਂ",
     irrigationGuidance: "ਪਾਣੀ / ਸਿੰਚਾਈ ਸਲਾਹ",
 
+    // Mandi & Profit
     marketTitle: "💰 ਤਾਜ਼ਾ ਮੰਡੀ ਭਾਅ ਅਤੇ ਸ਼ੁੱਧ ਮੁਨਾਫਾ",
     marketDesc: "ਮੁੱਖ ਫਸਲਾਂ ਦੇ ਮੰਡੀ ਭਾਅ ਅਤੇ ਆਪਣੇ ਖੇਤ ਦਾ ਅਸਲ ਮੁਨਾਫਾ ਕੱਢੋ।",
     selectCropProfit: "ਫਸਲ ਚੁਣੋ",
@@ -309,6 +335,7 @@ export const TRANSLATIONS = {
     netProfit: "ਅੰਦਾਜ਼ਨ ਸ਼ੁੱਧ ਮੁਨਾਫਾ",
     roiRate: "ਮੁਨਾਫਾ ਦਰ (ROI %)",
 
+    // Classical Crop & Yield
     cropRecTitle: "🌾 ਮੌਸਮ ਅਨੁਕੂਲ ਫਸਲ ਸਿਫਾਰਸ਼",
     tempInput: "ਤਾਪਮਾਨ (°C)",
     rainInput: "ਮੀਂਹ (ਮਿਮੀ)",
@@ -317,6 +344,11 @@ export const TRANSLATIONS = {
     humidityInput: "ਨਮੀ (%)",
     predictYieldBtn: "ਝਾੜ ਸੂਚਕ ਕੱਢੋ",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 ਕਿਸਾਨ ਮਿੱਤਰ — 24/7 ਏਆਈ ਖੇਤੀ ਸਲਾਹਕਾਰ ਅਤੇ ਫਸਲ ਡਾਕਟਰ",
+    chatDesc: "ਫਸਲਾਂ ਦੀਆਂ ਬਿਮਾਰੀਆਂ, ਕੀਟਨਾਸ਼ਕ, ਖਾਦ, ਮੌਸਮੀ ਖਤਰੇ ਅਤੇ ਖੇਤੀਬਾੜੀ ਦੇ ਫੈਸਲਿਆਂ ਬਾਰੇ ਤੁਰੰਤ ਵਿਗਿਆਨਕ ਸਲਾਹ ਲਓ।",
+
+    // Journal
     journalTitle: "📖 ਸਕੈਨ ਇਤਿਹਾਸ ਤੇ ਫਸਲ ਡਾਇਰੀ",
     journalDesc: "ਪਿਛਲੇ ਰੋਗਾਂ ਅਤੇ ਇਲਾਜ ਦਾ ਰਿਕਾਰਡ ਰੱਖੋ।",
     printReport: "🖨️ ਰਿਪੋਰਟ ਪ੍ਰਿੰਟ ਕਰੋ",
@@ -330,12 +362,14 @@ export const TRANSLATIONS = {
     logout: "🚪 లాగ్ అవుట్",
     poweredBy: "⚡ జెమిని 3.8 విజన్ ఏఐ ఆధారితం",
     navScanner: "ఆకు తెగుళ్లు",
+    navChat: "🤖 కిసాన్ మిత్ర ఏఐ",
     navFertilizer: "ఎరువుల కాలిక్యులేటర్",
     navWeather: "వాతావరణం & స్ప్రే",
     navMarket: "మార్కెట్ ధరలు & లాభం",
     navJournal: "ఫీల్డ్ డైరీ",
     navYield: "పంట & దిగుబడి",
 
+    // Disease Scanner
     scannerTitle: "🦠 ఏఐ ప్లాంట్ డాక్టర్ (తెగుళ్ల గుర్తింపు)",
     scannerDesc: "ఏ ఆకు ఫోటోనైనా అప్‌లోడ్ చేయండి. ఏఐ రోగం, తీవ్రత మరియు మందులను సూచిస్తుంది.",
     dropText: "ఆకు ఫోటోను ఇక్కడ వేయండి లేదా క్లిక్ చేయండి",
@@ -351,6 +385,7 @@ export const TRANSLATIONS = {
     preventionMeasures: "🛡️ నివారణ చర్యలు",
     saveJournal: "💾 డైరీలో భద్రపరచు",
 
+    // Fertilizer
     fertTitle: "🧪 పొలం విస్తీర్ణానికి ఎరువుల కాలిక్యులేటర్",
     fertDesc: "మీ పొలానికి అవసరమైన యూరియా, డీఏపీ, పొటాష్ బస్తాలు మరియు ఖర్చులను తెలుసుకోండి.",
     plotSizeLabel: "పొలం విస్తీర్ణం",
@@ -368,6 +403,7 @@ export const TRANSLATIONS = {
     microPrescription: "సూక్ష్మ పోషకాలు (జింక్/బోరాన్)",
     appSchedule: "ఎరువులు వేసే సమయాలు",
 
+    // Weather & Spray
     weatherTitle: "🌦️ వాతావరణం & స్ప్రే భద్రతా సలహాదారు",
     weatherDesc: "మందులు వృధా కాకుండా కాపాడండి. సరైన పిచికారీ మరియు నీటిపారుదల సమయం తెలుసుకోండి.",
     cityPlaceholder: "జిల్లా లేదా పట్టణం పేరు (ఉదా: గుంటూరు, వరంగల్)",
@@ -376,6 +412,7 @@ export const TRANSLATIONS = {
     bestSprayTime: "అనుకూలమైన సమయం",
     irrigationGuidance: "నీటిపారుదల సలహా",
 
+    // Mandi & Profit
     marketTitle: "💰 తాజా మార్కెట్ ధరలు & లాభాల అంచనా",
     marketDesc: "ప్రధాన పంటల క్వింటాల్ ధరలు మరియు మీ పొలం నుండి వచ్చే నికర లాభాన్ని లెక్కించండి.",
     selectCropProfit: "పంటను ఎంచుకోండి",
@@ -387,6 +424,7 @@ export const TRANSLATIONS = {
     netProfit: "నికర లాభం",
     roiRate: "లాభ శాతం (ROI %)",
 
+    // Classical Crop & Yield
     cropRecTitle: "🌾 వాతావరణ ఆధారిత పంట సిఫార్సు",
     tempInput: "ఉష్ణోగ్రత (°C)",
     rainInput: "వర్షపాతం (మి.మీ)",
@@ -395,6 +433,11 @@ export const TRANSLATIONS = {
     humidityInput: "తేమ శాతం (%)",
     predictYieldBtn: "సూచికను లెక్కించు",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 కిసాన్ మిత్ర — 24/7 ఏఐ వ్యవసాయ సలహాదారు & పంట డాక్టర్",
+    chatDesc: "పంట వ్యాధులు, పురుగుమందులు, ఎరువులు, వాతావరణ ప్రమాదాలు మరియు వ్యవసాయ నిర్ణయాలపై తక్షణ శాస్త్రీయ సలహా పొందండి.",
+
+    // Journal
     journalTitle: "📖 స్కాన్ రికార్డులు & ఫీల్డ్ డైరీ",
     journalDesc: "గతంలో గుర్తించిన తెగుళ్లు మరియు చికిత్స వివరాల నమోదు.",
     printReport: "🖨️ నివేదికను ప్రింట్ చేయండి",
@@ -408,12 +451,14 @@ export const TRANSLATIONS = {
     logout: "🚪 লগআউট",
     poweredBy: "⚡ জেমিনি ৩.৮ ভিশন এআই চালিত",
     navScanner: "পাতার রোগ",
+    navChat: "🤖 কিষাণ মিত্র এআই",
     navFertilizer: "সার ক্যালকুলেটর",
     navWeather: "আবহাওয়া ও স্প্রে",
     navMarket: "বাজার দর ও লাভ",
     navJournal: "মাঠের ডায়েরি",
     navYield: "ফসল ও ফলন",
 
+    // Disease Scanner
     scannerTitle: "🦠 এআই প্ল্যান্ট ডক্টর (রোগ নির্ণয়)",
     scannerDesc: "যেকোনো ফসলের পাতার ছবি দিন। এআই রোগ, তীব্রতা এবং সঠিক ওষুধ জানাবে।",
     dropText: "গাছের পাতার ছবি এখানে ফেলুন বা ক্লিক করুন",
@@ -429,6 +474,7 @@ export const TRANSLATIONS = {
     preventionMeasures: "🛡️ প্রতিরোধমূলক ব্যবস্থা",
     saveJournal: "💾 ডায়েরিতে সেভ করুন",
 
+    // Fertilizer
     fertTitle: "🧪 জমির পরিমাপ অনুযায়ী সার ও খরচের হিসাব",
     fertDesc: "আপনার জমির জন্য ইউরিয়া, ডিএপি ও পটাশের বস্তার সঠিক পরিমাণ এবং মোট খরচ জানুন।",
     plotSizeLabel: "জমির পরিমাণ",
@@ -446,6 +492,7 @@ export const TRANSLATIONS = {
     microPrescription: "অণুখাদ্য (জিঙ্ক/বোরন)",
     appSchedule: "সার প্রয়োগের সঠিক সময়সূচি",
 
+    // Weather & Spray
     weatherTitle: "🌦️ আবহাওয়া ও নিরাপদ স্প্রে পরামর্শ",
     weatherDesc: "বৃষ্টিতে ওষুধ ধুয়ে যাওয়া বা বাতাসে উড়ে যাওয়া রোধ করুন। স্প্রে ও সেচের সঠিক সময় জানুন।",
     cityPlaceholder: "জেলা বা শহরের নাম (যেমন: বর্ধমান, যশোর, বগুড়া)",
@@ -454,6 +501,7 @@ export const TRANSLATIONS = {
     bestSprayTime: "স্প্রে করার উপযুক্ত সময়",
     irrigationGuidance: "সেচ সংক্রান্ত পরামর্শ",
 
+    // Mandi & Profit
     marketTitle: "💰 বর্তমান বাজার দর এবং লাভের হিসাব",
     marketDesc: "প্রধান ফসলের কুইন্টাল প্রতি দর এবং আপনার জমির আনুমানিক নিট লাভ জানুন।",
     selectCropProfit: "ফসল নির্বাচন করুন",
@@ -465,6 +513,7 @@ export const TRANSLATIONS = {
     netProfit: "প্রত্যাশিত নিট লাভ",
     roiRate: "লাভের হার (ROI %)",
 
+    // Classical Crop & Yield
     cropRecTitle: "🌾 আবহাওয়া ভিত্তিক উপযুক্ত ফসল",
     tempInput: "তাপমাত্রা (°C)",
     rainInput: "বৃষ্টিপাত (মিমি)",
@@ -473,6 +522,11 @@ export const TRANSLATIONS = {
     humidityInput: "আর্দ্রতা (%)",
     predictYieldBtn: "ফলন সূচক বের করুন",
 
+    // Kisan Mitra AI Chat
+    chatTitle: "🤖 কিষাণ মিত্র — ২৪/৭ এআই কৃষি পরামর্শদাতা ও ফসল ডাক্তার",
+    chatDesc: "ফসলের রোগ, কীটনাশক, সার, আবহাওয়ার ঝুঁকি এবং কৃষি সিদ্ধান্ত সম্পর্কে তাৎক্ষণিক বৈজ্ঞানিক পরামর্শ পান।",
+
+    // Journal
     journalTitle: "📖 স্ক্যান ইতিহাস ও ফসলের ডায়েরি",
     journalDesc: "পূর্ববর্তী রোগ এবং নিরাময়ের অগ্রগতি ট্র্যাক করুন।",
     printReport: "🖨️ রিপোর্ট প্রিন্ট / ডাউনলোড করুন",
